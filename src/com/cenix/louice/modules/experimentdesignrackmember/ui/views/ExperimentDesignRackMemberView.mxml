@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<view:MemberView xmlns:fx="http://ns.adobe.com/mxml/2009"
+                 xmlns:s="library://ns.adobe.com/flex/spark"
+                 xmlns:mx="library://ns.adobe.com/flex/mx"
+                 xmlns:components="com.cenix.louice.shared.ui.components.*"
+                 xmlns:view="org.everest.flex.ui.views.*"
+                 width="100%" height="100%"
+                 title="{'ExperimentDesignRack: ' + model.title}" xmlns:rack="com.cenix.louice.shared.ui.components.rack.*">
+    <view:content>
+        <s:Form width="100%">
+            <s:layout>
+                <s:HorizontalLayout />
+            </s:layout>
+            <s:Group>
+                <s:layout>
+                    <s:FormLayout/>
+                </s:layout>
+                <s:FormItem label="Label">
+                    <mx:Label text="{model.label}" selectable="true"/>
+                </s:FormItem>
+            </s:Group>
+        </s:Form>
+    </view:content>
+
+    <view:additionalContent>
+        <s:Group width="100%" height="100%">
+            <s:Group  left="0" right="220" top="10" bottom="10">
+                <s:Rect top="0" right="0" bottom="0" left="0">
+                    <s:fill>
+                        <s:SolidColor color="#FFFFFF" />
+                    </s:fill>
+                </s:Rect>
+                <rack:RackView id="rackView"
+                               tagMap="{model.rack_layout.tagPredicateMap}"
+                               dimension="{ [model.rack_layout.rack_shape.number_rows,
+                               model.rack_layout.rack_shape.number_columns]}" top="24" left="5" right="5" bottom="5"/>
+            </s:Group>
+
+            <rack:TagForHighlightSelector id="tagForHighlightSelector"
+                                          rackView="{rackView}"
+                                          tagPredicates="{model.rack_layout.tagPredicates}"
+                                          width="200" height="100%" right="0"/>
+        </s:Group>
+    </view:additionalContent>
+</view:MemberView>

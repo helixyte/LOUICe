@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Form xmlns:fx="http://ns.adobe.com/mxml/2009"
+        xmlns:s="library://ns.adobe.com/flex/spark"
+        xmlns:mx="library://ns.adobe.com/flex/mx"
+        xmlns:components="com.cenix.louice.shared.ui.components.*"
+        xmlns:components1="org.everest.flex.ui.components.*"
+        width="400" height="200"
+        currentState="{isoRequest.iso_type == ISO_TYPE_STANDARD ? 'standard' : 'library'}">
+    <fx:Declarations>
+    </fx:Declarations>
+    <s:states>
+        <s:State name="standard"/>
+        <s:State name="library"/>
+    </s:states>    
+    <fx:Script>
+        <![CDATA[
+            import com.cenix.louice.modules.isorequestmember.ui.presenters.IsoRequestMemberPresentationModel;
+            
+            import spark.formatters.DateTimeFormatter;
+            
+            private static const ISO_TYPE_STANDARD:String = 'STANDARD';
+
+            [Bindable]
+            public var isoRequest:IsoRequestMemberPresentationModel;
+
+            private static const dtf:DateTimeFormatter = new DateTimeFormatter();
+            dtf.dateTimePattern = "EEEE, MMM dd yyyy";
+            
+        ]]>
+    </fx:Script>
+    <s:layout>
+        <s:HorizontalLayout/>
+    </s:layout>
+    <s:Group>
+        <s:layout>
+            <s:FormLayout/>
+        </s:layout>
+        <s:FormItem includeIn="standard" label="Ticket Number">
+            <components:TracButton ticketNumber="{isoRequest.ticket_number}"/>
+        </s:FormItem>
+        <s:FormItem label="ISO Plates:">
+            <s:Label text="{isoRequest.number_plates}"/>
+        </s:FormItem>
+        <s:FormItem label="Aliquot(s) per ISO plate:">
+            <s:Label text="{isoRequest.number_aliquots}"/>
+        </s:FormItem>
+    </s:Group>
+    <s:Group>
+        <s:layout>
+            <s:FormLayout/>
+        </s:layout>
+        <s:FormItem label="Requester:">
+            <s:Label text="{isoRequest.requester.username}"/>
+        </s:FormItem>
+        <s:FormItem label="Request Owner:">
+            <s:Label text="{isoRequest.owner}"/>
+        </s:FormItem>
+        <s:FormItem label="Plate Set Label:">
+            <s:Label text="{isoRequest.plate_set_label}"/>
+        </s:FormItem>
+    </s:Group>
+    <s:Group>
+        <s:layout>
+            <s:FormLayout/>
+        </s:layout>
+        <s:FormItem includeIn="standard" label="Experiment Metadata:">
+            <components1:MemberLinkButton link="{isoRequest.experiment_metadata}"/>
+        </s:FormItem>
+        <s:FormItem label="ISO Rack Shape:">
+            <s:Label text="{isoRequest.rackShape}"/>
+        </s:FormItem>
+        <s:FormItem label="Delivery Date:">
+            <s:Label text="{dtf.format(isoRequest.delivery_date)}"/>
+        </s:FormItem>
+    </s:Group>
+</s:Form>

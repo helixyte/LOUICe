@@ -1,0 +1,162 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- asdoc\FileDownloadView.mxml -->
+<!---
+    The REST framework can not handle binary data.
+    But we want to handle warnings and errors inside the Flex application.
+    This component uses a URL Loader to encapsulate a download including the handling of error and warnings.
+    Note: the 'save' button is needed due to a security sandbox restriction.
+-->
+<s:TitleWindow xmlns:fx="http://ns.adobe.com/mxml/2009"
+               xmlns:s="library://ns.adobe.com/flex/spark"
+               xmlns:mx="library://ns.adobe.com/flex/mx"
+               width="320" title="Download">
+    <s:layout>
+        <s:VerticalLayout paddingBottom="10" paddingLeft="10" paddingRight="10"
+                          paddingTop="10"/>
+    </s:layout>
+    <fx:Script>
+        <![CDATA[
+            import mx.core.FlexGlobals;
+            import mx.core.IFlexDisplayObject;
+            import mx.events.CloseEvent;
+            import mx.managers.CursorManager;
+            import mx.managers.PopUpManager;
+            
+            import org.as3commons.lang.StringUtils;
+            import org.everest.flex.ui.components.ErrorView;
+            import org.everest.flex.ui.components.WarningView;
+
+            private var fileName:String;
+
+            [Bindable]
+            private var loader:URLLoader;
+
+
+            public static function show(url:String, fileName:String):FileDownloadView{
+                var parent:DisplayObject = 
+                    Sprite(FlexGlobals.topLevelApplication);
+                var  p:IFlexDisplayObject = 
+                    PopUpManager.createPopUp(parent, FileDownloadView, true);
+                FileDownloadView(p).download(url, fileName);
+                PopUpManager.centerPopUp(p);
+                parent.addEventListener(Event.REMOVED_FROM_STAGE, 
+                    function(evnent:Event):void{PopUpManager.removePopUp(p)});
+                CursorManager.removeBusyCursor();
+                return FileDownloadView(p)
+            }
+
+            //Handle the close button and Cancel button.
+            public function close(event:Event=null):void {
+                PopUpManager.removePopUp(this);
+                if(loader != null){
+                    try {
+                        loader.close();
+                    }catch(error:Error){}
+                }
+            }
+
+            //Handle the close button and Cancel button.
+            public function closeWithEvent(event:Event=null):void {
+                close(event);
+                dispatchEvent(new CloseEvent(CloseEvent.CLOSE));
+            }
+
+            public function download(url:String, fileName:String):void
+            {
+                if(url.indexOf('flashfilter') < 0)
+                {
+                    url += url.indexOf('?') < 0 ? '?flashfilter=true' : '&flashfilter=true';
+                }
+                this.fileName = fileName;
+                loader = new URLLoader();
+                loader.dataFormat = URLLoaderDataFormat.BINARY;
+                progressBar.label = "loading ..";
+                configureListeners(loader);
+
+                var request:URLRequest = new URLRequest(url);
+                try {
+                    loader.load(request);
+                } catch (error:Error) {
+                    ErrorView.show("Unable to load requested URL.");
+                }
+            }
+
+            private function configureListeners(dispatcher:EventDispatcher):void {
+                dispatcher.addEventListener(Event.COMPLETE, completeHandler);
+                dispatcher.addEventListener(IOErrorEvent.IO_ERROR, ioErrorHandler);
+            }
+
+            private function completeHandler(event:Event):void {
+                var byteArray:ByteArray = ByteArray(loader.data);
+
+                //this is bad .. but flex does not allow us to use error response codes
+                //and the REST framework can not cope with binary data :-(
+                if(byteArray.length > 60){
+                    var str:String = byteArray.readMultiByte(60,'UTF-8');
+
+                    //examine if this is an error response from the flexfilter
+                    if (str.indexOf('<error>') > 0)
+                    {
+                        str = byteArray.toString();
+                        var message:String = StringUtils.substringBetween(str,'<message>','</message>')
+                        if (str.indexOf('<code>307 Temporary Redirect</code>') > 0)
+                        {
+                            //error seems to be a warning .. let us ask the user!
+                            WarningView.show(message, function():void {
+                                //resend the original request to the redirect location
+                                var newUrl:String = StringUtils.substringBetween(str,'<location>','</location>')
+                                download(newUrl, fileName);
+                            },close);
+
+                        } else {
+                            //show the error and close myself
+                            ErrorView.show(message);
+                            close();
+                        }
+                    } else {
+                        byteArray.position = 0;
+                        buttonSave.enabled = true;
+                        animation.play([buttonSave]);
+//                        buttonSave.setStyle('chromeColor','#ccFFcc');
+                    }
+
+                }
+                progressBar.label = "finished!";
+
+
+            }
+
+            private function ioErrorHandler(event:IOErrorEvent):void {
+                ErrorView.show("ioErrorHandler: " + event);
+            }
+
+
+            protected function saveFile(event:Event):void
+            {
+                var fileReference:FileReference = new FileReference();
+                    fileReference.addEventListener(Event.COMPLETE,closeWithEvent);
+                    fileReference.save(loader.data, fileName);
+            }
+
+        ]]>
+    </fx:Script>
+    <fx:Declarations>
+        <s:Sequence id="animation" repeatCount="0">
+            <s:AnimateColor colorFrom="{btClose.getStyle('chromeColor')}"
+                            colorPropertyName="chromeColor" colorTo="#99ff00"
+                            duration="600"/>
+            <s:AnimateColor colorFrom="#99ff00" colorPropertyName="chromeColor"
+                            colorTo="{btClose.getStyle('chromeColor')}"
+                            duration="600"/>
+        </s:Sequence>
+    </fx:Declarations>
+    <mx:ProgressBar id="progressBar" visible="true" width="100%" height="30"
+                    label="" direction="right" labelPlacement="center"
+                    mode="event" source="{loader}"/>
+    <s:HGroup width="100%" horizontalAlign="center">
+        <s:Button id="buttonSave" label="Save File" click="saveFile(event)"
+                  creationCompleteEffect="glow" enabled="false"
+                  fontWeight="bold"/>
+        <s:Button id="btClose" label="Close" click="close()"/>
+    </s:HGroup>
+</s:TitleWindow>

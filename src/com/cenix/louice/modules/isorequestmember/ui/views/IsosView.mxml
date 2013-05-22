@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Group xmlns:fx="http://ns.adobe.com/mxml/2009"
+         xmlns:s="library://ns.adobe.com/flex/spark"
+         xmlns:mx="library://ns.adobe.com/flex/mx"
+         xmlns:components="com.cenix.louice.modules.isorequestmember.ui.components.*"
+         creationComplete="creationCompleteHandler(event)" >
+    <fx:Script>
+        <![CDATA[
+            import com.cenix.louice.modules.isorequestmember.ui.presenters.IsoRequestMemberPresentationModel;
+            import com.cenix.louice.shared.model.vos.IsoMember;
+            import com.cenix.louice.shared.model.vos.JobMember;
+
+            import mx.events.FlexEvent;
+
+            import spark.events.IndexChangeEvent;
+
+            [Bindable]
+            public var isoRequest:IsoRequestMemberPresentationModel;
+
+            protected function creationCompleteHandler(event:FlexEvent):void
+            {
+                isoRequest.addEventListener(Event.CHANGE, updateList);
+            }
+
+            protected function updateList(event:Event=null):void
+            {
+                isoList.selectedIndex = isoRequest.selectedIsoIndex;
+            }
+
+            protected function isoList_changeHandler(event:IndexChangeEvent):void
+            {
+                isoRequest.selectedIsoIndex = event.newIndex;
+            }
+
+        ]]>
+    </fx:Script>
+    <s:HGroup width="100%" height="100%" gap="-1" paddingTop="6" paddingLeft="4" paddingBottom="6" paddingRight="6">
+
+        <s:List  id="isoList" height="100%" width="200"
+                 dataProvider="{isoRequest.isos}"
+                 fontWeight="bold" contentBackgroundColor="#FFFFFF" borderColor="#FFFFFF"
+                 selectionColor="#EBF4FF" borderVisible="false"
+                 change="isoList_changeHandler(event)"
+                 selectedIndex="{isoRequest.selectedIsoIndex}" >
+            <s:itemRenderer>
+                <fx:Component>
+                    <s:ItemRenderer height="28" >
+                        <fx:Script>
+                            <![CDATA[
+                                import com.cenix.louice.shared.model.vos.IsoMember;
+                                [Bindable]
+                                private var color:uint = 0x000000;
+                                [Bindable]
+                                private var title:String = "";
+
+                                override public function set data(value:Object):void
+                                {
+                                    super.data = value;
+                                    if (data is IsoMember)
+                                    {
+                                        title = " - " + data.label;
+                                    } else {
+                                        title = data.label;
+                                    }
+
+                                    if (data.status == 'cancelled')
+                                    {
+                                        color = 0xFF0000;
+                                    } else if (data.status == 'done')
+                                    {
+                                        color = 0x00CC33;
+                                    } else {
+                                        color = 0x000000;
+                                    }
+                                }
+                            ]]>
+                        </fx:Script>
+                        <s:Line left="0" right="0" top="0">
+                            <s:stroke>
+                                <s:SolidColorStroke color="#FFFFFF" weight="2" />
+                            </s:stroke>
+                        </s:Line>
+                        <s:Line left="0" bottom="0" top="0">
+                            <s:stroke>
+                                <s:SolidColorStroke color="#FFFFFF" weight="2" />
+                            </s:stroke>
+                        </s:Line>
+                        <s:Label text="{title}" color="{color}" paddingLeft="8" paddingTop="8"/>
+                    </s:ItemRenderer>
+                </fx:Component>
+            </s:itemRenderer>
+        </s:List>
+        <s:Line height="100%">
+            <s:stroke>
+                <s:SolidColorStroke color="#EBF4FF" caps="square" weight="8"/>
+            </s:stroke>
+        </s:Line>
+        <s:Scroller width="100%" height="100%">
+            <s:Group width="100%" height="100%">
+                <components:IsoForm width="100%" height="100%" visible="{isoList.selectedItem is IsoMember}"
+                                    isoRequest="{isoRequest}"
+                                    iso="{(isoList.selectedItem is IsoMember) ? isoList.selectedItem : null}" />
+
+                <components:JobForm width="100%" height="100%" visible="{isoList.selectedItem is JobMember}"
+                                    isoRequest="{isoRequest}"
+                                    isoJob="{(isoList.selectedItem is JobMember) ? isoList.selectedItem : null}" />
+            </s:Group>
+        </s:Scroller>
+
+    </s:HGroup>
+    <s:BusyIndicator top="13" left="170" visible="{isoRequest.isosLoading}"/>
+
+</s:Group>

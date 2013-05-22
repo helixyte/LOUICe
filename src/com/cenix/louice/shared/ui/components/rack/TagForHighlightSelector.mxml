@@ -1,0 +1,245 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Group xmlns:fx="http://ns.adobe.com/mxml/2009"
+         xmlns:s="library://ns.adobe.com/flex/spark"
+         xmlns:mx="library://ns.adobe.com/flex/mx"
+         width="180" height="300" contentBackgroundColor="#EBF4FF"
+         creationComplete="creationCompleteHandler(event)">
+
+    <fx:Script>
+        <![CDATA[
+            import com.cenix.louice.shared.model.vos.TagPredicate;
+            
+            import mx.collections.ArrayCollection;
+            import mx.events.FlexEvent;
+            
+            import spark.events.IndexChangeEvent;
+
+            [Bindable]
+            public var tagPredicates:ArrayCollection;
+
+            private var rackViews:Array;
+
+            public function addRackView(rackView:RackView):void
+            {
+                if(rackViews == null)
+                {
+                    rackViews = new Array();
+                }
+                rackViews.push(rackView);
+            }
+
+            public function set rackView(rackView:RackView):void
+            {
+                rackViews = [rackView];
+            }
+
+            public function refresh():void
+            {
+                if (list.selectedIndex > -1)
+                {
+                    selectionChange();
+                }
+
+                if (rackSearch.text.length > 0)
+                {
+                    highlightSearchTerm();
+                }
+            }
+
+            protected function creationCompleteHandler(event:FlexEvent):void
+            {
+                list.addEventListener(IndexChangeEvent.CHANGE, selectionChange);
+            }
+
+            protected function selectionChange(event:Event=null):void
+            {
+                //update all associated racks
+                var tagPredicate:TagPredicate = list.selectedItem;
+
+                if (rackViews != null && rackViews.length > 0 && tagPredicate != null)
+                {
+                    var colorLabelMap:Dictionary = new Dictionary();
+                    var i:int = 1;
+
+                    if(tagPredicate.values.length > 15)
+                    {
+                        for each (var v:String in tagPredicate.values)
+                        {
+                            colorLabelMap[v] = [16765184, i++];
+                        }
+                    } else {
+                        for each (var v1:String in tagPredicate.values)
+                        {
+                            colorLabelMap[v1] = [RackColorMap.COLORS[i++], ''];
+                        }
+                    }
+
+                    for each (var rackView:RackView in rackViews)
+                    {
+                        rackView.highlightTagPredicate(tagPredicate, colorLabelMap);
+                    }
+
+
+                } else {
+                    trace("NO rack view is associated with this selector.");
+                }
+            }
+
+//            [Bindable]
+//            public function get tagPredicates():ArrayCollection
+//            {
+//                return _tagPredicates;
+//            }
+//
+//            public function set tagPredicates(value:ArrayCollection):void
+//            {
+//                _tagPredicates = value;
+//
+//            }
+
+            private function highlightSearchTerm(event:Event=null):void
+            {
+//                list.selectedIndex = -1;
+                for each (var rackView:RackView in rackViews)
+                {
+                    rackView.highlightSearchTerm(rackSearch.text);
+                }
+            }
+
+        ]]>
+    </fx:Script>
+    <s:Rect left="0" right="0" top="0" bottom="0" radiusX="3" radiusY="3">
+        <s:fill>
+            <s:SolidColor color="#EBF4FF"/>
+        </s:fill>
+    </s:Rect>
+        <s:Label left="5" height="20" fontWeight="bold" text="Search:"
+                 verticalAlign="bottom"/>
+        <s:TextInput id="rackSearch" left="10" right="15" top="25"
+                     borderAlpha="0.5" change="{highlightSearchTerm()}"
+                     contentBackgroundAlpha="0.5"
+                     contentBackgroundColor="0xFFFFFF"/>
+        <s:Label left="5" top="57" height="20" fontWeight="bold" text="Factor:"
+                 verticalAlign="bottom"/>
+        <s:List id="list" left="5" right="5" top="80" bottom="20"
+                borderVisible="false" dataProvider="{tagPredicates}">
+            <s:itemRenderer>
+                <fx:Component>
+                    <s:ItemRenderer width="100%">
+                        <s:states>
+                            <s:State name="normal"/>
+                            <s:State name="hovered"/>
+                            <s:State name="selected"/>
+                            <s:State name="selectedAndShowsCaret"/>
+                        </s:states>
+
+                        <fx:Script>
+                            <![CDATA[
+                                import com.cenix.louice.shared.model.vos.TagPredicate;
+                                import com.cenix.louice.shared.ui.components.rack.RackColorMap;
+                                
+                                import mx.collections.ArrayCollection;
+
+                                [Bindable]
+                                protected var tagHighlightColors:Dictionary;
+
+                                override public function set data(value:Object):void {
+
+                                    super.data = value;
+
+                                    if (data == null) // a renderer's data is set to null when it goes out of view
+                                        return;
+
+                                    var tagPredicate:TagPredicate = TagPredicate(value);
+
+                                    predicateLabel.text = tagPredicate.label;
+
+                                    //build the list of colors
+                                    var colors:ArrayCollection = new ArrayCollection();
+                                    var i:int = 1;
+
+                                    if(tagPredicate.values.length > 15)
+                                    {
+                                        for each (var v:String in tagPredicate.values)
+                                        {
+                                            colors.addItem(new ArrayCollection([ i++ + '. ' + v, 16765184]));
+                                        }
+                                    } else {
+                                        for each (var v1:String in tagPredicate.values)
+                                        {
+                                            colors.addItem(new ArrayCollection([v1, RackColorMap.COLORS[i++]]));
+                                        }
+                                    }
+
+                                    tagColorList.dataProvider = colors;
+                                }
+                            ]]>
+                        </fx:Script>
+                        <s:transitions>
+                            <mx:Transition fromState="hovered"
+                                           toState="selectedAndShowsCaret">
+                                <s:Animate duration="200" target="{tagColorList}">
+                                    <s:SimpleMotionPath property="height"/>
+                                </s:Animate>
+                            </mx:Transition>
+                            <mx:Transition fromState="selectedAndShowsCaret"
+                                           toState="normal">
+                                <s:Animate duration="200" target="{tagColorList}">
+                                    <s:SimpleMotionPath property="height"/>
+                                </s:Animate>
+                            </mx:Transition>
+                        </s:transitions>
+
+                        <s:Group width="100%">
+                            <s:Rect left="0" right="0" top="0" bottom="0"
+                                    radiusX="3" radiusY="3">
+                                <s:fill>
+                                    <s:SolidColor color="#ffffff"
+                                                  color.hovered="#65A3FF"
+                                                  color.selected="#ebf4ff"
+                                                  color.selectedAndShowsCaret="#ebf4ff"/>
+                                </s:fill>
+                                <s:stroke>
+                                    <s:SolidColorStroke color="#ebf4ff"
+                                                        color.selectedAndShowsCaret="#ebf4ff"/>
+                                </s:stroke>
+                            </s:Rect>
+                            <s:Label id="predicateLabel" left="5"
+                                     fontWeight="bold" paddingBottom="3"
+                                     paddingTop="7"/>
+                            <s:DataGroup id="tagColorList" top="24" width="100%"
+                                         disabledAlpha="1" enabled="false"
+                                         height.hovered="0"
+                                         height.normal="0">
+                                <s:layout>
+                                    <s:VerticalLayout gap="0"
+                                                      useVirtualLayout="true"/>
+                                </s:layout>
+                                <s:itemRenderer>
+                                    <fx:Component>
+                                        <s:ItemRenderer width="100%"
+                                                        height="100%">
+                                            <s:Group width="100%">
+                                                <s:Rect left="10" right="10"
+                                                        top="0" bottom="2"
+                                                        radiusX="5" radiusY="5">
+                                                    <s:fill>
+                                                        <s:SolidColor color="{data.getItemAt(1)}"/>
+                                                    </s:fill>
+                                                </s:Rect>
+                                                <s:Label fontSize="12"
+                                                         paddingBottom="6"
+                                                         paddingLeft="15"
+                                                         paddingTop="6"
+                                                         text="{data.getItemAt(0)}"/>
+                                            </s:Group>
+                                        </s:ItemRenderer>
+                                    </fx:Component>
+                                </s:itemRenderer>
+                            </s:DataGroup>
+                        </s:Group>
+                    </s:ItemRenderer>
+                </fx:Component>
+            </s:itemRenderer>
+        </s:List>
+</s:Group>

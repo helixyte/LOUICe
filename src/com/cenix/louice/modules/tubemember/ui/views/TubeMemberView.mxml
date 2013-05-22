@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<views1:MemberView xmlns:fx="http://ns.adobe.com/mxml/2009"
+                   xmlns:s="library://ns.adobe.com/flex/spark"
+                   xmlns:mx="library://ns.adobe.com/flex/mx"
+                   xmlns:components="org.everest.flex.ui.components.*"
+                   xmlns:views="com.cenix.louice.modules.devicemember.ui.views.*"
+                   xmlns:view="org.everest.flex.ui.views.*"
+                   xmlns:views1="org.everest.flex.ui.views.*"
+                   width="100%" height="100%">
+    <fx:Script>
+        <![CDATA[
+            import com.cenix.louice.shared.utils.UnitConvUtils;
+        ]]>
+    </fx:Script>
+ 
+    <s:Label fontSize="14" fontWeight="bold" text="{'Tube: ' + model.title}"/>
+
+    <s:Form width="100%">
+        <s:FormItem width="100%" label="Barcode">
+            <s:Label text="{model.barcode}"/>
+        </s:FormItem>
+        <s:FormItem width="100%" label="Rack">
+            <components:MemberLinkButton link="{model.tube_rack}"/>
+        </s:FormItem>
+        <s:FormItem width="100%" label="Rack Specs">
+            <components:MemberLinkButton link="{model.tube_rack_specs}"/>
+        </s:FormItem>
+        <s:FormItem width="100%" label="Rack Location">
+            <components:MemberLinkButton link="{model.location}"/>
+        </s:FormItem>
+        <s:FormItem width="100%" label="Rack Position">
+            <s:Label text="{model.position}"/>
+        </s:FormItem>
+        <s:FormItem width="100%" label="Tube Specs">
+            <components:MemberLinkButton link="{model.tube_specs}"/>
+        </s:FormItem>
+        <s:FormItem width="100%" label="Status">
+            <components:MemberLinkButton link="{model.itemstatus}"/>
+        </s:FormItem>
+        <s:FormItem width="100%" label="Sample Volume (µl)">
+            <s:Label text="{UnitConvUtils.volumeLabelFunction(model.sample_volume)}"/>
+        </s:FormItem>
+        <s:FormItem width="100%" label="Sample Molecules">
+            <components:DataGrid width="100%" minHeight="200"
+                                 dataProvider="{model.sample_molecules}">
+                <components:columns>
+                    <s:ArrayList>
+                        <s:GridColumn dataField="sample_molecule_design_pool_id"
+                                      headerText="Molecule Design Pool ID"/>
+                        <s:GridColumn dataField="molecule_design_id"
+                                      headerText="Molecule Design ID"/>
+                        <s:GridColumn dataField="supplier" headerText="Supplier"
+                                      itemRenderer="org.everest.flex.ui.renderers.DataGridLinkRenderer"/>
+                        <s:GridColumn dataField="product_id"
+                                      headerText="Product ID"/>
+                        <s:GridColumn dataField="concentration"
+                                      headerText="Concentration (µM)"
+                                      labelFunction="{UnitConvUtils.dataGridConcentrationLabelFunction}"/>
+                        <s:GridColumn dataField="freeze_thaw_cycles"
+                                      headerText="Freeze Thaw Cycles"/>
+                    </s:ArrayList>
+                </components:columns>
+            </components:DataGrid>
+        </s:FormItem>
+    </s:Form>
+</views1:MemberView>

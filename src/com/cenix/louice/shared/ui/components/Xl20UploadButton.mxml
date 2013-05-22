@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Button xmlns:fx="http://ns.adobe.com/mxml/2009"
+		  xmlns:s="library://ns.adobe.com/flex/spark"
+		  xmlns:mx="library://ns.adobe.com/flex/mx"
+		  label="Upload XL20 Output File"
+		  click="uploadButton_clickHandler(event)"
+		  icon="@Embed(source='/assets/icons/upload.png')">
+	<fx:Script>
+		<![CDATA[
+			import org.everest.flex.ui.components.ErrorView;
+			private var fileRef:FileReference = new FileReference();
+			
+			public var data:ByteArray;
+			
+			protected function uploadButton_clickHandler(event:MouseEvent):void
+			{
+				fileRef.addEventListener(Event.SELECT, selectHandler);
+				fileRef.addEventListener(Event.COMPLETE, onLoadComplete);
+				fileRef.addEventListener(IOErrorEvent.IO_ERROR, onLoadError);
+				fileRef.browse([new FileFilter("XL20 Output Files (*.txt)", "*.txt")]);
+			}
+			
+			private function onLoadComplete(e:Event):void
+			{
+				this.data = fileRef.data;
+				// Dispatch again so listeners can process the loaded data.
+				this.dispatchEvent(e);
+			}
+
+			private function onLoadError(e:IOErrorEvent):void
+			{
+				ErrorView.show("Error loading file :\n" + e.text);
+			}
+			
+			private function selectHandler(event:Event):void
+			{
+				fileRef.load();
+			}
+			
+		]]>
+	</fx:Script>
+</s:Button>

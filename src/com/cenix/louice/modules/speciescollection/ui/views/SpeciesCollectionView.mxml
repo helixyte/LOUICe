@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<view:CollectionView xmlns:fx="http://ns.adobe.com/mxml/2009"
+                     xmlns:s="library://ns.adobe.com/flex/spark"
+                     xmlns:mx="library://ns.adobe.com/flex/mx"
+                    xmlns:view="org.everest.flex.ui.views.*">
+
+    <view:collectionGridColumns>
+        <s:GridColumn headerText="Genus Name" dataField="genus_name"/>
+        <s:GridColumn headerText="Species Name" dataField="species_name"/>
+        <s:GridColumn headerText="Common Name" dataField="common_name"/>
+        <s:GridColumn headerText="Acronym Name" dataField="acronym"/>
+    </view:collectionGridColumns>
+</view:CollectionView>

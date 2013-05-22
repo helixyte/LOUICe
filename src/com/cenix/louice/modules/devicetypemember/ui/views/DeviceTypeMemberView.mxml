@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?>
+<views:MemberView xmlns:fx="http://ns.adobe.com/mxml/2009"
+                  xmlns:s="library://ns.adobe.com/flex/spark"
+                  xmlns:mx="library://ns.adobe.com/flex/mx"
+                  xmlns:view="org.everest.flex.ui.views.*"
+                  xmlns:components="org.everest.flex.ui.components.*"
+                  xmlns:views="org.everest.flex.ui.views.*"
+                  title="{'Device Type: ' + model.title}">
+
+    <fx:Script>
+        <![CDATA[
+            import com.cenix.louice.modules.devicetypemember.ui.presenters.DeviceTypeMemberPresentationModel;
+            import org.everest.flex.ui.presenters.MemberPresentationModel;
+
+            public override function submit(model:MemberPresentationModel):void{
+
+                formValidator.validateForm(null);
+
+                if(formValidator.formIsValid){
+                    //we do not need to persist the devices as they are not updated
+                    DeviceTypeMemberPresentationModel(model).devices = null;
+                    model.submit();
+                    currentState = 'normal';
+                }
+            }
+        ]]>
+    </fx:Script>
+<!--    <fx:Declarations>
+        <fx:Array id="validators">
+            <mx:StringValidator maxLength="256" minLength="3" property="text"
+                                source="{inputLabel}"/>
+        </fx:Array>
+    </fx:Declarations>
+-->
+    <!-- NORMAL CONTENT -->
+    <view:content>
+        <s:Form width="100%">
+            <s:FormItem label="Label">
+                <s:Label text="{model.label}"/>
+            </s:FormItem>
+        </s:Form>
+    </view:content>
+
+    <!-- EDITOR CONTENT
+    <view:editorContent>
+        <s:Form width="100%">
+            <s:FormItem label="Label">
+                <s:TextInput id="inputLabel" change="{model.label = inputLabel.text;}"
+                             text="{model.label}"/>
+            </s:FormItem>
+        </s:Form>
+    </view:editorContent>
+    -->
+    <!-- ADDITIONAL CONTENT -->
+    <view:additionalContent>
+        <s:Label fontWeight="bold" text="Associated Devices:"/>
+            <components:DataGrid width="100%" minHeight="200"
+                                 dataProvider="{model.devices}">
+                <components:columns>
+                    <s:ArrayList>
+                        <s:GridColumn dataField="label" headerText="Label"/>
+                        <s:GridColumn dataField="model" headerText="Model"/>
+                        <s:GridColumn dataField="manufacturer"
+                                      headerText="Manufacturer"
+                                      itemRenderer="org.everest.flex.ui.renderers.DataGridLinkRenderer"/>
+                        <s:GridColumn dataField="locations"
+                                      headerText="Locations"
+                                      itemRenderer="org.everest.flex.ui.renderers.DataGridLinkRenderer"/>
+                    </s:ArrayList>
+                </components:columns>
+            </components:DataGrid>
+    </view:additionalContent>
+</views:MemberView>

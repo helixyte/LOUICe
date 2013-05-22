@@ -1,0 +1,206 @@
+<?xml version="1.0" encoding="utf-8"?>
+<views:CollectionView xmlns:fx="http://ns.adobe.com/mxml/2009"
+                     xmlns:s="library://ns.adobe.com/flex/spark"
+                     xmlns:mx="library://ns.adobe.com/flex/mx"
+                     xmlns:components="com.cenix.louice.shared.ui.components.*"
+                     xmlns:view="org.everest.flex.ui.views.*"
+                     xmlns:maps1="org.everest.flex.maps.*" 
+                     xmlns:components1="org.everest.flex.ui.components.*" 
+                     xmlns:views="org.everest.flex.ui.views.*"
+
+                     title="Stock Info" 
+                     showCsvButton="true"
+                     width="100%" 
+                     height="100%" 
+                     >
+
+    <fx:Script>
+        <![CDATA[
+            import com.cenix.louice.shared.model.vos.GeneMember;
+            import com.cenix.louice.shared.model.vos.StockInfoMember;
+            import com.cenix.louice.shared.utils.UnitConvUtils;
+            
+            import mx.events.CollectionEvent;
+            
+            import spark.events.IndexChangeEvent;
+            
+            import org.everest.flex.model.MembersCollection;
+            import org.everest.flex.ui.presenters.SuggestionDropDownListPresentationModel;
+
+            private function targetGeneLabelFunction(item:Object, column:*):String
+            {
+                // TODO: check if there is a better way to filter the genes
+                var label:String = "";
+                var filteredGenes:Array = new Array();
+                var speciesLink:String = 
+                        speciesInput.selectedItem != null ? 
+                        speciesInput.selectedItem.value : 
+                        null;
+                var targetGenes:MembersCollection = StockInfoMember(item).genes;
+                for each (var targetGene:GeneMember in targetGenes) {
+                    if (speciesLink == null || 
+                        speciesLink == targetGene.species.link.href) {
+                        filteredGenes.push(targetGene.accession + ":" + 
+                                           targetGene.locus_name + ":" + 
+                                           getAcronym(targetGene.species.title));
+                    }
+                }
+                if (filteredGenes.length > 5) {
+                    label = filteredGenes.slice(0, 5).join(", ") +
+                        ", [..." + (filteredGenes.length - 5) + " more...]";
+                }
+                else {
+                    label = filteredGenes.join(", ");
+                }
+                return label;
+            }
+
+            private function getAcronym(speciesTitle:String):String
+            {   //A bit of a hack but this avoids
+                //putting the species as entity in each
+                //gene which would make the request even slower.
+                var res:String;
+                switch(speciesTitle)
+                {
+                    case "human": res = "HS"; break;
+                    case "mouse": res = "MM"; break;
+                    case "rat": res = "RN"; break;
+                    case "worm": res = "CE"; break;
+                    case "fly": res= "DN"; break;
+                    default: res= speciesTitle;
+                }
+
+                return res;
+            }
+
+            protected function moleculeTypeInput_changeHandler(event:IndexChangeEvent):void
+            {
+                trace(moleculeTypeInput.selectedItem);
+            }
+        ]]>
+    </fx:Script>
+
+
+    <fx:Declarations>
+        <maps1:SuggestionEventMap 
+            dispatcher="{moleculeTypeInput}"
+            presenter="{SuggestionDropDownListPresentationModel}"
+            view="{SuggestionDropDownListView}"/>
+        <maps1:SuggestionEventMap 
+            dispatcher="{modificationInput}"
+            presenter="{SuggestionDropDownListPresentationModel}"
+            view="{SuggestionDropDownListView}"/>
+        <maps1:SuggestionEventMap 
+            dispatcher="{speciesInput}"
+            presenter="{SuggestionDropDownListPresentationModel}"
+            view="{SuggestionDropDownListView}"/>
+    </fx:Declarations>
+
+    <view:filterFormContent>
+        <s:FormItem width="100%" label="Molecule Design Pool ID">
+            <components1:SmartTextArea 
+                criteria="{model.criteria}"
+                name="molecule-design-pool-id"
+                operator="contained"
+                restrict="0-9 ,"/>
+        </s:FormItem>
+        <s:FormItem width="100%" label="Targeted Gene Accession">
+            <components1:SmartTextArea 
+                criteria="{model.criteria}" 
+                name="genes.accession"
+                operator="contained"
+                restrict="a-zA-Z0-9 ,"/>
+        </s:FormItem>
+        <!--
+        <s:FormItem label="Sample Minimum Volume (μl)">
+            <components:NumberInput 
+                width="64"
+                conversionFactor="{UnitConvUtils.VOLUME_FACTOR}"
+                criteria="{model.criteria}"
+                name="minimum-volume"
+                operator="greater-than-or-equal-to"/>
+        </s:FormItem>
+        -->
+        <s:FormItem label="Sample Molecule Concentration (μM)">
+            <components1:NumberInput 
+                width="64"
+                conversionFactor="{UnitConvUtils.CONCENTRATION_FACTOR}" 
+                accessibilityDescription="" 
+                criteria="{model.criteria}" 
+                name="concentration"
+                operator="equal-to"/>
+        </s:FormItem>
+        <s:FormItem label="Molecule Type">
+            <components1:SuggestionDropDownListView 
+                id="moleculeTypeInput"
+                url="/molecule-types"
+                name="molecule-type"
+                operator="equal-to"
+                criteria="{model.criteria}"
+                width="256"
+                change="moleculeTypeInput_changeHandler(event)"/>
+        </s:FormItem>
+        <s:FormItem label="Modification">
+            <components1:SuggestionDropDownListView 
+                id="modificationInput"
+                url="{moleculeTypeInput.selectedItem.value ? 
+                      moleculeTypeInput.selectedItem.value + 'modifications' : 
+                      null}"
+                name="molecule-design-pool.molecule-designs.chemical-structures"
+                operator="contains"
+                criteria="{model.criteria}"
+                width="256"/>
+        </s:FormItem>
+    </view:filterFormContent>
+
+    <view:collectionGridColumns>
+<!-- FIXME: reenable once the rendering of design pool links works
+		<s:GridColumn minWidth="64" 
+                      dataField="molecule_design_pool"
+                      headerText="Molecule Design Pool"
+                      itemRenderer="org.everest.flex.ui.renderers.DataGridLinkRenderer"/>
+-->     
+		<s:GridColumn minWidth="64" 
+					  dataField="molecule_design_pool_id"
+					  headerText="Molecule Design Pool ID"/>
+		<s:GridColumn minWidth="64" 
+                      dataField="molecule_type"
+                      headerText="Molecule Type"
+                      itemRenderer="org.everest.flex.ui.renderers.DataGridLinkRenderer"/>
+        <s:GridColumn width="82" 
+                      dataField="total_tubes" 
+                      headerText="# Tubes"/>
+        <s:GridColumn minWidth="64" 
+                      dataField="total_volume"
+                      headerText="Total Volume (μl)"
+                      labelFunction="{UnitConvUtils.dataGridVolumeLabelFunction}"/>
+        <s:GridColumn minWidth="64" 
+                      dataField="minimum_volume"
+                      headerText="Minimum-Volume (μl)"
+                      labelFunction="{UnitConvUtils.dataGridVolumeLabelFunction}"/>
+        <s:GridColumn minWidth="64" 
+                      dataField="maximum_volume"
+                      headerText="Maximum Volume (μl)"
+                      labelFunction="{UnitConvUtils.dataGridVolumeLabelFunction}"/>
+        <s:GridColumn minWidth="64" 
+                      dataField="concentration"
+                      headerText="Concentration (μM)"
+                      labelFunction="{UnitConvUtils.dataGridConcentrationLabelFunction}"/>
+        <s:GridColumn minWidth="210"
+                      headerText="Targeted Genes"
+                      labelFunction="{targetGeneLabelFunction}"
+                      sortable="false"/>
+    </view:collectionGridColumns>
+
+    <view:footerContent>
+        <mx:Spacer width="100%"/>
+        <s:Label text="Show only targeted genes in:"/>
+        <components1:SuggestionDropDownListView 
+            id="speciesInput" 
+            width="96"
+            change="{resultGrid.dataProvider.dispatchEvent( 
+                        new CollectionEvent(CollectionEvent.COLLECTION_CHANGE) )}"
+            url="/species"/>
+    </view:footerContent>
+
+</views:CollectionView>

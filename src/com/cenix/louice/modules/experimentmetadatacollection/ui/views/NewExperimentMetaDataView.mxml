@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="utf-8"?>
+<views:NewMemberView xmlns:fx="http://ns.adobe.com/mxml/2009"
+                     xmlns:s="library://ns.adobe.com/flex/spark"
+                     xmlns:mx="library://ns.adobe.com/flex/mx"
+                     xmlns:components="com.cenix.louice.shared.ui.components.*"
+                     xmlns:view="org.everest.flex.ui.views.*"
+                     xmlns:validators="com.cenix.louice.shared.ui.components.validators.*"
+                     xmlns:maps1="org.everest.flex.maps.*"
+                     xmlns:components1="org.everest.flex.ui.components.*"
+                     xmlns:views="org.everest.flex.ui.views.*"
+                     creationComplete="{focusManager.setFocus(inputLabel)}"
+                     title="New Experiment Metadata">
+    <fx:Script>
+        <![CDATA[
+            import com.cenix.louice.shared.model.vos.ExperimentMetaDataMember;
+            import com.cenix.louice.shared.model.vos.ExperimentTypes;
+            import org.everest.flex.model.Member;
+            import com.cenix.louice.shared.model.vos.SubprojectMember;
+            import org.everest.flex.ui.presenters.SuggestionDropDownListPresentationModel;
+
+            protected override function get member():Member
+            {
+                var member:ExperimentMetaDataMember = new ExperimentMetaDataMember();
+                    member.subproject = new SubprojectMember();
+                    member.subproject.link = subprojectInput.selectedItemAsLink;
+                    member.label= inputLabel.text;
+                    member.number_replicates = inputNumberOfReplicates.value;
+                    member.experiment_type = typeSelectBox.selectedItem;
+                return member;
+            }
+
+        ]]>
+    </fx:Script>
+
+    <fx:Declarations>
+
+        <fx:Array id="validators">
+            <mx:StringValidator maxLength="256" minLength="3" property="text"
+                                source="{inputLabel}"/>
+            <validators:SelectionValidator source="{subprojectInput}"/>
+        </fx:Array>
+
+        <maps1:SuggestionEventMap dispatcher="{subprojectInput}"
+                                  presenter="{SuggestionDropDownListPresentationModel}"
+                                  view="{SuggestionDropDownListView}"/>
+    </fx:Declarations>
+
+
+    <s:Form id="newMemberForm" width="100%">
+
+        <s:FormItem width="100%" label="Label" required="true">
+            <s:TextInput id="inputLabel"
+                         change="this.formValidator.validateForm(event);"/>
+        </s:FormItem>
+        <s:FormItem width="100%" label="Type:">
+            <s:ComboBox id="typeSelectBox" width="220" color="0x000000"
+                        dataProvider="{ExperimentTypes.types}"
+                        labelFunction="{ExperimentTypes.labelFunction}"
+                        selectedIndex="0"/>
+        </s:FormItem>
+        <s:FormItem width="100%" label="Interplate Replicates" required="true">
+            <s:NumericStepper id="inputNumberOfReplicates" maximum="99"
+                              minimum="1" value="1"/>
+        </s:FormItem>
+
+        <s:FormItem width="100%" label="Subproject" required="true">
+            <components1:SuggestionDropDownListView id="subprojectInput"
+                                                    width="220"
+                                                    change="this.formValidator.validateForm(event);"
+                                                    defaultChoice="false"
+                                                    url="/subprojects/?q=active:equal-to:true"/>
+        </s:FormItem>
+
+        <s:FormItem>
+            <s:HGroup>
+                <s:Button label="Create" click="createMember()"
+                          enabled="{this.formValidator.formIsValid}"/>
+                <s:Button label="Cancel" click="close()"/>
+            </s:HGroup>
+        </s:FormItem>
+
+    </s:Form>
+</views:NewMemberView>

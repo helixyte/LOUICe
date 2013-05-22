@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="utf-8"?>
+<components:ResizableTitleWindow xmlns:fx="http://ns.adobe.com/mxml/2009"
+               xmlns:s="library://ns.adobe.com/flex/spark"
+               xmlns:mx="library://ns.adobe.com/flex/mx"
+               xmlns:validators="com.cenix.louice.shared.ui.components.validators.*"
+               minWidth="400"
+               close="close();" title="Print Barcodes" xmlns:BarCode="BarCode.*" xmlns:components="org.everest.flex.ui.components.*">
+    <components:layout>
+        <s:VerticalLayout paddingTop="5" paddingBottom="5" paddingRight="5" paddingLeft="5"/>
+    </components:layout>
+
+    <fx:Script>
+        <![CDATA[
+            import com.cenix.louice.shared.model.vos.BarcodePrintJobMember;
+
+            import org.everest.flex.events.MemberEvent;
+
+            import mx.collections.ArrayCollection;
+            import mx.core.IFlexDisplayObject;
+            import mx.managers.PopUpManager;
+
+
+            [Bindable]
+            private var _barcodePrintJob:BarcodePrintJobMember;
+
+            [Bindable]
+            public static var printers:ArrayCollection = new ArrayCollection(
+                        [ {label:"Dummy Printer", data:"DUMMY"},
+                          {label:"Barcode Printer 1", data:"barcode1"},
+                          {label:"Barcode Printer 2", data:"barcode2"},
+                          {label:"Barcode Printer 3 (Lab 1)", data:"barcode3"},
+                          {label:"Barcode Printer 4", data:"barcode4"},
+                          {label:"Barcode Printer 5 (Lab 2)", data:"barcode5"},
+                          {label:"Laserjet IT", data:"lj_it"}
+                        ]);
+
+            // Handle the close button and Cancel button.
+            public function close():void {
+                PopUpManager.removePopUp(this);
+            }
+
+            public function set barcodePrintJob(barcodePrintJob:BarcodePrintJobMember):void
+            {
+                this._barcodePrintJob = barcodePrintJob;
+
+                if ((barcodePrintJob != null)&&(barcodePrintJob.barcode_label_pairs != null))
+                {
+                    if (barcodePrintJob.barcode_label_pairs.length > 50)
+                    {
+                        this.width = parent.width - 10;
+                        this.height = parent.height - 10;
+                    } else if (barcodePrintJob.barcode_label_pairs.length > 10)
+                    {
+                        this.width = 1000;
+                    }
+                }
+
+            }
+
+            public static function show(parent:DisplayObject, barcodePrintJob:BarcodePrintJobMember):void{
+                var  p:IFlexDisplayObject = PopUpManager.createPopUp(parent, BarcodePrintPreView, true);
+                    BarcodePrintPreView(p).barcodePrintJob = barcodePrintJob;
+                    PopUpManager.centerPopUp(p);
+            }
+
+            protected function printBarcodes(event:MouseEvent):void
+            {
+
+                    _barcodePrintJob.printer = printerSelectBox.selectedItem.data;
+
+                    var e:MemberEvent = new MemberEvent(MemberEvent.CREATE_MEMBER_IN_BACKGROUND);
+                        e.member = _barcodePrintJob;
+                        e.pageUrl = "/barcodes"
+                    this.parent.dispatchEvent(e);
+
+
+                this.close();
+
+            }
+        ]]>
+    </fx:Script>
+    <s:Scroller width="100%" height="100%">
+        <s:DataGroup dataProvider="{_barcodePrintJob.barcode_label_pairs}" width="100%" >
+            <s:layout>
+                <s:TileLayout />
+            </s:layout>
+            <s:itemRenderer>
+                <fx:Component>
+                    <s:ItemRenderer autoDrawBackground="false">
+                        <s:HGroup paddingBottom="10" paddingLeft="12">
+                            <BarCode:Code128B barCodeText="{data.barcode}"
+                                              addLabel="{false}"
+                                              barCodeHeight="40"/>
+                            <s:VGroup>
+                                <s:Label  id="barcodeLabel" text="{data.barcode}"/>
+                                <s:Label  id="labelLabel" text="{data.label}"/>
+                            </s:VGroup>
+                        </s:HGroup>
+                    </s:ItemRenderer>
+                </fx:Component>
+            </s:itemRenderer>
+        </s:DataGroup>
+    </s:Scroller>
+
+
+    <s:Form width="100%">
+        <s:FormItem label="Printer:" width="100%">
+            <s:ComboBox dataProvider="{printers}" width="220" color="0x000000"
+                        id="printerSelectBox" selectedIndex="0"/>
+        </s:FormItem>
+
+        <s:FormItem width="100%">
+            <s:HGroup>
+                <s:Button label="print" id="print" click="printBarcodes(event)"/>
+                <s:Button label="cancel" click="{close()}" />
+            </s:HGroup>
+        </s:FormItem>
+    </s:Form>
+</components:ResizableTitleWindow>

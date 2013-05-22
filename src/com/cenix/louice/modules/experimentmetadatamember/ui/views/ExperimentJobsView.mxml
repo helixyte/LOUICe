@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Group xmlns:fx="http://ns.adobe.com/mxml/2009"
+         xmlns:s="library://ns.adobe.com/flex/spark"
+         xmlns:mx="library://ns.adobe.com/flex/mx"
+         xmlns:views="com.cenix.louice.modules.experimentmetadatamember.ui.views.*">
+
+    <fx:Script>
+        <![CDATA[
+            import com.cenix.louice.modules.experimentmetadatamember.ui.presenter.ExperimentMetaDataMemberPresentationModel;
+            import com.cenix.louice.shared.model.vos.JobMember;
+
+            import mx.collections.ArrayCollection;
+            import mx.core.FlexGlobals;
+            import mx.core.IFlexDisplayObject;
+            import mx.events.CollectionEvent;
+            import mx.managers.PopUpManager;
+
+            import org.everest.flex.ui.components.ConfirmationView;
+            import org.everest.flex.ui.views.CollectionView;
+
+            import spark.components.gridClasses.GridColumn;
+
+            [Bindable]
+            public var model:ExperimentMetaDataMemberPresentationModel;
+
+            private var popup:IFlexDisplayObject;
+
+
+            private function initializeGrid(e:Event = null):void
+            {
+
+
+                ArrayCollection(jobGrid.dataProvider).refresh();
+
+                if (popup != null)
+                {
+                    PopUpManager.removePopUp(popup)
+                }
+            }
+
+            protected function showCreateJobView():void{
+
+                 popup = PopUpManager.createPopUp(this, NewExperimentJobView, true);
+                 NewExperimentJobView(popup).experimentMetadataModel = this.model;
+                 //maximize popup
+                 popup.move(5,5);
+                 popup.width = FlexGlobals.topLevelApplication.width - 10;
+                 popup.height = FlexGlobals.topLevelApplication.height - 10;
+
+                 this.jobGrid.dataProvider.addEventListener(CollectionEvent.COLLECTION_CHANGE, closeCreateJobView);
+                 this.addEventListener(Event.REMOVED_FROM_STAGE, closeCreateJobView);
+            }
+
+            public function closeCreateJobView(event:Event=null):void
+            {
+                if (popup != null)
+                {
+                    PopUpManager.removePopUp(popup);
+                }
+
+                this.jobGrid.dataProvider.removeEventListener(CollectionEvent.COLLECTION_CHANGE, closeCreateJobView);
+                this.removeEventListener(Event.REMOVED_FROM_STAGE, closeCreateJobView);
+
+            }
+
+            private function deleteJob():void
+            {
+                var job:JobMember = JobMember(jobGrid.selectedItem);
+                ConfirmationView.show('Are you sure you want to delete job '+job.label+ '?', 'Delete Job',
+                    function():void{
+                        model.deleteJob(job);
+                        jobGrid.dataProvider.removeItemAt(jobGrid.selectedIndex);
+                    });
+            }
+
+
+            private function viewJob(event:Event=null):void
+            {
+                if (jobGrid.selectedItem != null)
+                {
+                    var url:String = '/experiment-jobs/' + jobGrid.selectedItem.id;
+                    model.navigateToLink(url);
+                }
+            }
+        ]]>
+    </fx:Script>
+    <s:layout>
+        <s:VerticalLayout paddingBottom="5" paddingTop="5" paddingRight="5" />
+    </s:layout>
+    <s:DataGrid id="jobGrid" dataProvider="{model.experimentJobs}"  width="100%" height="100%" doubleClickEnabled="true" doubleClick="{viewJob(event)}">
+        <s:columns>
+            <s:ArrayList>
+                <s:GridColumn dataField="label" headerText="Label">
+                    <s:itemRenderer>
+                        <fx:Component>
+                            <s:DefaultGridItemRenderer
+                                fontWeight="bold"/>
+                        </fx:Component>
+                    </s:itemRenderer>
+                </s:GridColumn>
+                <s:GridColumn dataField="user" headerText="User"
+                              itemRenderer="org.everest.flex.ui.renderers.DataGridLinkRenderer"/>
+                <s:GridColumn width="150" minWidth="136" dataField="start_time"
+                              headerText="Start"
+                              labelFunction="{CollectionView.dateTimeLabelFunction}">
+                    <s:itemRenderer>
+                        <fx:Component>
+                            <s:DefaultGridItemRenderer
+                                textAlign="right"/>
+                        </fx:Component>
+                    </s:itemRenderer>
+                </s:GridColumn>
+
+            </s:ArrayList>
+        </s:columns>
+    </s:DataGrid>
+    <s:HGroup verticalAlign="middle" width="100%">
+        <s:Button label="View" click="viewJob()"
+                  enabled="{jobGrid.selectedItem != null}"/>
+        <s:Button id="createJob" label="Create new Job"
+                  click="{showCreateJobView()}"/>
+        <s:Button label="Delete Job" enabled="{jobGrid.selectedIndex > -1}"
+                  click="{deleteJob()}"/>
+    </s:HGroup>
+</s:Group>

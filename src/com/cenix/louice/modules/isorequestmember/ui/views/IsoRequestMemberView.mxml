@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="utf-8"?>
+<view:MemberView xmlns:fx="http://ns.adobe.com/mxml/2009"
+				 xmlns:s="library://ns.adobe.com/flex/spark"
+				 xmlns:mx="library://ns.adobe.com/flex/mx"
+				 xmlns:views="com.cenix.louice.modules.projectmodel.ui.views.*"
+				 xmlns:components="com.cenix.louice.shared.ui.components.*"
+				 xmlns:view="org.everest.flex.ui.views.*"
+				 xmlns:validators="com.cenix.louice.shared.ui.components.validators.*"
+				 xmlns:views1="com.cenix.louice.modules.isorequestmember.ui.views.*"
+				 xmlns:renderer="com.cenix.louice.modules.isorequestmember.ui.renderer.*"
+				 xmlns:components1="org.everest.flex.ui.components.*"
+				 xmlns:components2="com.cenix.louice.modules.isorequestmember.ui.components.*"
+				 width="100%" height="100%"
+				 title="{model.iso_type == 'STANDARD' ? 'Internal Sample Order Request for: ' + model.experiment_metadata.title : 'Library Creation Internal Sample Order'}" >
+    <fx:Script>
+        <![CDATA[
+			import com.cenix.louice.shared.model.vos.IsoRequestMember;
+			
+			import mx.core.FlexGlobals;
+			import mx.managers.PopUpManager;
+			
+			import org.everest.flex.events.MemberEvent;
+			
+            protected function generateIsos_clickHandler(event:MouseEvent):void
+            {
+                var newIsoView:NewIsosView = NewIsosView(PopUpManager.createPopUp(this, NewIsosView, true));
+                newIsoView.model = this.model;
+                PopUpManager.centerPopUp(newIsoView);
+                model.addEventListener(MemberEvent.MEMBER_CHANGED,
+                    function(evnent:Event): 
+                        void{PopUpManager.removePopUp(newIsoView)});
+            }
+
+            protected function reassignForEdit_clickHandler(event:MouseEvent):void
+            {
+                model.changeOwner("");
+            }
+
+            protected function close_clickHandler(event:MouseEvent):void
+            {
+                model.changeOwner(this.model.requester.directory_user_id);
+            }
+
+            protected function acceptTicket_clickHandler(event:MouseEvent):void
+            {
+                model.changeOwner(
+                    FlexGlobals.topLevelApplication.currentUser.directory_user_id 
+                    + ', ' + IsoRequestMember.STOCKMANAGEMENT_USER);
+            }
+
+            protected function reopenTicket_clickHandler(event:MouseEvent):void
+            {
+                model.changeOwner('reopen'); //Ugly but I see no other way to do this without a status.
+            }
+
+        ]]>
+    </fx:Script>
+    <!-- NORMAL CONTENT -->
+    <view:content>
+        <components2:IsoRequestForm width="100%" isoRequest="{model}"/>
+    </view:content>
+    <view:actionBarContent>
+        <s:HGroup visible="{model.iso_type == 'STANDARD'}">
+            <s:Button id="acceptTicket" label="Accept Ticket"
+					  click="acceptTicket_clickHandler(event)" enabled="{model.acceptEnabled}"/>
+            <s:Button id="generateIsos" label="Generate ISOs"
+					  click="generateIsos_clickHandler(event)" enabled="{model.generateEnabled}"/>
+            <s:Button id="reassignForEdit" label="Reassign for Edit"
+					  click="reassignForEdit_clickHandler(event)"
+					  enabled="{model.generateEnabled &amp;&amp; !model.hasIsos}"/>
+            <s:Button id="close" label="Close" click="close_clickHandler(event)"
+					  enabled="{model.generateEnabled}"/>
+            <s:Button label="Reopen" click="reopenTicket_clickHandler(event)"
+					  enabled="{model.reopenEnabled}"/>            
+        </s:HGroup>
+    </view:actionBarContent>
+    <view:additionalContent>
+        <views1:IsosView width="100%" height="100%" isoRequest="{model}"/>
+    </view:additionalContent>
+</view:MemberView>

@@ -1,0 +1,100 @@
+@namespace s "library://ns.adobe.com/flex/spark";
+@namespace mx "library://ns.adobe.com/flex/mx";
+@namespace rack "com.cenix.louice.shared.ui.components.rack.*";
+@namespace components "com.cenix.louice.shared.ui.components.*";
+@namespace controls "ws.tink.mx.controls.*";
+@namespace view "com.cenix.louice.shared.ui.view.*";
+@namespace views "org.everest.flex.ui.views.*";
+@namespace components1 "org.everest.flex.ui.components.*";
+
+global
+{
+    chrome-color: #EBF4FF;
+    color: #444444;
+    content-background-color: #FFFFFF;
+    roll-over-color: #EBF4FF;
+    selection-color: #DEEBFF;
+    focus-color: #EEEEEE;
+    accent-color: #C0E3FF;
+    vertical-align: middle;
+    text-align: left;
+    borderColor: #999999;
+}
+
+.editableLabel{
+    skin-class: ClassReference("skin.EditableLabelSkin");
+}
+
+s|Application
+{
+    background-color: #EBF4FF;
+}
+
+s|Form{
+    backgroundColor: #FFFFFF;
+}
+
+s|FormItem {
+    skinClass: ClassReference("skin.FormItemSkin");
+}
+
+s|FormItem s|Label#labelDisplay {
+    textAlign: right;
+}
+
+s|FormItem s|Label#errorTextDisplay {
+    textAlign: left;
+}
+
+s|DataGrid
+{
+    alternatingRowColors:#FFFFFF,#F9F9F9;
+}
+
+mx|LinkButton
+{
+    color: #3380DD;
+    text-decoration: none;
+}
+
+
+components1|HTMLToolTip
+{
+    font-size: 12px;
+}
+
+rack|RackViewLabel
+{
+    /*skin-class: ClassReference("skin.RackViewLabelSkin");*/
+    textAlign: center;
+    fontSize: 12px;
+    verticalAlign: middle;
+    color: #498bf4;
+
+}
+
+rack|RackViewMember
+{
+    skin-class: ClassReference("skin.RackViewMemberSkin");
+}
+
+views|CollectionView s|FormLayout
+{
+    gap: -15;
+}
+
+/*
+controls|FilterComboBox
+{
+    arrow-button-width : 22;
+    corner-radius : 5;
+    disabled-icon-color : #919999;
+    dropdown-style-name : "comboDropdown";
+    leading : 0;
+    padding-left : 5;
+    padding-right : 5;
+    skin : ClassReference( "mx.skins.halo.ComboBoxArrowSkin" );
+    selection-color: #deebff;
+
+}
+*/

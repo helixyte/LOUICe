@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<views:CollectionView xmlns:fx="http://ns.adobe.com/mxml/2009"
+                     xmlns:s="library://ns.adobe.com/flex/spark"
+                     xmlns:mx="library://ns.adobe.com/flex/mx"
+                    xmlns:view="org.everest.flex.ui.views.*"
+                     title="Item Statuses" xmlns:views="org.everest.flex.ui.views.*">
+
+    <view:collectionGridColumns>
+        <s:GridColumn width="96" dataField="name" headerText="Name">
+            <s:itemRenderer>
+                <fx:Component>
+                    <s:DefaultGridItemRenderer
+                        fontWeight="bold"/>
+                </fx:Component>
+            </s:itemRenderer>
+        </s:GridColumn>
+        <s:GridColumn headerText="Description" dataField="description"/>
+    </view:collectionGridColumns>
+</views:CollectionView>

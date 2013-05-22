@@ -1,0 +1,418 @@
+<?xml version="1.0" encoding="utf-8"?>
+<components:ResizableTitleWindow xmlns:fx="http://ns.adobe.com/mxml/2009"
+                                 xmlns:s="library://ns.adobe.com/flex/spark"
+                                 xmlns:mx="library://ns.adobe.com/flex/mx"
+                                 xmlns:components="org.everest.flex.ui.components.*"
+                                 xmlns:components1="com.cenix.louice.modules.experimentmetadatamember.ui.components.*"
+                                 xmlns:view="org.everest.flex.ui.views.*"
+                                 xmlns:validators="com.cenix.louice.shared.ui.components.validators.*"
+                                 xmlns:views="com.cenix.louice.modules.experimentmetadatamember.ui.views.*"
+                                 xmlns:vos="com.cenix.louice.shared.model.vos.*"
+                                 xmlns:maps1="org.everest.flex.maps.*"
+                                 xmlns:validators1="org.everest.flex.ui.validators.*"
+                                 width="1124" minWidth="1124" minHeight="780"
+                                 close="{close()}"
+                                 creationComplete="creationCompleteHandler(event)"
+                                 title="New Job">
+	<components:states>
+		<s:State name="normal"/>
+		<s:State name="isoless"/>
+	</components:states>
+	<fx:Script>
+		<![CDATA[
+			import com.cenix.louice.modules.experimentmetadatamember.ui.components.ExperimentDesignRackComponent;
+			import com.cenix.louice.modules.experimentmetadatamember.ui.presenter.ExperimentMetaDataMemberPresentationModel;
+			import com.cenix.louice.shared.model.vos.ExperimentDesignMember;
+			import com.cenix.louice.shared.model.vos.ExperimentDesignRackMember;
+			import com.cenix.louice.shared.model.vos.ExperimentJobMember;
+			import com.cenix.louice.shared.model.vos.ExperimentMember;
+			import com.cenix.louice.shared.model.vos.ExperimentRackMember;
+			import com.cenix.louice.shared.model.vos.ExperimentTypes;
+			import com.cenix.louice.shared.model.vos.ItemStatusMember;
+			import com.cenix.louice.shared.model.vos.JobTypeMember;
+			import com.cenix.louice.shared.model.vos.PlateMember;
+			import com.cenix.louice.shared.model.vos.PlateSpecsMember;
+			import com.cenix.louice.shared.model.vos.RackMember;
+			import com.cenix.louice.shared.model.vos.SubprojectMember;
+			
+			import mx.collections.ArrayCollection;
+			import mx.events.CollectionEvent;
+			import mx.events.FlexEvent;
+			import mx.managers.PopUpManager;
+			
+			import org.everest.flex.model.Link;
+			import org.everest.flex.model.MembersCollection;
+			import org.everest.flex.ui.presenters.FeedPresentationModel;
+			
+			[Bindable]
+			private var _experimentMetadataModel:ExperimentMetaDataMemberPresentationModel;
+			
+			[Bindable]
+			private var isoPlates:ArrayCollection = new ArrayCollection();
+			
+			[Bindable]
+			private var experimentRacks:MembersCollection = new MembersCollection();
+			
+			[Bindable]
+			private var experiments:MembersCollection;
+			
+			[Bindable]
+			private var experimentRacksCount:int = 0;
+			
+			public function set experimentMetadataModel(model:ExperimentMetaDataMemberPresentationModel):void
+			{
+				this._experimentMetadataModel = model;
+				experimentDesignRacksComponent.experimentMetadataLink = this._experimentMetadataModel.selfLink;
+				
+				inputReplicates.text =  String(this._experimentMetadataModel.number_replicates);
+				labelPatternComponent.addEventListener(Event.CHANGE, updateIsoRacks);
+				labelPatternComponent.showBusyIndicator();
+				this.currentState = model.experiment_type == ExperimentTypes.ISO_LESS ? "isoless" : "normal";
+				if(this.currentState == 'normal')
+				{
+					isoPlates.addEventListener(CollectionEvent.COLLECTION_CHANGE, updateIsoRacks);	
+				}				
+			}
+			
+			protected function creationCompleteHandler(event:FlexEvent):void
+			{
+				plateTypeInput.dataProvider = new ArrayCollection(plateSpecs);
+				plateTypeInput.selectedIndex = 0;
+			}
+			
+			public function close():void {
+				PopUpManager.removePopUp(this);
+			}
+			
+			private function createJob(e:Event=null):void{
+				if(formValidator.formIsValid){
+					var job:ExperimentJobMember = new ExperimentJobMember();
+					//                        job.user = FlexGlobals.topLevelApplication.currentUser;
+					job.label = inputLabel.text;
+					job.subproject = new SubprojectMember();
+					job.subproject.link = this._experimentMetadataModel.subproject.link;
+					job.subproject.active = undefined; //needs to be undefined to avoid xml element
+					job.job_type = new JobTypeMember();
+					job.job_type.link = new Link("RNAi Experiment","http://localhost:6543/job-types/rnai-experiment/");
+					job.experiments = new MembersCollection();
+					job.experiments = this.experiments;
+					job.start_time = new Date();
+					if(job != null){
+						this._experimentMetadataModel.createJob(job);
+					}
+				}
+			}
+			
+            protected function createBatchButton_clickHandler(event:MouseEvent):void
+            {
+                updateIsoLessRacks();
+            }
+            
+            protected function batchLabel_changeHandler(event:Event):void
+            {
+                experimentRacks.removeAll();
+                this.batchFormValidator.validateForm(event);
+            }
+            
+			private function updateRacks(event:Event=null):void
+			{
+				if(this.currentState == 'isoless')
+				{
+					updateIsoLessRacks(event);
+				}
+				else
+				{
+					updateIsoRacks(event);
+				}
+			}
+
+			private function updateIsoLessRacks(event:Event=null):void
+			{
+				if(plateTypeInput.selectedItem == null){
+					return;
+				}
+				
+				experimentRacks.removeAll();
+				experiments = new MembersCollection();
+				experimentRacksCount = 0;
+                
+                if(batchLabel.text.length == 0){
+                    return;
+                }
+				
+				var experiment:ExperimentMember = new ExperimentMember();
+				experiment.label = batchLabel.text + "_exp";								
+				experiment.destination_rack_specs = new PlateSpecsMember();
+				experiment.destination_rack_specs.link = 
+					new Link(plateTypeInput.selectedItem.label, 
+							 plateTypeInput.selectedItem.value);
+				experiment.experiment_design = new ExperimentDesignMember();
+				experiment.experiment_design.link = 
+					new Link("Design", 
+							 this._experimentMetadataModel.selfLink + "/experiment-design");
+				experiment.experiment_racks = new MembersCollection();
+				
+				for each (var designRack:ExperimentDesignRackMember 
+					      in this._experimentMetadataModel.experimentDesign.experiment_design_racks)
+				{
+					for (var i:int = 1; i <= int(inputReplicates.text); i++)
+					{
+						experimentRacksCount++;
+						var experimentRack:ExperimentRackMember = new ExperimentRackMember();
+						experimentRack.design_rack = new ExperimentDesignRackMember();
+						experimentRack.design_rack.link = 
+							new Link(designRack.label, 
+								this._experimentMetadataModel.selfLink + "/experiment-design-racks/" + designRack.id);
+						experimentRack.title = experimentDesignRacksComponent.generateLabel(
+							designRack,
+							i,
+							batchLabel.text,
+							labelPatternComponent.pattern);
+						var plate:PlateMember = new PlateMember();
+						plate.label = experimentRack.title;
+						plate.creation_date = new Date();
+						plate.specs = experiment.destination_rack_specs;
+						plate.status = new ItemStatusMember();
+						plate.status.link = new Link("future","http://localhost:6543/item-statuses/future/"); //TODO not sure about the status to set here
+						experimentRack.plate = plate;
+						
+						experimentRacks.addItem(experimentRack);
+						experiment.experiment_racks.addItem(experimentRack);									
+					}
+				}
+                this.experiments.addItem(experiment);				
+                batchGrid.validateNow();
+			}
+			
+			private function updateIsoRacks(event:Event=null):void
+			{
+				if(plateTypeInput.selectedItem == null){
+					return;
+				}
+				
+				experimentRacks.removeAll();
+				experiments = new MembersCollection();
+				experimentRacksCount = 0;
+				
+				var count:int = 1;
+				for each (var sourceRack:* in isoPlates)
+				{
+					var sourceRackLink:RackMember = new RackMember();
+					sourceRackLink.link =  new Link(sourceRack.label, sourceRack.selfLink);
+					
+					var experiment:ExperimentMember = new ExperimentMember();
+					experiment.label = sourceRack.prefix + "_exp" + count;
+					count++;
+					//                        experiment.number_replicates = inputReplicates.value;
+					experiment.destination_rack_specs = new PlateSpecsMember();
+					experiment.destination_rack_specs.link = new Link(plateTypeInput.selectedItem.label, plateTypeInput.selectedItem.value);
+					experiment.source_rack = sourceRackLink;
+					experiment.experiment_design = new ExperimentDesignMember();
+					experiment.experiment_design.link = new Link("Design", this._experimentMetadataModel.selfLink + "/experiment-design");
+					experiment.experiment_racks = new MembersCollection();
+					
+					for each (var designRack:ExperimentDesignRackMember in this._experimentMetadataModel.experimentDesign.experiment_design_racks){
+						
+						for (var i:int = 1; i <= int(inputReplicates.text); i++)
+						{
+							experimentRacksCount++;
+							var experimentRack:ExperimentRackMember = new ExperimentRackMember();
+							experimentRack.source_rack = sourceRackLink;
+							experimentRack.design_rack = new ExperimentDesignRackMember();
+							experimentRack.design_rack.link = 
+								new Link(designRack.label, 
+									     this._experimentMetadataModel.selfLink + "/experiment-design-racks/" + designRack.id);
+							experimentRack.title = experimentDesignRacksComponent.generateLabel(
+								designRack,
+								i,
+								sourceRack.prefix,
+								labelPatternComponent.pattern);
+							//                            experimentRack.experiment = experiment;
+							var plate:PlateMember = new PlateMember();
+							plate.label = experimentRack.title;
+							plate.creation_date = new Date();
+							plate.specs = experiment.destination_rack_specs;
+							plate.status = new ItemStatusMember();
+							plate.status.link = new Link("future","http://localhost:6543/item-statuses/future/"); //TODO not sure about the status to set here
+							experimentRack.plate = plate;
+							
+							experimentRacks.addItem(experimentRack);
+							experiment.experiment_racks.addItem(experimentRack);
+							
+						}
+					}
+					
+					this.experiments.addItem(experiment);
+				}
+				
+				rackGrid.validateNow();
+				rackGrid.expandAll();
+			}
+			
+			private static function calculateCellContentLength(item:Object, column:*):String
+			{
+				var value:String = item[column.dataField];
+				if (value)
+				{
+					return String(value.length);
+					
+				} else {
+					return "";
+				}
+			}
+			
+			public function markRowAsInvalid(data:Object, col:*):Object
+			{
+				var title:String = data["title"];
+				if ((title != null)&&(title.length > 20)){
+					return {color:0xFF0000};
+				}
+				
+				return null;
+			}
+			
+		]]>
+	</fx:Script>
+	
+	<fx:Declarations>
+		
+		<fx:Array id="plateSpecs">
+			<fx:Object label="std. 384 well"
+                       value="http://localhost:6543/plate-specs/std384/"/>
+			<fx:Object label="std. 96 well"
+                       value="http://localhost:6543/plate-specs/std96/"/>
+			<fx:Object label="std. 1536 well"
+                       value="http://localhost:6543/plate-specs/std1536/"/>
+		</fx:Array>
+		
+		<fx:Array id="validators">
+			<mx:StringValidator maxLength="256" minLength="3" property="text"
+                                source="{inputLabel}"/>
+			<validators:SelectionValidator source="{plateTypeInput}"/>
+		</fx:Array>
+		
+		<validators1:FormValidator id="formValidator" validators="{validators}"/>
+		
+        <fx:Array id="batchValidators">
+            <mx:StringValidator maxLength="20" minLength="2" property="text"
+                                source="{batchLabel}"/>
+        </fx:Array>
+        
+        <validators1:FormValidator id="batchFormValidator" validators="{batchValidators}"/>
+
+        <maps1:SuggestionEventMap dispatcher="{experimentDesignRacksComponent}"
+                                  presenter="{FeedPresentationModel}"
+                                  view="{ExperimentDesignRackComponent}"/>
+		
+	</fx:Declarations>
+	<components:layout>
+		<s:VerticalLayout clipAndEnableScrolling="true"/>
+	</components:layout>
+	
+	<s:Form id="newMemberForm" width="100%" height="100%">
+		<s:HGroup width="100%">
+			<s:Group>
+				<s:layout>
+					<s:FormLayout gap="0"/>
+				</s:layout>
+				
+				<s:FormItem width="100%" label="Job Label" required="true">
+					<s:TextInput id="inputLabel"
+                                 change="this.formValidator.validateForm(event);"/>
+				</s:FormItem>
+				
+				<s:FormItem width="100%" label="Replicates">
+					<s:Label id="inputReplicates"/>
+				</s:FormItem>
+				
+				<s:FormItem visible="true" width="100%" label="Plate Type"
+                            required="true">
+					<s:ComboBox id="plateTypeInput" width="220"
+                                change="updateRacks(event)"/>
+				</s:FormItem>
+			</s:Group>
+			<s:Group width="100%" height="100%">
+				<s:layout>
+					<s:FormLayout gap="0"/>
+				</s:layout>
+				<s:FormItem includeIn="normal" width="100%" height="100%"
+                            label="ISO Plates">
+					<components1:IsoPlateInput width="100%" height="100%"
+                                               isoPlates="{isoPlates}"
+                                               isoRequest="{_experimentMetadataModel.iso_request}"/>
+				</s:FormItem>
+				<s:FormItem includeIn="isoless" width="100%" label="Batch prefix">
+					<s:HGroup>
+						<s:TextInput id="batchLabel"
+                                     change="batchLabel_changeHandler(event)"/>
+						<s:Button id="btCreateBatch" label="create"
+                                  click="createBatchButton_clickHandler(event)"
+                                  enabled="{this.batchFormValidator.formIsValid}"
+                                  fontWeight="bold"/>						
+					</s:HGroup>
+				</s:FormItem>
+			</s:Group>
+		</s:HGroup>
+		<s:Group width="100%" height="100%">
+			<s:layout>
+				<s:VerticalLayout/>
+			</s:layout>
+			<s:HGroup width="100%" height="100%">
+				<s:Label fontWeight="bold" text="Experiments"/>
+				<mx:AdvancedDataGrid id="rackGrid" includeIn="normal"
+                                     width="100%" height="100%"
+                                     styleFunction="markRowAsInvalid">
+					<mx:dataProvider>
+						<mx:HierarchicalData childrenField="experiment_racks"
+                                             source="{experiments}"/>
+					</mx:dataProvider>
+					<mx:columns>
+						<mx:AdvancedDataGridColumn width="110"
+                                                   dataField="source_rack"
+                                                   headerText="ISO Plate"/>
+						<mx:AdvancedDataGridColumn width="70"
+                                                   dataField="design_rack"
+                                                   headerText="Design Plate"/>
+						<mx:AdvancedDataGridColumn dataField="title"
+                                                   fontWeight="bold"
+                                                   headerText="Cell Plate Label"/>
+						<mx:AdvancedDataGridColumn width="55" dataField="title"
+                                                   headerText="Length"
+                                                   labelFunction="{calculateCellContentLength}"/>
+					</mx:columns>
+				</mx:AdvancedDataGrid>
+				<s:DataGrid id="batchGrid" includeIn="isoless" width="100%"
+                            height="100%" dataProvider="{experimentRacks}">
+					<s:columns>
+						<s:ArrayList>
+							<s:GridColumn width="100" dataField="design_rack"
+                                          headerText="Design Plate"/>
+							<s:GridColumn dataField="title"
+                                          headerText="Cell Plate Label"/>							
+							<s:GridColumn width="100" dataField="title"
+                                          headerText="Length"
+                                          labelFunction="{calculateCellContentLength}"/>
+						</s:ArrayList>
+					</s:columns>
+				</s:DataGrid>
+			</s:HGroup>
+			<s:Label visible="{experimentRacksCount &gt; 0}" width="100%"
+                     fontWeight="bold"
+                     text="{experimentRacksCount} cell plates will be created"
+                     textAlign="right"/>
+			<s:HGroup width="100%">
+				<s:Label fontWeight="bold" text="Label Pattern"/>
+				<components1:LabelPatternComponent id="labelPatternComponent"
+                                                   tags="{experimentDesignRacksComponent.tags}"/>
+			</s:HGroup>
+			<s:HGroup>
+				<s:Button label="Schedule" click="createJob()"
+                          enabled="{this.formValidator.formIsValid &amp;&amp; this.experiments.length &gt; 0}"/>
+				<s:Button label="Close" click="close()"/>
+				<components1:ExperimentDesignRackComponent id="experimentDesignRacksComponent"
+                                                           change="{updateRacks()}"/>
+			</s:HGroup>
+			
+		</s:Group>
+	</s:Form>
+</components:ResizableTitleWindow>

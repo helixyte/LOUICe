@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Application xmlns:fx="http://ns.adobe.com/mxml/2009"
+               xmlns:s="library://ns.adobe.com/flex/spark"
+               xmlns:mx="library://ns.adobe.com/flex/mx"
+               xmlns:maps="org.everest.flex.maps.*"
+               xmlns:views="org.everest.flex.ui.views.*"
+               xmlns:components="com.cenix.louice.shared.ui.components.*"
+               xmlns:local="*"
+               xmlns:louice="com.cenix.louice.*"
+               xmlns:ui="com.cenix.louice.shared.ui.*"
+               creationComplete="{creationComplete()}"
+               pageTitle="Laboratory Operation User Interface at Cenix"
+               scriptTimeLimit="60">
+    <fx:Script>
+        <![CDATA[
+			import com.adobe.utils.StringUtil;
+			import com.cenix.louice.shared.model.constants.AppHostPort;
+			import com.cenix.louice.shared.model.vos.UserMember;
+			import com.cenix.louice.shared.utils.CurrentUserManager;
+			
+			import mx.events.BrowserChangeEvent;
+			import mx.managers.BrowserManager;
+			import mx.managers.IBrowserManager;
+			import mx.managers.ToolTipManager;
+			import mx.utils.URLUtil;
+			
+			import org.everest.flex.events.NavigationEvent;
+			import org.everest.flex.model.ContentType;
+			import org.everest.flex.ui.components.HTMLToolTip;
+
+            public static const VERSION:String = "1.4.0b2";
+			public var RELEASE_QUALIFIER:String = '';
+			public var TRAC_BASE_URL:String = '';
+
+            [Bindable]
+            private var currentUserManager:CurrentUserManager = 
+                new CurrentUserManager();
+
+			private var browserManager:IBrowserManager;
+			
+
+            public function get currentUser():UserMember
+            {
+                return (currentUserManager != null) ? 
+                    currentUserManager.currentUser : null;
+            }
+
+            public function get currentUserName():String
+            {
+                return (currentUserManager != null) ? 
+                    currentUserManager.currentUserName : null;
+            }
+
+            private function creationComplete():void
+            {
+                ToolTipManager.toolTipClass = HTMLToolTip;
+                ToolTipManager.hideDelay = Infinity;
+				browserManager = BrowserManager.getInstance();
+				browserManager.addEventListener(BrowserChangeEvent.URL_CHANGE, _setReleaseQualifier);
+				browserManager.init("", "Welcome!");
+				// This sets the release qualifier on the welcoming screen.
+				_setReleaseQualifier();
+            }
+
+            public function get version():String
+            {
+                return VERSION;
+            }
+
+            public function loadMenu(e:Event=null):void
+            {
+                var event:NavigationEvent = 
+                    new NavigationEvent(NavigationEvent.LOAD_MODULE);
+                event.contentType = ContentType.APP_SERVICE;
+                event.pageUrl = "/";
+                shell.dispatchEvent(event);
+            }
+
+			private function _setReleaseQualifier(e:BrowserChangeEvent=null):void {
+				var port:int = URLUtil.getPort(browserManager.url);
+				var serverName:String = URLUtil.getServerName(browserManager.url);
+				if (StringUtil.beginsWith(serverName, AppHostPort.DEBUGGING_HOST) && port == AppHostPort.DEBUGGING_PORT) {
+					RELEASE_QUALIFIER = "Debug";
+					TRAC_BASE_URL = "http://dev/tracold/";
+				}
+				else if (StringUtil.beginsWith(serverName, AppHostPort.DEVELOPMENT_HOST) && port == AppHostPort.DEVELOPMENT_PORT) {
+					RELEASE_QUALIFIER = "Development Release";
+					TRAC_BASE_URL = "http://dev/tracold/";
+				}
+				else if (StringUtil.beginsWith(serverName, AppHostPort.DEMO_HOST) && port == AppHostPort.DEMO_PORT) {
+					RELEASE_QUALIFIER = "Demo Release";
+					TRAC_BASE_URL = "http://dev/tracold/";
+				}
+				else
+				{
+					RELEASE_QUALIFIER = "";
+					TRAC_BASE_URL = "http://trac/cenix/";					
+				}
+				controlBar.releaseQualifier = RELEASE_QUALIFIER;
+			}
+			
+        ]]>
+    </fx:Script>
+
+    <fx:Declarations>
+        <maps:EverestShellEventMap everestConfiguration="{new LouiceConfiguration()}"/>
+    </fx:Declarations>
+
+    <fx:Style source="/assets/styles/main.css"/>
+
+
+    <s:controlBarContent>
+        <components:ApplicationControlBar id="controlBar" width="100%"
+                                          currentUserManager="{currentUserManager}"/>
+    </s:controlBarContent>
+
+    <s:controlBarLayout>
+        <s:HorizontalLayout paddingBottom="8" paddingLeft="16" paddingRight="16"
+                            paddingTop="8" verticalAlign="middle"/>
+    </s:controlBarLayout>
+
+    <mx:ProgressBar id="progressBar" visible="{shell.loading}" left="{width / 2}"
+                    top="30" indeterminate="true" textAlign="center"/>
+
+    <views:EverestShellView id="shell" visible="true" left="0" right="0" top="0"
+                            bottom="23"/>
+
+    <components:ApplicationFooter left="0" right="0" bottom="0" minHeight="23"/>
+
+</s:Application>

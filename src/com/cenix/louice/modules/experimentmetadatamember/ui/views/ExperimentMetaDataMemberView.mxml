@@ -1,0 +1,320 @@
+<?xml version="1.0" encoding="utf-8"?>
+<view:MemberView xmlns:fx="http://ns.adobe.com/mxml/2009"
+                 xmlns:s="library://ns.adobe.com/flex/spark"
+                 xmlns:mx="library://ns.adobe.com/flex/mx"
+                 xmlns:components="com.cenix.louice.shared.ui.components.*"
+                 xmlns:views="com.cenix.louice.shared.ui.view.*"
+                 xmlns:validators="com.cenix.louice.shared.ui.components.validators.*"
+                 xmlns:views1="com.cenix.louice.modules.experimentmetadatamember.ui.views.*"
+                 xmlns:maps1="org.everest.flex.maps.*"
+                 xmlns:components1="org.everest.flex.ui.components.*"
+                 xmlns:view="org.everest.flex.ui.views.*"
+                 width="100%" height="100%"
+                 editable="{model.iso_request.owner == ''}"
+                 title="{'Experiment Metadata: ' + model.label}"
+                 creationComplete="creationCompleteHandler(event)">
+    <fx:Script>
+        <![CDATA[
+            import com.cenix.louice.modules.experimentmetadatamember.ui.presenter.ExperimentMetaDataMemberPresentationModel;
+            import com.cenix.louice.shared.model.vos.ExperimentTypes;
+            import com.cenix.louice.shared.model.vos.IsoRequestMember;
+            import com.cenix.louice.shared.model.vos.SubprojectMember;
+            
+            import mx.core.FlexGlobals;
+            import mx.events.FlexEvent;
+            
+            import spark.events.IndexChangeEvent;
+            
+            import org.everest.flex.events.MemberEvent;
+            import org.everest.flex.model.ResourceState;
+            import org.everest.flex.ui.components.ConfirmationView;
+            import org.everest.flex.ui.components.ErrorView;
+            import org.everest.flex.ui.presenters.MemberPresentationModel;
+            import org.everest.flex.ui.presenters.SuggestionDropDownListPresentationModel;
+
+            private var fileRef:FileReference = new FileReference();
+            private var fileData:ByteArray;
+            private var _isoRequestTab:DisplayObject;
+			
+            protected function creationCompleteHandler(event:FlexEvent):void
+            {
+                model.addEventListener(MemberEvent.MEMBER_CHANGED, 
+                    modelChangedHandler);
+            }
+            
+            private function modelChangedHandler(event:Event):void
+            {
+                if(model.experiment_type == ExperimentTypes.ISO_LESS && _isoRequestTab == null)
+                {
+                    _isoRequestTab = contentTabNavigator.removeChildAt(0);
+                } else if (_isoRequestTab != null) {
+                    contentTabNavigator.addChildAt(_isoRequestTab, 0);
+                    _isoRequestTab = null;
+                }
+            }
+            
+            private function selectFile_clickHandler(event:MouseEvent):void
+            {
+                fileRef.addEventListener(Event.SELECT, selectHandler);
+                fileRef.addEventListener(Event.COMPLETE, onLoadComplete);
+                fileRef.addEventListener(IOErrorEvent.IO_ERROR, onLoadError);
+                fileRef.browse([new FileFilter("Excel Files (*.xls)", "*.xls")]);
+            }
+
+            private function onLoadComplete(e:Event):void
+            {
+                this.fileData = fileRef.data;
+                model.updateMemberFromData(fileData, 
+										   'application/vnd.xls', 
+										   'application/atom+xml');
+            }
+
+            private function onLoadError(e:IOErrorEvent):void
+            {
+                ErrorView.show("Error loading file :\n" + e.text);
+            }
+
+            private function selectHandler(event:Event):void
+            {
+                fileRef.load();
+
+            }
+
+            protected function subprojectInput_changeHandler(event:IndexChangeEvent):void
+            {
+                var subproject:SubprojectMember = new SubprojectMember();
+                subproject.link = subprojectInput.selectedItemAsLink;
+                model.subproject = subproject;
+            }
+
+            protected function activate_clickHandler(event:MouseEvent):void
+            {
+                if ((model.experimentDesign == null) || (model.experimentDesign.experiment_design_racks == null) || (model.experimentDesign.experiment_design_racks.length < 1) || (model.iso_request == null))
+                {
+                    ErrorView.show("Activation not possible because no " +
+                        "experiment design was found.");
+                } else {
+                    var msg:String = (model.iso_request.delivery_date == null) ? 'The ISO Request has no delivery date!\n\n':'';
+
+                    ConfirmationView.show(msg+
+                        'ISO plate request will be sent and further editing ' +
+                        'will be disabled.\n\nAre you sure you want to activate?',
+                        'Activate?',activate);
+                }
+            }
+			
+            private function activate():void
+            {
+                model.iso_request.isos = null;
+                model.iso_request.owner = 
+                            IsoRequestMember.STOCKMANAGEMENT_USER;
+                model.submit();
+            }
+
+            protected function downloadMoleculeDesignPools(event:MouseEvent):void
+            {
+                var url:String = model.selfLink + 'molecule-design-pool-set.csv';
+                navigateToURL(new URLRequest(url));
+            }
+
+            protected function downloadExcelFile(event:MouseEvent):void
+            {
+                var url:String = 
+                    FlexGlobals.topLevelApplication.TRAC_BASE_URL + 'raw-attachment/ticket/' + 
+                    model.ticketNumber + 
+                    '/' + model.label + '.xls';
+                navigateToURL(new URLRequest(url));
+            }
+
+            public override function submit(model:MemberPresentationModel):void{
+                formValidator.validateForm(null);
+                if(formValidator.formIsValid){
+                    var m:ExperimentMetaDataMemberPresentationModel = ExperimentMetaDataMemberPresentationModel(model);
+                    if (typeSelectBox.selectedItem != m.experiment_type || inputNumberOfReplicates.value != m.number_replicates)
+                    {
+                        ConfirmationView.show(
+                            "The changes you have made will require to repeat " +
+                            "the Excel file upload.\n\nDo you want to continue?",
+                            "Warning",
+                            function():void{
+                                currentState = ResourceState.PENDING_REQUEST;
+                                m.experiment_type = typeSelectBox.selectedItem;
+                                m.number_replicates = inputNumberOfReplicates.value;
+                                model.submit();
+                            });
+                    } else {
+						// Letting the ISOs there would confuse the server (the client would send 
+						// a collection link even if there were no ISOs)
+						if (m.iso_request != null)
+						{
+							m.iso_request.isos = null;
+						}
+						model.submit();
+                    }
+                }
+            }
+
+
+        ]]>
+    </fx:Script>
+    <fx:Declarations>
+        <maps1:SuggestionEventMap dispatcher="{subprojectInput}"
+                                  presenter="{SuggestionDropDownListPresentationModel}"
+                                  view="{SuggestionDropDownListView}"/>
+    </fx:Declarations>
+    
+    <view:content>
+        <s:Form width="100%">
+            <s:layout>
+                <s:HorizontalLayout/>
+            </s:layout>
+            <s:Group>
+                <s:layout>
+                    <s:FormLayout/>
+                </s:layout>
+                <s:FormItem width="100%" label="Label:">
+                    <s:Label fontWeight="bold" text="{model.label}"/>
+                </s:FormItem>
+                <s:FormItem width="100%" label="Type:">
+                    <s:Label width="200"
+                             text="{ExperimentTypes.labelFunction(model.experiment_type)}"/>
+                </s:FormItem>
+            </s:Group>
+            <s:Group>
+                <s:layout>
+                    <s:FormLayout/>
+                </s:layout>
+                <s:FormItem label="Ticket number">
+                    <components:TracButton ticketNumber="{model.ticketNumber}"/>
+                </s:FormItem>
+            </s:Group>
+            <s:Group>
+                <s:layout>
+                    <s:FormLayout/>
+                </s:layout>
+                <s:FormItem label="Subproject:">
+                    <s:Label text="{model.subproject.fullTitle}"/>
+                </s:FormItem>
+                <s:FormItem width="100%" label="Creation Date:">
+                    <s:Label text="{dateToString(model.creation_date)}"/>
+                </s:FormItem>
+            </s:Group>
+            <s:Group>
+                <s:layout>
+                    <s:FormLayout/>
+                </s:layout>
+                <s:FormItem width="100%" label="Number of Replicates:">
+                    <s:Label width="200" text="{model.number_replicates}"/>
+                </s:FormItem>
+                <s:FormItem visible="{model.experiment_type != ExperimentTypes.ISO_LESS}"
+                            width="100%" label="Floating Molecule Design Pools">
+                    <s:Button height="18" label="CSV List"
+                              click="downloadMoleculeDesignPools(event)"
+                              icon="@Embed(source='/assets/icons/download.png')"/>
+                </s:FormItem>
+            </s:Group>
+        </s:Form>
+    </view:content>
+
+    <view:editorContent>
+        <s:Form width="100%">
+            <s:layout>
+                <s:HorizontalLayout/>
+            </s:layout>
+            <s:Group>
+                <s:layout>
+                    <s:FormLayout/>
+                </s:layout>
+                <s:FormItem width="100%" label="Name:">
+                    <s:TextInput id="inputName" width="200"
+                                 change="{model.label = inputName.text;}"
+                                 fontWeight="bold" styleName="editableLabel"
+                                 text="{model.label}"/>
+                </s:FormItem>
+                <s:FormItem width="100%" label="Type:">
+                    <s:ComboBox id="typeSelectBox" width="220" color="0x000000"
+                                dataProvider="{ExperimentTypes.types}"
+                                labelFunction="{ExperimentTypes.labelFunction}"
+                                selectedItem="{model.experiment_type}"/>
+
+                </s:FormItem>
+            </s:Group>
+            <s:Group>
+                <s:layout>
+                    <s:FormLayout/>
+                </s:layout>
+                <s:FormItem width="100%" label="Number of Replicates:">
+                    <s:NumericStepper id="inputNumberOfReplicates" maximum="99"
+                                      minimum="1"
+                                      value="{model.number_replicates}"/>
+
+                </s:FormItem>
+                <s:FormItem label="Subproject">
+                    <components1:SuggestionDropDownListView id="subprojectInput"
+                                                            width="200"
+                                                            change="subprojectInput_changeHandler(event)"
+                                                            defaultChoice="false"
+                                                            selectedItem="{model.subproject}"
+                                                            url="/subprojects/?q=active:equal-to:true"/>
+                </s:FormItem>
+            </s:Group>
+            <s:Group>
+                <s:layout>
+                    <s:FormLayout/>
+                </s:layout>
+                <s:FormItem width="100%" label="Creation Date:">
+                    <s:Label text="{dateToString(model.creation_date)}"/>
+                </s:FormItem>
+                <s:FormItem width="100%" label="Floating Molecule Design Pools">
+                    <s:Button height="18" label="CSV List"
+                              click="downloadMoleculeDesignPools(event)"
+                              icon="@Embed(source='/assets/icons/download.png')"/>
+                </s:FormItem>
+            </s:Group>
+        </s:Form>
+    </view:editorContent>
+
+    <view:actionBarContent>
+        <s:Button label="{model.hasCompletedIsoRequest?'Reactivate':'Activate'}"
+                  click="activate_clickHandler(event)"
+                  enabled="{model.iso_request.owner.indexOf('stockmanagement') &lt; 0}"
+                  fontWeight="bold"
+                  toolTip="Assign ticket to stock manager and start ISO process."/>
+        <s:Spacer width="30"/>
+        <s:Label height="100%" enabled="{selectFile.enabled}" fontWeight="bold"
+                 text="Create/Update with Excel File:" verticalAlign="middle"/>
+        <s:Button id="selectFile" label="Select File"
+                  click="selectFile_clickHandler(event)"
+                  toolTip="Once metadata is activated the 'iso' and 'transfection' sheets should not be modified.  If you need to make changes to the metadata to reflect cell plate or source plate layout changes please add these as new factors in either the 'seeding', 'treatment' or 'assay' sheets.  Metadata should then be amalgamated in Knime.&lt;br/&gt;If you require further assistance please contact your friendly IT department..."/>
+        <!--<components1:ImageButton id="buttonHelp" source="@Embed('/assets/icons/help.png')"  toolTip="toto"/>-->
+
+        <s:Spacer width="5"/>
+        <s:Button label="Excel" click="downloadExcelFile(event)"
+                  icon="@Embed(source='/assets/icons/download.png')"/>
+    </view:actionBarContent>
+
+    <view:additionalContent>
+        <mx:TabNavigator id="contentTabNavigator" width="100%" height="100%" paddingLeft="8"
+                         paddingRight="0" paddingTop="0">
+            <s:NavigatorContent label="ISO Request">
+                <views1:IsoRequestView id="isoRequestView" width="100%"
+                                       height="100%"
+                                       currentState="{this.currentState}"
+                                       isoRequest="{model.iso_request}"/>
+            </s:NavigatorContent>
+            <s:NavigatorContent width="100%" height="100%"
+                                label="Experiment Design">
+                <s:VGroup width="100%" height="100%">
+                    <views1:ExperimentDesignView width="100%" height="100%"
+                                                 experimentDesign="{model.experimentDesign}"
+                                                 selfLink="{model.selfLink}"
+                                                 tagPredicates="{model.tagPredicates}"/>
+                </s:VGroup>
+            </s:NavigatorContent>
+            <s:NavigatorContent width="100%" height="100%" label="Jobs">
+                <views1:ExperimentJobsView width="100%" height="100%"
+                                           model="{this.model}"/>
+            </s:NavigatorContent>
+        </mx:TabNavigator>
+    </view:additionalContent>
+</view:MemberView>

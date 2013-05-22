@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<views:MemberView xmlns:fx="http://ns.adobe.com/mxml/2009"
+                  xmlns:s="library://ns.adobe.com/flex/spark"
+                  xmlns:mx="library://ns.adobe.com/flex/mx"
+                  xmlns:components="com.cenix.louice.shared.ui.components.*"
+                  xmlns:view="org.everest.flex.ui.views.*"
+                  xmlns:components1="org.everest.flex.ui.components.*"
+                  xmlns:views="org.everest.flex.ui.views.*"
+                  width="100%" height="100%"
+                  title="{'Plate Specs: ' + model.title}">
+
+    <view:content>
+        <s:Form width="100%">
+            <s:FormItem width="100%" label="Label">
+                <s:Label text="{model.label}"/>
+            </s:FormItem>
+            <s:FormItem width="100%" label="Shape">
+                <components1:MemberLinkButton link="{model.shape}"/>
+            </s:FormItem>
+            <s:FormItem width="100%" label="Manufacturer">
+                <components1:MemberLinkButton link="{model.manufacturer}"/>
+            </s:FormItem>
+            <s:FormItem width="100%" label="Well Secifications">
+                <components1:MemberLinkButton link="{model.well_specs}"/>
+            </s:FormItem>
+        </s:Form>
+    </view:content>
+</views:MemberView>

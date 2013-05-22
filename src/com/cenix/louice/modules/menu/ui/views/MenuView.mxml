@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:VGroup xmlns:fx="http://ns.adobe.com/mxml/2009"
+          xmlns:s="library://ns.adobe.com/flex/spark"
+          xmlns:mx="library://ns.adobe.com/flex/mx"
+          xmlns:components="com.cenix.louice.shared.ui.components.*"
+          width="100%" height="100%" currentState="{model.viewState}">
+
+    <fx:Script>
+        <![CDATA[
+            import com.cenix.louice.modules.menu.ui.presenters.MenuPresentationModel;
+
+            [Bindable]
+            public var model:MenuPresentationModel;
+
+            protected function foldUnfoldButton_clickHandler(event:MouseEvent):void
+            {
+                currentState = (currentState != "foldedSideMenu") ? "foldedSideMenu" :  "normal";
+            }
+
+            protected function foldUnfoldButton_dragHandler(event:MouseEvent):void
+            {
+                if (currentState != "foldedSideMenu")
+                {
+                    currentState = "foldedSideMenu";
+                }
+            }
+        ]]>
+    </fx:Script>
+
+    <s:states>
+        <s:State name="normal"/>
+        <s:State name="pendingRequest"/>
+        <s:State name="pendingResponse"/>
+        <s:State name="foldedSideMenu"/>
+    </s:states>
+
+    <s:transitions>
+        <mx:Transition fromState="*" toState="foldedSideMenu">
+            <s:Animate duration="180" target="{sideMenuList}">
+                <s:SimpleMotionPath property="width"/>
+            </s:Animate>
+        </mx:Transition>
+        <mx:Transition fromState="foldedSideMenu" toState="*">
+            <s:Animate duration="140" target="{sideMenuList}">
+                <s:SimpleMotionPath property="width"/>
+            </s:Animate>
+        </mx:Transition>
+    </s:transitions>
+
+    <s:BorderContainer width="100%" height="100%" borderVisible="false"
+                       cornerRadius="3">
+        <s:HGroup width="100%" height="100%" gap="0" paddingBottom="0"
+                  paddingLeft="8" paddingRight="0" paddingTop="0"
+                  verticalAlign="middle">
+
+            <s:Spacer width="2"/>
+            <s:List id="primaryMenuList" width="100%" height="100%"
+                    borderVisible="false"
+                    click="model.loadPage(primaryMenuList.selectedItem)"
+                    dataProvider="{model.menuItems}" dragEnabled="true"
+                    dragMoveEnabled="true" dropEnabled="true"
+                    itemRenderer="com.cenix.louice.modules.menu.ui.renderers.MenuItemRenderer"
+                    requireSelection="false" selectedItem="{model.selectedItem}"
+                    enabled.pendingResponse="false">
+                    <s:layout>
+                        <s:TileLayout columnAlign="justifyUsingWidth"
+                                      orientation="columns"/>
+                    </s:layout>
+            </s:List>
+
+            <s:Button width="20" height="100%" label="&lt;"
+                      click="foldUnfoldButton_clickHandler(event)"
+                      dragEnter="foldUnfoldButton_dragHandler(event)"
+                      dragOver="foldUnfoldButton_dragHandler(event)"
+                      skinClass="com.cenix.louice.modules.menu.ui.skin.SideMenuButtonSkin"
+                      width.foldedSideMenu="16" label.foldedSideMenu="&gt;"/>
+
+            <s:List id="sideMenuList" width="0" height="100%"
+                    borderVisible="false"
+                    click="model.loadPage(sideMenuList.selectedItem)"
+                    contentBackgroundColor="#efefef"
+                    dataProvider="{model.filteredMenuItems}" dragEnabled="true"
+                    dragMoveEnabled="true" dropEnabled="true"
+                    itemRenderer="com.cenix.louice.modules.menu.ui.renderers.MenuItemRenderer"
+                    toolTip="You can drag and drop items here that you do not want in the main menu."
+                    width.foldedSideMenu="310">
+
+            </s:List>
+        </s:HGroup>
+    </s:BorderContainer>
+</s:VGroup>

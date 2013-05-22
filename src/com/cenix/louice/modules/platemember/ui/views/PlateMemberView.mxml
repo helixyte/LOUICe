@@ -1,0 +1,183 @@
+<?xml version="1.0" encoding="utf-8"?>
+<views1:MemberView xmlns:fx="http://ns.adobe.com/mxml/2009"
+                   xmlns:s="library://ns.adobe.com/flex/spark"
+                   xmlns:mx="library://ns.adobe.com/flex/mx"
+                   xmlns:components="org.everest.flex.ui.components.*"
+                   xmlns:views="com.cenix.louice.modules.devicemember.ui.views.*"
+                   xmlns:view="org.everest.flex.ui.views.*"
+                   xmlns:components1="com.cenix.louice.shared.ui.components.*"
+                   xmlns:rack="com.cenix.louice.shared.ui.components.rack.*"
+                   xmlns:views1="org.everest.flex.ui.views.*"
+                   width="100%" height="100%" title="{'Plate: ' + model.title}">
+    <fx:Script>
+        <![CDATA[
+            import com.cenix.louice.modules.containercollection.view.AttributeLabelUtils;
+            import com.cenix.louice.shared.model.vos.BarcodeType;
+            import com.cenix.louice.shared.model.vos.ContainerMember;
+            import com.cenix.louice.shared.model.vos.WellMember;
+            import com.cenix.louice.shared.utils.UnitConvUtils;
+
+            private function sampleMoleculeAttrLabelFunction( item:Object, column:*):String
+            {
+                return AttributeLabelUtils.sampleMoleculeAttributeList(WellMember(item), column.dataField);
+            }
+
+            public static function toolTipFunction(item:Object):String{
+                var container:ContainerMember = ContainerMember(item);
+                var toolTip:String = '<b>' + container.position + '</b><br/>';
+                if (! isNaN(container.sample_volume))
+                {
+                    toolTip += ("Volume: " + 
+                                UnitConvUtils.volumeLabelFunction(container.sample_volume) +
+                                ' µl<br/>');
+                    toolTip += ("Molecule Design Pool ID: " + 
+                                container.sample_molecule_design_pool_id + '<br/>');
+                    toolTip = maybeAppend(toolTip, container, 
+                        "molecule_design_id", "Molecule Design ID");
+                    toolTip = maybeAppend(toolTip, container,
+                        "supplier", "Supplier");
+                    toolTip = maybeAppend(toolTip, container,
+                        "product_id", "Product ID");
+                    toolTip = maybeAppend(toolTip, container, 
+                        "concentration", "Concentration", "µM");
+                    toolTip = maybeAppend(toolTip, container, 
+                        "freeze_thaw_cycles", "Freeze Thaw Cycles");
+                    toolTip = maybeAppend(toolTip, container,
+                        "insert_date", "Insert Date");
+                }
+                return toolTip;
+            }
+
+            private static function maybeAppend(toolTip:String, 
+                                                member:ContainerMember, 
+                                                attr:String, 
+                                                label:String, 
+                                                unit:String=""):String
+            {
+                var value:String = 
+                  AttributeLabelUtils.sampleMoleculeAttributeList(member,attr);
+
+                if ((value != null)&&(value.length > 0))
+                {
+                    toolTip +=  label + ": " + value + " " + unit + '<br/>';
+                }
+
+                return toolTip;
+            }
+        ]]>
+    </fx:Script>
+
+    <view:content>
+        <s:Form width="100%">
+            <s:layout>
+                <s:HorizontalLayout/>
+            </s:layout>
+            <s:Group>
+                <s:layout>
+                    <s:FormLayout/>
+                </s:layout>
+                <s:FormItem label="Barcode">
+                    <components1:BarcodeButton label="{model.label}"
+                                               barcode="{model.barcode}"
+                                               showLink="false"
+                                               type="{BarcodeType.UNIRACK}"/>
+                </s:FormItem>
+                <s:FormItem label="Label">
+                    <mx:Label selectable="true" text="{model.label}"/>
+                </s:FormItem>
+                <s:FormItem label="Creation Date">
+                    <mx:Label text="{dateToString(model.creation_date)}"/>
+                </s:FormItem>
+            </s:Group>
+            <s:Group>
+                <s:layout>
+                    <s:FormLayout/>
+                </s:layout>
+                <s:FormItem label="Specs">
+                    <components:MemberLinkButton link="{model.specs}"/>
+                </s:FormItem>
+                <s:FormItem label="Location">
+                    <components:MemberLinkButton link="{model.location}"/>
+                </s:FormItem>
+                <s:FormItem label="Status">
+                    <components:MemberLinkButton link="{model.status}"/>
+                </s:FormItem>
+            </s:Group>
+            <s:Group>
+                <s:layout>
+                    <s:FormLayout/>
+                </s:layout>
+                <s:FormItem label="Comment">
+                    <s:VGroup>
+                        <mx:Label width="100%" text="{model.comment}"/>
+                    </s:VGroup>
+                </s:FormItem>
+            </s:Group>
+        </s:Form>
+    </view:content>
+
+    <view:additionalContent>
+        <mx:TabNavigator visible="{model.hasContainers}" width="100%"
+                         height="100%" creationPolicy="all" paddingLeft="5"
+                         paddingRight="5">
+
+            <s:NavigatorContent label="Layout">
+                    <rack:RackView left="0" right="0" top="0" bottom="20"
+                                   members="{model.containers}"
+                                   toolTipFunction="{toolTipFunction}"/>
+
+            </s:NavigatorContent>
+
+            <s:NavigatorContent label="Table">
+                <components:DataGrid id="wellsGrid" width="100%" height="100%"
+                                     borderColor="#999999"
+                                     dataProvider="{model.containers}"
+                                     doubleClickEnabled="false">
+                    <components:columns>
+                        <s:ArrayList>
+                            <s:GridColumn minWidth="64" dataField="position"
+                                          headerText="Position"/>
+                            <s:GridColumn minWidth="64" dataField="sample_volume"
+                                          headerText="Volume (µl)"
+                                          labelFunction="{UnitConvUtils.dataGridVolumeLabelFunction}"/>
+                            <s:GridColumn minWidth="96"
+                                          dataField="sample_molecule_design_pool_id"
+                                          headerText="Molecule Design Pool ID"
+                                          sortable="false"/>
+                            <s:GridColumn minWidth="96"
+                                          dataField="molecule_design_id"
+                                          headerText="Molecule Design ID"
+                                          labelFunction="{sampleMoleculeAttrLabelFunction}"
+                                          sortable="false"/>
+                            <s:GridColumn minWidth="64" dataField="supplier"
+                                          headerText="Supplier"
+                                          labelFunction="{sampleMoleculeAttrLabelFunction}"
+                                          sortable="false"/>
+                            <s:GridColumn minWidth="64" dataField="product_id"
+                                          headerText="Product ID"
+                                          labelFunction="{sampleMoleculeAttrLabelFunction}"
+                                          sortable="false"/>
+                            <s:GridColumn minWidth="64" dataField="concentration"
+                                          headerText="Concentration (µM)"
+                                          labelFunction="{sampleMoleculeAttrLabelFunction}"/>
+                            <s:GridColumn minWidth="64"
+                                          dataField="freeze_thaw_cycles"
+                                          headerText="Freeze Thaw Cycles"
+                                          labelFunction="{sampleMoleculeAttrLabelFunction}"
+                                          sortable="false"/>
+                            <s:GridColumn minWidth="96" dataField="insert_date"
+                                          headerText="Insert Date"
+                                          labelFunction="{sampleMoleculeAttrLabelFunction}"
+                                          sortable="false"/>
+                        </s:ArrayList>
+                    </components:columns>
+                </components:DataGrid>
+            </s:NavigatorContent>
+        </mx:TabNavigator>
+        <s:HGroup width="100%">
+            <mx:Spacer width="100%"/>
+            <s:Label text="Total Wells"/>
+            <s:Label text="{model.containers.length}"/>
+        </s:HGroup>
+    </view:additionalContent>
+</views1:MemberView>

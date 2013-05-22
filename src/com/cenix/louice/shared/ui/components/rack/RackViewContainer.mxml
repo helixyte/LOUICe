@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Graphic xmlns:fx="http://ns.adobe.com/mxml/2009"
+           xmlns:s="library://ns.adobe.com/flex/spark"
+           xmlns:mx="library://ns.adobe.com/flex/mx"
+           useHandCursor="true">
+    <s:states>
+        <s:State name="filled"/>
+        <s:State name="empty"/>
+        <s:State name="none"/>
+    </s:states>
+    <fx:Script>
+        <![CDATA[
+            private static const DISABLED_BORDER_COLOR:uint = 0xCCCCCC;
+            private static const BORDER_COLOR:uint = 0x498bf4;
+
+            public function set color(col:uint):void
+            {
+                fill1.color = fill2.color = col;
+            }
+
+            public function set highlightBorder(highlight:Boolean):void
+            {
+                if (highlight)
+                {
+                    border.color = 0xFF0000;
+                    border.weight = 5;
+                } else {
+                    border.color = 0x498bf4;
+                    border.weight = 1;
+                }
+
+            }
+
+            public function set label(label:String):void
+            {
+                containerLabel.text = label;
+            }
+
+
+            public function set state(state:String):void
+            {
+                
+                super.enabled = state == "none" ? false : true;
+                currentState = state;
+
+//                borderColor.color = enabled ? BORDER_COLOR : DISABLED_BORDER_COLOR;
+//                color = enabled ? 0x498bf4 : 0xffffff;
+            }
+            
+            public function get state():String
+            {
+                return currentState;
+            }
+            
+            public override function set width(value:Number):void
+            {
+                ellipse.width = value;
+                super.width = value;
+            }
+
+            public override function set height(value:Number):void
+            {
+                ellipse.height = value;
+                super.height = value;
+            }
+
+            public function set radius(radius:int):void
+            {
+                this.width = this.height = radius;
+                ellipse.width = ellipse.height = radius;
+            }
+
+            public function reset():void
+            {
+                fill1.color = fill2.color = 0x498bf4;
+                containerLabel.text = "";
+            }
+        ]]>
+    </fx:Script>
+    <s:Ellipse id="ellipse" left="0" right="0" top="0" bottom="0">
+        <s:stroke>
+            <s:SolidColorStroke id="border" alpha="0.8" color="#498bf4"
+                                weight="1"/>
+        </s:stroke>
+        <s:fill>
+            <s:RadialGradient id="fill">
+                <s:GradientEntry id="fill1" alpha="0.8" color="#498bf4"
+                                 ratio="0.0"
+                                 alpha.empty="0.3"
+                                 alpha.none="0.1"/>
+                <s:GradientEntry id="fill2" alpha="0.8" color="#498bf4"
+                                 ratio="0.48001"
+                                 alpha.empty="0.3"
+                                 alpha.none="0.1"/>
+            </s:RadialGradient>
+        </s:fill>
+    </s:Ellipse>
+    <s:Label id="containerLabel" left="0" right="0" top="0" bottom="0"
+             textAlign="center" verticalAlign="middle"/>
+</s:Graphic>

@@ -1,0 +1,352 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Group xmlns:fx="http://ns.adobe.com/mxml/2009"
+         xmlns:s="library://ns.adobe.com/flex/spark"
+         xmlns:mx="library://ns.adobe.com/flex/mx"
+         resize="resizeHandler(event)" >
+    <fx:Script>
+        <![CDATA[
+            import com.cenix.louice.shared.model.vos.TagMember;
+            import com.cenix.louice.shared.model.vos.TagPredicate;
+
+            import mx.collections.ArrayCollection;
+            import mx.controls.Spacer;
+
+            import spark.components.HGroup;
+            import spark.components.VGroup;
+
+            public var autoResize:Boolean=true;
+
+            [Bindable]
+            public var label:String = "";
+
+            private const GAP:int = 0;
+            private const PADDING1:int = 7;
+            private const PADDING2:int = 7;
+
+
+            private var _members:Dictionary;
+            private var _columnCount:int;
+            private var _rowCount:int;
+            private var _rowLabels:Array;
+            private var _tagMap:TagMap;
+
+            private var _containerElements:Array;
+            private var _labelElements:Array;
+
+            [Bindable]
+            private var _oldRadius:Number = 0;
+
+            public var toolTipFunction:Function;
+
+            private const ROW_LETTERS:Array = ["A","B","C","D","E","F","G","H","I","J","K","L","M","N","O","P","Q","R","S","T","U","V","W","X","Y","Z","AA","AB","AC","AD","AE","AF","AG","AH","AI","AJ","AK","AL","AM","AN","AO","AP","AQ","AR","AS","AT","AU","AV","AW","AX","AY","AZ"];
+
+            protected function resizeHandler(event:Event=null):void
+            {
+                var cWidth:int = Math.floor((width - (PADDING1+PADDING2)) / (_columnCount + 1.4));
+                var cHeight:int = Math.floor((height - (PADDING1+PADDING2)) / (_rowCount + 1.6));
+                var radius:int = Math.min(cWidth,cHeight);
+
+                trace(radius +  "    "  + _oldRadius);
+                if (Math.abs(radius - _oldRadius) > 3) {
+
+                    _oldRadius = radius;
+
+                    this.width = (radius * (_columnCount + 1.4))  + PADDING1+PADDING2 ;
+                    this.height = (radius * (_rowCount + 1.4))  + PADDING1+PADDING2 ;
+
+                    for each (var cell:RackViewContainer in _containerElements)
+                    {
+                        cell.radius = radius;
+                    }
+
+                    for each (var label:* in _labelElements)
+                    {
+                        label.width = radius;
+                        label.height = radius;
+                    }
+
+                    background.width = width;
+                    background.height = height;
+                    white.width = width;
+                    white.height = height;
+                }
+
+            }
+
+            private function getRowAndColumn(positionLabel:String):Array{
+
+                //position labels mix row and column so we need to umnix that by hand.
+                //rows are alphabetic from A-Z..AA-ZZ etc.
+                var rowLetter:String = "";
+                var columnNumber:String = "";
+                var len:int = positionLabel.length;
+
+                for (var i:int=0; i < len; i++) {
+
+                    var c:String = positionLabel.charAt(i);
+
+                    if(isNaN(parseInt(c))) {
+                        rowLetter += c;
+                    } else {
+                        columnNumber += c;
+                    }
+                }
+
+                return [rowLetter.toUpperCase(),columnNumber];
+            }
+
+            private function determineLayout():void{
+
+                //the layout is not predefined, it will be deducted from the data
+                var dejavu:Dictionary = new Dictionary();
+
+                _rowLabels = new Array();
+                _columnCount = 0;
+
+                for each (var rackMember:Object in _members){
+
+                    var rowAndColumn:Array = getRowAndColumn(rackMember.position);
+                    var rowLetter:String = rowAndColumn[0];
+                    var column:int = int(rowAndColumn[1]);
+
+                    _columnCount = Math.max(_columnCount, column);
+
+                    if(dejavu[rowLetter] == null){
+                        _rowLabels.push(rowLetter);
+                        dejavu[rowLetter] = true;
+                    }
+                }
+
+                _rowCount = _rowLabels.length;
+
+                _rowLabels.sort(RackPositionComperator.compare);
+
+
+            }
+
+            private function initializeRack():void{
+
+                var indx:int = 0;
+                _oldRadius = 0;
+                _rack.removeAllElements();
+                _rack.gap = GAP;
+                _rack.paddingRight = _rack.paddingBottom = PADDING2;
+                _rack.paddingLeft = _rack.paddingTop = PADDING1;
+
+
+
+                this._containerElements = new Array();
+                this._labelElements = new Array();
+
+                //add all components of the rack depending on the layout
+
+                for each (var row:String in _rowLabels){
+
+                    var rowLabel:RackViewLabel = new RackViewLabel(row)
+                    var newRow:HGroup = new HGroup();
+                    newRow.variableColumnWidth = false;
+                    newRow.gap = GAP;
+                    newRow.addElement(rowLabel);
+                    _labelElements.push(rowLabel);
+                    for (var i:int=1; i <= _columnCount; i++) {
+
+                        var position:String = row + i;
+
+                        var container:RackViewContainer = new RackViewContainer();
+                        container.id = position;
+                        container.cacheAsBitmap = true;
+
+                        ///process MEMBERS
+                        if(_members != null){
+                            var rackMember:Object = _members[position];
+                            if((rackMember != null) && (toolTipFunction != null)){
+                                container.toolTip = toolTipFunction(rackMember);
+                            }
+                            if(rackMember != null)
+                            {
+                                if((rackMember.sample_volume != null) &&
+                                    (rackMember.sample_volume > 0)){
+                                    container.state = 'filled';
+                                } else {
+                                    container.state = 'empty';
+                                }
+                            } else {
+                                container.state = 'none';
+                            }
+                        } else {
+                            container.state = 'none';
+                        }
+
+                        ///process TAGs
+                        if(_tagMap != null){
+                            var tags:ArrayCollection = _tagMap.getTags(position);
+
+                            if(tags != null){
+                                container.toolTip = '<b>' + position + ' Factors:</b><br/>';
+                                for each (var tag:TagMember in tags)
+                                {
+                                    container.toolTip += tag.label + ": " + tag.value +'<br/>';
+                                }
+                                container.state = 'filled';
+                            } else {
+                                container.state = 'none';
+                            }
+                        }
+
+                        newRow.addElement(container);
+                        _containerElements.push(container);
+                    }
+
+                    _rack.addElement(newRow);
+                }
+
+                var spacer:Spacer = new Spacer();
+                var numbersRow:HGroup = new HGroup();
+                numbersRow.gap = GAP;
+                numbersRow.variableColumnWidth = false;
+                numbersRow.addElement(spacer);
+                this._labelElements.push(spacer);
+                for (var j:int=1; j <= _columnCount; j++) {
+                    var columnLabel:RackViewLabel = new RackViewLabel( String(j))
+                    numbersRow.addElement(columnLabel);
+                    this._labelElements.push(columnLabel);
+                }
+
+                _rack.addElementAt(numbersRow, 0);
+
+                resizeHandler();
+            }
+
+            public function set members(members:ArrayCollection):void
+            {
+                trace("loading members");
+                this._members = new Dictionary();
+
+                for each (var rackMember:Object in members){
+                    _members[rackMember.position] = rackMember;
+                }
+
+                determineLayout();
+                initializeRack();
+
+            }
+
+            public function set dimension(rowColumnArray:Array):void{
+
+                trace("determine layout");
+                if((rowColumnArray != null)&&(rowColumnArray.length == 2)&&((rowColumnArray[0] != _rowCount)||(rowColumnArray[1] != _columnCount))){
+                    _rowCount = rowColumnArray[0];
+                    _columnCount = rowColumnArray[1];
+
+                    if((_rowCount>0)&&(_columnCount>0)){
+                        _rowLabels = new Array();
+                        for(var i:int=0; i<_rowCount; i++){
+                            _rowLabels.push(ROW_LETTERS[i]);
+                        }
+                    }
+
+                    initializeRack();
+                }
+            }
+
+            public function set tagMap(tagMap:TagMap):void
+            {
+                this._tagMap = tagMap;
+                initializeRack();
+            }
+
+            public function highlightTagPredicate(tagPredicate:TagPredicate, colorLabelMap:Dictionary):void
+            {
+
+                if(_tagMap != null){
+                    for each (var cell:RackViewContainer in _containerElements)
+                    {
+                        var tags:ArrayCollection = _tagMap.getTags(cell.id);
+                        var color:uint = 0xFFFFFF;
+                        var label:String = '';
+
+                        for each (var tag:TagMember in tags)
+                        {
+                            if (tag.predicate == tagPredicate.name)
+                            {
+                                var c:Array = colorLabelMap[tag.value];
+                                if (c != null)
+                                {
+                                    color = c[0];
+                                    label = c[1];
+                                }
+                            }
+                        }
+                        cell.color = color;
+                        cell.label = label;
+                    }
+                }
+            }
+
+            public function highlightSearchTerm(searchTerm:String):void
+            {
+                searchTerm = searchTerm.toLowerCase();
+
+
+                for each (var cell:RackViewContainer in _containerElements)
+                {
+                    var toolTip:String = cell.toolTip;
+                    var len:uint = searchTerm.length;
+
+                    if ((len>0) && (toolTip != null) && (toolTip.toLowerCase().indexOf(searchTerm) > -1))
+                    {
+                        cell.highlightBorder = true;
+                    } else {
+                        cell.highlightBorder = false;
+                    }
+                }
+            }
+
+        ]]>
+    </fx:Script>
+
+    <s:Group left="4"  height="26" visible="{label != ''}">
+        <s:Rect top="0" right="0" left="0" bottom="0" topLeftRadiusX="3" topLeftRadiusY="3" topRightRadiusX="3" topRightRadiusY="3">
+            <s:fill>
+                <s:SolidColor color="#ffffff" />
+            </s:fill>
+            <s:filters>
+                <s:BevelFilter distance="2" angle="45" highlightColor="#cfe0fc"/>
+            </s:filters>
+        </s:Rect>
+        <s:Label id="rackLabel"  text="{label}"  fontSize="12" left="11" right="11" top="-1" textAlign="center"
+                 fontWeight="bold" paddingTop="8" paddingBottom="2" paddingRight="16" paddingLeft="10"/>
+    </s:Group>
+
+    <s:Group top="19" right="0" left="0" bottom="0">
+        <s:Path id="white" data="M5,5 L5,5L{width},5L{width},{height}L5,{height}L5,5Z"
+                winding="nonZero" top="0" left="0">
+            <s:fill>
+                <s:SolidColor color="#ffffff">
+
+                </s:SolidColor>
+            </s:fill>
+        </s:Path>
+
+        <s:Path data="M5,5 L5,5L{width},5L{width},{height}L5,{height}L5,5Z"
+                winding="nonZero" id="background" alpha="0.4">
+            <s:fill>
+                <s:LinearGradient rotation="45">
+                    <s:GradientEntry color="#FFFFFF" ratio="0"/>
+                    <s:GradientEntry color="#498bf4" ratio="1"/>
+                </s:LinearGradient>
+            </s:fill>
+            <s:stroke>
+                <s:LinearGradientStroke weight="5" rotation="45">
+                    <s:GradientEntry color="#FFFFFF" ratio="0"/>
+                    <s:GradientEntry color="#498bf4" ratio="1"/>
+                </s:LinearGradientStroke>
+            </s:stroke>
+            <s:filters>
+                <s:BevelFilter distance="2" angle="45" highlightColor="#498bf4"/>
+            </s:filters>
+        </s:Path>
+        <s:VGroup id="_rack" minWidth="400" minHeight="400" />
+    </s:Group>
+
+</s:Group>

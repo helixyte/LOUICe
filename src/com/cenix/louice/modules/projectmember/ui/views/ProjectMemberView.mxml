@@ -1,0 +1,196 @@
+<?xml version="1.0" encoding="utf-8"?>
+<views1:MemberView xmlns:fx="http://ns.adobe.com/mxml/2009"
+                 xmlns:s="library://ns.adobe.com/flex/spark"
+                 xmlns:mx="library://ns.adobe.com/flex/mx"
+                 xmlns:views="com.cenix.louice.modules.projectmodel.ui.views.*"
+                 xmlns:components="org.everest.flex.ui.components.*"
+                xmlns:view="org.everest.flex.ui.views.*"
+                 xmlns:maps="org.everest.flex.maps.*"
+                 xmlns:validators="com.cenix.louice.shared.ui.components.validators.*"
+                 width="100%" height="100%" title="{'Project: ' + model.label}" xmlns:views1="org.everest.flex.ui.views.*"  >
+
+
+    <fx:Script>
+        <![CDATA[
+            import org.everest.flex.model.Link;
+            import com.cenix.louice.shared.model.vos.OrganizationMember;
+            import com.cenix.louice.shared.model.vos.SubprojectMember;
+            import com.cenix.louice.shared.model.vos.UserMember;
+            import org.everest.flex.ui.presenters.SuggestionDropDownListPresentationModel;
+
+            import spark.events.IndexChangeEvent;
+
+
+
+            protected function addSubproject(event:MouseEvent):void
+            {
+
+                var count: int = model.subprojects.length + 1;
+                var newSubproject:SubprojectMember = new SubprojectMember();
+                    newSubproject.label = "Subproject " + count;
+                    newSubproject.active = true;
+                    newSubproject.creation_date = new Date();
+
+                model.addSubproject(newSubproject);
+            }
+
+
+            protected function customerInputChangeHandler(event:IndexChangeEvent=null):void
+            {
+                if (customerInput.selectedItem != null)
+                {
+                    var newOrg:OrganizationMember = new OrganizationMember();
+                    newOrg.link = new Link(customerInput.selectedItem.label, customerInput.selectedItem.value);
+
+                    model.customer = newOrg;
+                }
+            }
+
+            protected function userInputChangeHandler(event:IndexChangeEvent):void
+            {
+                var newLeader:UserMember = new UserMember();
+                    newLeader.link = new Link(leaderInput.selectedItem.label, leaderInput.selectedItem.value);
+
+                model.leader = newLeader;
+            }
+
+        ]]>
+    </fx:Script>
+
+    <fx:Declarations>
+
+        <fx:Array id="validators">
+            <mx:StringValidator maxLength="256" minLength="3" property="text" source="{inputName}"/>
+        </fx:Array>
+
+        <maps:SuggestionEventMap dispatcher="{customerInput}"
+                                 presenter="{SuggestionDropDownListPresentationModel}"
+                                 view="{SuggestionDropDownListView}"/>
+
+        <maps:SuggestionEventMap dispatcher="{leaderInput}"
+                                 presenter="{SuggestionDropDownListPresentationModel}"
+                                 view="{SuggestionDropDownListView}"/>
+    </fx:Declarations>
+
+    <!-- NORMAL CONTENT -->
+    <view:content>
+
+        <s:Form width="100%">
+            <s:layout>
+                <s:HorizontalLayout/>
+            </s:layout>
+                <s:Group>
+                    <s:layout>
+                        <s:FormLayout/>
+                    </s:layout>
+                    <s:FormItem width="100%" label="Name">
+                        <s:Label text="{model.label}"/>
+                    </s:FormItem>
+                    <s:FormItem width="100%" label="Project Leader">
+                        <components:MemberLinkButton link="{model.leader}"/>
+                    </s:FormItem>
+                </s:Group>
+                <s:Group>
+                    <s:layout>
+                        <s:FormLayout/>
+                    </s:layout>
+                    <s:FormItem width="100%" label="Creation Date">
+                        <s:Label text="{dateToString(model.creation_date)}"/>
+                    </s:FormItem>
+                    <s:FormItem width="100%" label="Customer">
+                        <components:MemberLinkButton link="{model.customer}"/>
+                    </s:FormItem>
+                </s:Group>
+        </s:Form>
+
+        <components:DataGrid width="100%" minHeight="200" dataProvider="{model.subprojects}" >
+            <components:columns>
+                <s:ArrayList>
+                    <s:GridColumn dataField="label" headerText="Sub Projects"/>
+
+                    <s:GridColumn width="180" minWidth="136" dataField="creation_date"
+                                  headerText="Creation Date" labelFunction="dateFormatLabelFunction"/>
+
+                    <s:GridColumn width="80" dataField="active" headerText="Active"/>
+                </s:ArrayList>
+            </components:columns>
+        </components:DataGrid>
+
+    </view:content>
+
+    <!-- EDITOR CONTENT -->
+    <view:editorContent>
+
+        <s:Form width="100%">
+            <s:layout>
+                <s:HorizontalLayout/>
+            </s:layout>
+            <s:Group>
+                <s:layout>
+                    <s:FormLayout/>
+                </s:layout>
+                <s:FormItem width="100%" label="Name">
+                    <s:TextInput id="inputName" change="{model.label = inputName.text;}"
+                                 fontWeight="bold" text="{model.label}"/>
+                </s:FormItem>
+                <s:FormItem width="100%" label="Project Leader">
+                    <components:SuggestionDropDownListView id="leaderInput"
+                                                           change="userInputChangeHandler(event)"
+                                                           defaultChoice="false" url="/users"
+                                                           selectedItem="{model.leader}"/>
+                </s:FormItem>
+            </s:Group>
+            <s:Group>
+                <s:layout>
+                    <s:FormLayout/>
+                </s:layout>
+                <s:FormItem label="Creation Date">
+                    <mx:Label text="{dateToString(model.creation_date)}"/>
+                </s:FormItem>
+                <s:FormItem width="100%" label="Customer">
+                    <components:SuggestionDropDownListView id="customerInput"
+                                                           change="customerInputChangeHandler(event)"
+                                                           defaultChoice="false"
+                                                           url="/organizations"
+                                                           selectedItem="{model.customer}"/>
+                </s:FormItem>
+            </s:Group>
+        </s:Form>
+
+
+        <components:DataGrid id="subprojectGrid" width="100%" minHeight="200"
+                            dataProvider="{model.subprojects}" editable="true">
+            <components:columns>
+                <s:ArrayList>
+                    <s:GridColumn dataField="label" headerText="Sub Projects"/>
+
+                    <s:GridColumn width="180" minWidth="136" dataField="creation_date"
+                                  editable="false" headerText="Creation Date"
+                                  labelFunction="dateFormatLabelFunction"/>
+
+                    <s:GridColumn width="80" dataField="active" headerText="Active">
+                        <s:itemEditor>
+                            <fx:Component>
+                                <s:ComboBoxGridItemEditor>
+                                    <s:dataProvider>
+                                        <s:ArrayList>
+                                            <fx:String>false</fx:String>
+                                            <fx:String>true</fx:String>
+                                        </s:ArrayList>
+                                    </s:dataProvider>
+                                </s:ComboBoxGridItemEditor>
+                            </fx:Component>
+                        </s:itemEditor>
+                    </s:GridColumn>
+                </s:ArrayList>
+            </components:columns>
+        </components:DataGrid>
+
+        <s:Group width="100%" height="25">
+            <s:Button id="btnAddSubproject" right="0" label="Add Subproject"
+                      click="addSubproject(event)"/>
+        </s:Group>
+    </view:editorContent>
+
+
+</views1:MemberView>
