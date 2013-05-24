@@ -1,8 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <views:NewMemberView xmlns:fx="http://ns.adobe.com/mxml/2009"
-                    xmlns:s="library://ns.adobe.com/flex/spark"
-                    xmlns:mx="library://ns.adobe.com/flex/mx" xmlns:components="com.cenix.louice.shared.ui.components.*" xmlns:view="org.everest.flex.ui.views.*"
-                    title="New Project"  creationComplete="{focusManager.setFocus(inputName)}" xmlns:validators="com.cenix.louice.shared.ui.components.validators.*" xmlns:maps="org.everest.flex.maps.*" xmlns:components1="org.everest.flex.ui.components.*" xmlns:views="org.everest.flex.ui.views.*" >
+                     xmlns:s="library://ns.adobe.com/flex/spark"
+                     xmlns:mx="library://ns.adobe.com/flex/mx"
+                     xmlns:components="com.cenix.louice.shared.ui.components.*"
+                     xmlns:view="org.everest.flex.ui.views.*"
+                     xmlns:validators="com.cenix.louice.shared.ui.components.validators.*"
+                     xmlns:maps="org.everest.flex.maps.*"
+                     xmlns:components1="org.everest.flex.ui.components.*"
+                     xmlns:views="org.everest.flex.ui.views.*"
+                     creationComplete="{focusManager.setFocus(inputName)}"
+                     title="New Project">
 
     <fx:Script>
         <![CDATA[
@@ -52,45 +59,44 @@
     <fx:Declarations>
 
         <fx:Array id="validators">
-            <mx:StringValidator source="{inputName}" property="text" minLength="3" maxLength="256" />
-            <validators:SelectionValidator source="{leaderInput}" />
-            <validators:SelectionValidator source="{customerInput}" />
+            <mx:StringValidator maxLength="256" minLength="3" property="text"
+                                source="{inputName}"/>
+            <validators:SelectionValidator source="{leaderInput}"/>
+            <validators:SelectionValidator source="{customerInput}"/>
         </fx:Array>
 
 
-        <maps:SuggestionEventMap
-            dispatcher="{customerInput}"
-            presenter="{SuggestionDropDownListPresentationModel}"
-            view="{SuggestionDropDownListView}"
-            />
+        <maps:SuggestionEventMap dispatcher="{customerInput}"
+                                 presenter="{SuggestionDropDownListPresentationModel}"
+                                 view="{SuggestionDropDownListView}"/>
 
-        <maps:SuggestionEventMap
-            dispatcher="{leaderInput}"
-            presenter="{SuggestionDropDownListPresentationModel}"
-            view="{SuggestionDropDownListView}"
-            />
+        <maps:SuggestionEventMap dispatcher="{leaderInput}"
+                                 presenter="{SuggestionDropDownListPresentationModel}"
+                                 view="{SuggestionDropDownListView}"/>
 
     </fx:Declarations>
 
 
-    <s:Form width="100%" id="newMemberForm">
+    <s:Form id="newMemberForm" width="100%">
 
-            <s:FormItem label="Name" width="100%" required="true">
-                <s:TextInput id="inputName" change="this.formValidator.validateForm(event);"/>
+            <s:FormItem width="100%" label="Name" required="true">
+                <s:TextInput id="inputName"
+                             change="this.formValidator.validateForm(event);"/>
             </s:FormItem>
-            <s:FormItem label="Leader" width="100%" required="true">
+            <s:FormItem width="100%" label="Leader" required="true">
                 <components1:SuggestionDropDownListView id="leaderInput"
-                    change="this.formValidator.validateForm(event);"
-                    preselectedValue="{_application.currentUser.selfLink}"
-                    defaultChoice="false" url="/users"/>
+                                                        change="this.formValidator.validateForm(event);"
+                                                        defaultChoice="false"
+                                                        preselectedValue="{_application.currentUser.selfLink}"
+                                                        url="/users"/>
             </s:FormItem>
-            <s:FormItem label="Customer" width="100%" required="true">
+            <s:FormItem width="100%" label="Customer" required="true">
                 <components1:SuggestionDropDownListView id="customerInput"
-                    change="this.formValidator.validateForm(event);"
-                    defaultChoice="false"
-                    url="/organizations"/>
+                                                        change="this.formValidator.validateForm(event);"
+                                                        defaultChoice="false"
+                                                        url="/organizations"/>
             </s:FormItem>
-        <s:FormItem label="Subproject(s)" width="100%" id="subprojects">
+        <s:FormItem id="subprojects" width="100%" label="Subproject(s)">
             <s:TextInput id="inputSubproject0"/>
             <s:TextInput id="inputSubproject1"/>
             <s:TextInput id="inputSubproject2"/>
@@ -98,7 +104,8 @@
         </s:FormItem>
             <s:FormItem>
                 <s:HGroup>
-                    <s:Button label="Submit" click="createMember()" enabled="{this.formValidator.formIsValid}"/>
+                    <s:Button label="Submit" click="createMember()"
+                              enabled="{this.formValidator.formIsValid}"/>
                     <s:Button label="Cancel" click="close()"/>
                 </s:HGroup>
             </s:FormItem>

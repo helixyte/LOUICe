@@ -12,7 +12,6 @@
     <fx:Script>
         <![CDATA[
             import com.cenix.louice.modules.experimentmetadatamember.ui.model.StaticTag;
-            import org.everest.flex.ui.presenters.FeedPresentationModel;
 
             import mx.collections.ArrayCollection;
             import mx.collections.IList;
@@ -22,8 +21,6 @@
             public var staticTags:ArrayCollection = new ArrayCollection();
 
             private var initialTags:ArrayCollection = new ArrayCollection();
-
-            private var _model:FeedPresentationModel;
 
             public function get pattern():IList
             {
