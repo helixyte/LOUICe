@@ -11,7 +11,6 @@ package com.cenix.louice.modules.experimentmetadatamember.ui.presenter
     import com.cenix.louice.shared.model.vos.SubprojectMember;
     import com.cenix.louice.shared.model.vos.TagMember;
     import com.cenix.louice.shared.model.vos.TagPredicate;
-    import com.cenix.louice.shared.model.vos.TargetSetMember;
     
     import flash.events.Event;
     import flash.events.IEventDispatcher;
@@ -142,18 +141,6 @@ package com.cenix.louice.modules.experimentmetadatamember.ui.presenter
         public function set subproject(subproject:SubprojectMember):void
         {
             ExperimentMetaDataMember(_member).subproject = subproject;
-            dispatchEvent(new Event(MemberEvent.MEMBER_CHANGED));
-        }
-
-        [Bindable(Event="memberChanged")]
-        public function get target_set():TargetSetMember
-        {
-            return ExperimentMetaDataMember(_member).target_set;
-        }
-
-        public function set target_set(target_set:TargetSetMember):void
-        {
-            ExperimentMetaDataMember(_member).target_set = target_set;
             dispatchEvent(new Event(MemberEvent.MEMBER_CHANGED));
         }
 

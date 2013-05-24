@@ -8,7 +8,6 @@ package com.cenix.louice.shared.model.vos
         public var label:String;
         public var subproject:SubprojectMember;
         public var molecule_design_pool_set:MoleculeDesignPoolSetMember;
-        public var target_set:TargetSetMember;
         public var experiment_design:ExperimentDesignMember;
         public var iso_request:IsoRequestMember;
         public var creation_date:Date;

@@ -7,7 +7,7 @@ package com.cenix.louice.shared.model.vos
     {
         public var rack:RackMember;
         public var rack_specs:RackSpecsMember;
-        public var position:String;
+        public var position:RackPositionMember;
         public var sample_volume:Number;
         public var sample_molecule_design_pool_id:String;
         public var sample_molecules:MembersCollection;

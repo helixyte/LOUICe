@@ -29,7 +29,6 @@ package
     import com.cenix.louice.shared.model.vos.MoleculeDesignPoolMember;
     import com.cenix.louice.shared.model.vos.MoleculeDesignPoolSetMember;
     import com.cenix.louice.shared.model.vos.MoleculeDesignSetMember;
-    import com.cenix.louice.shared.model.vos.MoleculeModificationMember;
     import com.cenix.louice.shared.model.vos.MoleculeTypeMember;
     import com.cenix.louice.shared.model.vos.OrganizationMember;
     import com.cenix.louice.shared.model.vos.PlateMember;
@@ -47,7 +46,6 @@ package
     import com.cenix.louice.shared.model.vos.SubprojectMember;
     import com.cenix.louice.shared.model.vos.TagMember;
     import com.cenix.louice.shared.model.vos.TaggedRackPositionSetMember;
-    import com.cenix.louice.shared.model.vos.TargetSetMember;
     import com.cenix.louice.shared.model.vos.TubeMember;
     import com.cenix.louice.shared.model.vos.TubeRackMember;
     import com.cenix.louice.shared.model.vos.TubeRackSpecsMember;
@@ -155,7 +153,6 @@ package
                 res.push( new SchemaModelEntry("molecule_design_pool", "http://schemata.cenix-bioscience.com/moleculedesignset", "MoleculeDesignPool",MoleculeDesignPoolMember) );
                 res.push( new SchemaModelEntry("molecule_design_pool_set", "http://schemata.cenix-bioscience.com/moleculedesignpoolset", "MoleculeDesignPoolSet",MoleculeDesignPoolSetMember, "/schemata/MoleculeDesignPoolSet.xsd") );
                 res.push( new SchemaModelEntry("molecule_design_set", "http://schemata.cenix-bioscience.com/moleculedesignset", "MoleculeDesignSet",MoleculeDesignSetMember, "/schemata/MoleculeDesignSet.xsd") );
-                res.push( new SchemaModelEntry("molecule_modification", "http://schemata.cenix-bioscience.com/moleculemodification", "MoleculeModification",MoleculeModificationMember, "/schemata/MoleculeModification.xsd") );
                 res.push( new SchemaModelEntry("molecule_type", "http://schemata.cenix-bioscience.com/moleculetype", "MoleculeType",MoleculeTypeMember, "/schemata/MoleculeType.xsd") );
                 res.push( new SchemaModelEntry("organization", "http://schemata.cenix-bioscience.com/organization", "Organization",OrganizationMember, "/schemata/Organization.xsd") );
                 res.push( new SchemaModelEntry("project", "http://schemata.cenix-bioscience.com/project", "Project",ProjectMember, "/schemata/Project.xsd") );
@@ -173,7 +170,6 @@ package
                 res.push( new SchemaModelEntry("subproject", "http://schemata.cenix-bioscience.com/subproject", "Subproject",SubprojectMember, "/schemata/Subproject.xsd") );
                 res.push( new SchemaModelEntry("tag", "http://schemata.cenix-bioscience.com/tag", "Tag",TagMember, "/schemata/Tag.xsd") );
                 res.push( new SchemaModelEntry("tagged_rack_position_set", "http://schemata.cenix-bioscience.com/taggedrackpositionset", "TaggedRackPositionSet",TaggedRackPositionSetMember, "/schemata/TaggedRackPositionSet.xsd") );
-                res.push( new SchemaModelEntry("target_set", "http://schemata.cenix-bioscience.com/targetset", "TargetSet",TargetSetMember, "/schemata/TargetSet.xsd") );
                 res.push( new SchemaModelEntry("tube-rack", "http://schemata.cenix-bioscience.com/rack", "TubeRack",TubeRackMember) );
                 res.push( new SchemaModelEntry("tube_rack_specs", "http://schemata.cenix-bioscience.com/rackspecs", "TubeRackSpecs",TubeRackSpecsMember) );
                 res.push( new SchemaModelEntry("user", "http://schemata.cenix-bioscience.com/user", "User",UserMember, "/schemata/User.xsd") );

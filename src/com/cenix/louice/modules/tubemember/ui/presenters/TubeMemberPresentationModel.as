@@ -2,6 +2,7 @@ package com.cenix.louice.modules.tubemember.ui.presenters
 {
     import com.cenix.louice.shared.model.vos.ContainerSpecsMember;
     import com.cenix.louice.shared.model.vos.ItemStatusMember;
+    import com.cenix.louice.shared.model.vos.RackPositionMember;
     import com.cenix.louice.shared.model.vos.RackSpecsMember;
     import com.cenix.louice.shared.model.vos.TubeMember;
     
@@ -37,7 +38,7 @@ package com.cenix.louice.modules.tubemember.ui.presenters
         }
 
         [Bindable(Event="memberChanged")]
-        public function get position():String
+        public function get position():RackPositionMember
         {
             return TubeMember(_member).position;
         }
