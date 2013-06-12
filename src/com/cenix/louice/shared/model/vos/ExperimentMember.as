@@ -1,8 +1,9 @@
 package com.cenix.louice.shared.model.vos
 {
     import mx.collections.Sort;
-
+    
     import spark.collections.SortField;
+    
     import org.everest.flex.model.Member;
     import org.everest.flex.model.MembersCollection;
 
@@ -13,7 +14,7 @@ package com.cenix.louice.shared.model.vos
         public var source_rack:RackMember;
         public var experiment_design:ExperimentDesignMember;
         public var experiment_job:ExperimentJobMember;
-        public var experiment_type:String;
+        public var experiment_metadata_type:ExperimentMetaDataTypeMember;
 
         private var _experiment_racks:MembersCollection;
         private var _number_replicates:uint;

@@ -28,7 +28,7 @@
 			import com.cenix.louice.modules.platemember.ui.views.PlateMemberView;
 			import com.cenix.louice.shared.model.vos.BarcodePrintJobMember;
 			import com.cenix.louice.shared.model.vos.BarcodeType;
-			import com.cenix.louice.shared.model.vos.ExperimentTypes;
+			import com.cenix.louice.shared.model.vos.ExperimentMetaDataTypes;
 			import com.cenix.louice.shared.model.vos.IsoMember;
 			import com.cenix.louice.shared.model.vos.PlateMember;
 			import com.cenix.louice.shared.model.vos.RackMember;
@@ -68,7 +68,7 @@
                               || (isoMember.iso_sample_stock_racks.length < 1) ){
                         setCurrentState("xl20");
                     }else if(isoMember.status == 'queued') {
-                        if((isoRequest.experiment_type.toUpperCase() == 'SCREEN') 
+                        if((isoRequest.experiment_metadata_type.id.toUpperCase() == ExperimentMetaDataTypes.SCREEN) 
                             && (isoRequest.rackShape == 384))
                         {
                             setCurrentState("waitForControlRack");
@@ -351,7 +351,7 @@
 					 enter="{inputBarcode2XL20.setFocus()}" maxChars="8"
 					 prompt="Barcode 1" restrict="0-9"/>
         <s:TextInput id="inputBarcode2XL20"
-					 visible="{isoRequest.experiment_type == ExperimentTypes.SCREEN &amp;&amp; numberPreparationPlateWells == 384}"
+					 visible="{isoRequest.experiment_metadata_type.id.toUpperCase() == ExperimentMetaDataTypes.SCREEN &amp;&amp; numberPreparationPlateWells == 384}"
 					 width="80" enter="{inputBarcode3XL20.setFocus()}"
 					 maxChars="8" prompt="Barcode 2" restrict="0-9"/>
         <s:Spacer width="10"/>
@@ -362,11 +362,11 @@
 			  paddingLeft="5" paddingTop="2" verticalAlign="top">
         <s:Spacer width="140"/>
         <s:TextInput id="inputBarcode3XL20"
-					 visible="{isoRequest.experiment_type == ExperimentTypes.SCREEN &amp;&amp; numberPreparationPlateWells == 384}"
+					 visible="{isoRequest.experiment_metadata_type.id.toUpperCase() == ExperimentMetaDataTypes.SCREEN &amp;&amp; numberPreparationPlateWells == 384}"
 					 width="80" enter="{inputBarcode4XL20.setFocus()}"
 					 maxChars="8" prompt="Barcode 3" restrict="0-9"/>
         <s:TextInput id="inputBarcode4XL20"
-					 visible="{isoRequest.experiment_type == ExperimentTypes.SCREEN &amp;&amp; numberPreparationPlateWells == 384}"
+					 visible="{isoRequest.experiment_metadata_type.id.toUpperCase() == ExperimentMetaDataTypes.SCREEN &amp;&amp; numberPreparationPlateWells == 384}"
 					 width="80" maxChars="8" prompt="Barcode 4" restrict="0-9"/>
         <s:Spacer width="10"/>
         <components1:SmartTextArea id="inputRequiredRacks" width="100%"
@@ -479,7 +479,7 @@
 							  enabled="{isoRequest.platesToLoad &lt; 1}"/>
                 </s:HGroup>
             </s:HGroup>
-            <s:HGroup visible="{isoRequest.experiment_type != ExperimentTypes.MANUAL}"
+            <s:HGroup visible="{isoRequest.experiment_metadata_type.id.toUpperCase() != ExperimentMetaDataTypes.MANUAL}"
 					  width="100%" contentBackgroundColor="#EBF4FF"
 					  paddingLeft="5" paddingTop="2" verticalAlign="top">
                 <s:Label width="140" fontWeight="bold" paddingTop="5"

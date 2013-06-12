@@ -5,6 +5,7 @@ package com.cenix.louice.modules.experimentmetadatamember.ui.presenter
     import com.cenix.louice.shared.model.vos.ExperimentDesignRackMember;
     import com.cenix.louice.shared.model.vos.ExperimentMember;
     import com.cenix.louice.shared.model.vos.ExperimentMetaDataMember;
+    import com.cenix.louice.shared.model.vos.ExperimentMetaDataTypeMember;
     import com.cenix.louice.shared.model.vos.IsoRequestMember;
     import com.cenix.louice.shared.model.vos.JobMember;
     import com.cenix.louice.shared.model.vos.RackLayoutMember;
@@ -228,17 +229,19 @@ package com.cenix.louice.modules.experimentmetadatamember.ui.presenter
         public function set number_replicates(number_replicates:uint):void
         {
             ExperimentMetaDataMember(_member).number_replicates = number_replicates;
+            dispatchEvent(new Event(MemberEvent.MEMBER_CHANGED));
         }
 
         [Bindable(Event="memberChanged")]
-        public function get experiment_type():String
+        public function get experiment_metadata_type():ExperimentMetaDataTypeMember
         {
-            return ExperimentMetaDataMember(_member).experiment_type;
+            return ExperimentMetaDataMember(_member).experiment_metadata_type;
         }
 
-        public function set experiment_type(experiment_type:String):void
+        public function set experiment_metadata_type(experiment_metadata_type:ExperimentMetaDataTypeMember):void
         {
-            ExperimentMetaDataMember(_member).experiment_type = experiment_type;
+            ExperimentMetaDataMember(_member).experiment_metadata_type = experiment_metadata_type;
+            dispatchEvent(new Event(MemberEvent.MEMBER_CHANGED));
         }
 		
 		[Bindable(Event="memberChanged")]

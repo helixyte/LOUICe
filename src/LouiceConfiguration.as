@@ -14,6 +14,7 @@ package
     import com.cenix.louice.shared.model.vos.ExperimentJobMember;
     import com.cenix.louice.shared.model.vos.ExperimentMember;
     import com.cenix.louice.shared.model.vos.ExperimentMetaDataMember;
+    import com.cenix.louice.shared.model.vos.ExperimentMetaDataTypeMember;
     import com.cenix.louice.shared.model.vos.ExperimentRackMember;
     import com.cenix.louice.shared.model.vos.GeneMember;
     import com.cenix.louice.shared.model.vos.IsoJobMember;
@@ -136,6 +137,7 @@ package
                 res.push( new SchemaModelEntry("experiment_job", "http://schemata.cenix-bioscience.com/job", "ExperimentJob",ExperimentJobMember) );
                 res.push( new SchemaModelEntry("experiment", "http://schemata.cenix-bioscience.com/experiment", "Experiment",ExperimentMember, "/schemata/Experiment.xsd") );
                 res.push( new SchemaModelEntry("experiment_metadata", "http://schemata.cenix-bioscience.com/experimentmetadata", "ExperimentMetaData",ExperimentMetaDataMember, "/schemata/ExperimentMetaData.xsd") );
+                res.push( new SchemaModelEntry("experiment_metadata_type", "http://schemata.cenix-bioscience.com/experimentmetadatatype", "ExperimentMetaDataType",ExperimentMetaDataTypeMember, "/schemata/ExperimentMetaDataType.xsd") );
                 res.push( new SchemaModelEntry("experimentdesign", "http://schemata.cenix-bioscience.com/experimentdesign", "ExperimentDesign",ExperimentDesignMember, "/schemata/ExperimentDesign.xsd") );
                 res.push( new SchemaModelEntry("experimentdesignrack", "http://schemata.cenix-bioscience.com/experimentdesignrack", "ExperimentDesignRack",ExperimentDesignRackMember, "/schemata/ExperimentDesignRack.xsd") );
                 res.push( new SchemaModelEntry("experiment_rack", "http://schemata.cenix-bioscience.com/experimentrack", "ExperimentRack",ExperimentRackMember, "/schemata/ExperimentRack.xsd") );

@@ -26,8 +26,8 @@
 			import com.cenix.louice.shared.model.vos.ExperimentDesignRackMember;
 			import com.cenix.louice.shared.model.vos.ExperimentJobMember;
 			import com.cenix.louice.shared.model.vos.ExperimentMember;
+			import com.cenix.louice.shared.model.vos.ExperimentMetaDataTypes;
 			import com.cenix.louice.shared.model.vos.ExperimentRackMember;
-			import com.cenix.louice.shared.model.vos.ExperimentTypes;
 			import com.cenix.louice.shared.model.vos.ItemStatusMember;
 			import com.cenix.louice.shared.model.vos.JobTypeMember;
 			import com.cenix.louice.shared.model.vos.PlateMember;
@@ -67,7 +67,7 @@
 				inputReplicates.text =  String(this._experimentMetadataModel.number_replicates);
 				labelPatternComponent.addEventListener(Event.CHANGE, updateIsoRacks);
 				labelPatternComponent.showBusyIndicator();
-				this.currentState = model.experiment_type == ExperimentTypes.ISO_LESS ? "isoless" : "normal";
+				this.currentState = model.experiment_metadata_type.id.upper() == ExperimentMetaDataTypes.ISO_LESS ? "isoless" : "normal";
 				if(this.currentState == 'normal')
 				{
 					isoPlates.addEventListener(CollectionEvent.COLLECTION_CHANGE, updateIsoRacks);	

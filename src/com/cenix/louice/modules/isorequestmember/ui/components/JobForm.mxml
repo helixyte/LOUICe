@@ -22,7 +22,7 @@
 			import com.cenix.louice.modules.isorequestmember.ui.presenters.IsoRequestMemberPresentationModel;
 			import com.cenix.louice.modules.platemember.ui.views.PlateMemberView;
 			import com.cenix.louice.shared.model.vos.BarcodeType;
-			import com.cenix.louice.shared.model.vos.ExperimentTypes;
+			import com.cenix.louice.shared.model.vos.ExperimentMetaDataTypes;
 			import com.cenix.louice.shared.model.vos.IsoJobMember;
 			import com.cenix.louice.shared.model.vos.IsoMember;
 			import com.cenix.louice.shared.model.vos.RackMember;
@@ -51,7 +51,7 @@
 
             private static var loadRack:Function;
             
-            private static const SCREEN_EXPERIMENT_TYPE:String = ExperimentTypes.SCREEN;
+            private static const SCREEN_EXPERIMENT_TYPE:String = ExperimentMetaDataTypes.SCREEN;
 			
             [Bindable]
             public function get isoJob():IsoJobMember
@@ -198,7 +198,7 @@
 								   validators="{xl20Validators}"/>
     </fx:Declarations>
 
-        <s:VGroup visible="{isoRequest.rackShape == 384 &amp;&amp; isoRequest.experiment_type == SCREEN_EXPERIMENT_TYPE}"
+        <s:VGroup visible="{isoRequest.rackShape == 384 &amp;&amp; isoRequest.experiment_metadata_type.id.toUpperCase() == SCREEN_EXPERIMENT_TYPE}"
 				  width="100%">
 
             <s:Spacer height="5"/>
@@ -264,7 +264,7 @@
             </s:Line>
         </s:VGroup>
         <s:HGroup excludeFrom="new"
-				  visible="{isoRequest.rackShape == 384  &amp;&amp; isoRequest.experiment_type == SCREEN_EXPERIMENT_TYPE}"
+				  visible="{isoRequest.rackShape == 384  &amp;&amp; isoRequest.experiment_metadata_type.id.toUpperCase() == SCREEN_EXPERIMENT_TYPE}"
 				  width="100%" height="100%">
             <s:VGroup width="100%" height="100%">
                     <!-- ISO CONTROL STOCK RACK -->

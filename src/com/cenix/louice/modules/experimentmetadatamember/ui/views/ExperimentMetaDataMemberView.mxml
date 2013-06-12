@@ -10,13 +10,14 @@
                  xmlns:components1="org.everest.flex.ui.components.*"
                  xmlns:view="org.everest.flex.ui.views.*"
                  width="100%" height="100%"
+                 creationComplete="creationCompleteHandler(event)"
                  editable="{model.iso_request.owner == ''}"
-                 title="{'Experiment Metadata: ' + model.label}"
-                 creationComplete="creationCompleteHandler(event)">
+                 title="{'Experiment Metadata: ' + model.label}">
     <fx:Script>
         <![CDATA[
             import com.cenix.louice.modules.experimentmetadatamember.ui.presenter.ExperimentMetaDataMemberPresentationModel;
-            import com.cenix.louice.shared.model.vos.ExperimentTypes;
+            import com.cenix.louice.shared.model.vos.ExperimentMetaDataTypeMember;
+            import com.cenix.louice.shared.model.vos.ExperimentMetaDataTypes;
             import com.cenix.louice.shared.model.vos.IsoRequestMember;
             import com.cenix.louice.shared.model.vos.SubprojectMember;
             
@@ -35,6 +36,8 @@
             private var fileRef:FileReference = new FileReference();
             private var fileData:ByteArray;
             private var _isoRequestTab:DisplayObject;
+            private var _oldExperimentMetaDataTypeId:String = null;
+            private var _oldNumberReplicates:Number = -1;
 			
             protected function creationCompleteHandler(event:FlexEvent):void
             {
@@ -44,10 +47,15 @@
             
             private function modelChangedHandler(event:Event):void
             {
-                if(model.experiment_type == ExperimentTypes.ISO_LESS && _isoRequestTab == null)
+                var newEmdtId:String = model.experiment_metadata_type.id.toUpperCase();
+                if (_oldExperimentMetaDataTypeId == null)
+                    _oldExperimentMetaDataTypeId = newEmdtId;
+                if (_oldNumberReplicates == -1)
+                    _oldNumberReplicates = model.number_replicates;
+                if(newEmdtId == ExperimentMetaDataTypes.ISO_LESS && _isoRequestTab == null)
                 {
                     _isoRequestTab = contentTabNavigator.removeChildAt(0);
-                } else if (_isoRequestTab != null) {
+                } else if (newEmdtId != ExperimentMetaDataTypes.ISO_LESS && _isoRequestTab != null) {
                     contentTabNavigator.addChildAt(_isoRequestTab, 0);
                     _isoRequestTab = null;
                 }
@@ -87,6 +95,21 @@
                 model.subproject = subproject;
             }
 
+            protected function metadataTypeInput_changeHandler(event:IndexChangeEvent):void
+            {
+                var selItem:Object = metadataTypeInput.model.members[event.newIndex];
+                var newEmdt:ExperimentMetaDataTypeMember = new ExperimentMetaDataTypeMember();
+                newEmdt.link = metadataTypeInput.selectedItemAsLink;
+                newEmdt.id = selItem.id;
+                newEmdt.display_name = selItem.display_name;
+                model.experiment_metadata_type = newEmdt;
+            }
+            
+            protected function numberReplicatesInput_changeHandler(event:Event):void
+            {
+                model.number_replicates = numberReplicatesInput.value;
+            }
+            
             protected function activate_clickHandler(event:MouseEvent):void
             {
                 if ((model.experimentDesign == null) || (model.experimentDesign.experiment_design_racks == null) || (model.experimentDesign.experiment_design_racks.length < 1) || (model.iso_request == null))
@@ -127,10 +150,12 @@
             }
 
             public override function submit(model:MemberPresentationModel):void{
+                var m:ExperimentMetaDataMemberPresentationModel = 
+                                ExperimentMetaDataMemberPresentationModel(model);
                 formValidator.validateForm(null);
                 if(formValidator.formIsValid){
-                    var m:ExperimentMetaDataMemberPresentationModel = ExperimentMetaDataMemberPresentationModel(model);
-                    if (typeSelectBox.selectedItem != m.experiment_type || inputNumberOfReplicates.value != m.number_replicates)
+                    if (m.experiment_metadata_type.id != _oldExperimentMetaDataTypeId ||
+                        m.number_replicates != _oldNumberReplicates)
                     {
                         ConfirmationView.show(
                             "The changes you have made will require to repeat " +
@@ -138,9 +163,7 @@
                             "Warning",
                             function():void{
                                 currentState = ResourceState.PENDING_REQUEST;
-                                m.experiment_type = typeSelectBox.selectedItem;
-                                m.number_replicates = inputNumberOfReplicates.value;
-                                model.submit();
+                                m.submit();
                             });
                     } else {
 						// Letting the ISOs there would confuse the server (the client would send 
@@ -149,15 +172,21 @@
 						{
 							m.iso_request.isos = null;
 						}
-						model.submit();
+                        currentState = ResourceState.PENDING_REQUEST;
+						m.submit();
                     }
+                    _oldExperimentMetaDataTypeId = null;
+                    _oldNumberReplicates = -1;
                 }
             }
-
 
         ]]>
     </fx:Script>
     <fx:Declarations>
+        <maps1:SuggestionEventMap dispatcher="{metadataTypeInput}"
+                                  presenter="{SuggestionDropDownListPresentationModel}"
+                                  view="{SuggestionDropDownListView}"/>
+
         <maps1:SuggestionEventMap dispatcher="{subprojectInput}"
                                   presenter="{SuggestionDropDownListPresentationModel}"
                                   view="{SuggestionDropDownListView}"/>
@@ -177,7 +206,7 @@
                 </s:FormItem>
                 <s:FormItem width="100%" label="Type:">
                     <s:Label width="200"
-                             text="{ExperimentTypes.labelFunction(model.experiment_type)}"/>
+                             text="{model.experiment_metadata_type.title}"/>
                 </s:FormItem>
             </s:Group>
             <s:Group>
@@ -206,7 +235,7 @@
                 <s:FormItem width="100%" label="Number of Replicates:">
                     <s:Label width="200" text="{model.number_replicates}"/>
                 </s:FormItem>
-                <s:FormItem visible="{model.experiment_type != ExperimentTypes.ISO_LESS}"
+                <s:FormItem visible="{model.experiment_metadata_type.id.upper() != ExperimentMetaDataTypes.ISO_LESS}"
                             width="100%" label="Floating Molecule Design Pools">
                     <s:Button height="18" label="CSV List"
                               click="downloadMoleculeDesignPools(event)"
@@ -230,13 +259,14 @@
                                  change="{model.label = inputName.text;}"
                                  fontWeight="bold" styleName="editableLabel"
                                  text="{model.label}"/>
-                </s:FormItem>
-                <s:FormItem width="100%" label="Type:">
-                    <s:ComboBox id="typeSelectBox" width="220" color="0x000000"
-                                dataProvider="{ExperimentTypes.types}"
-                                labelFunction="{ExperimentTypes.labelFunction}"
-                                selectedItem="{model.experiment_type}"/>
-
+                </s:FormItem>                
+                <s:FormItem width="100%" label="Name:">
+                    <components1:SuggestionDropDownListView id="metadataTypeInput"
+                                                            width="200"
+                                                            change="metadataTypeInput_changeHandler(event)"
+                                                            defaultChoice="false"
+                                                            selectedItem="{model.experiment_metadata_type}"
+                                                            url="/experiment-metadata-types"/>
                 </s:FormItem>
             </s:Group>
             <s:Group>
@@ -244,8 +274,9 @@
                     <s:FormLayout/>
                 </s:layout>
                 <s:FormItem width="100%" label="Number of Replicates:">
-                    <s:NumericStepper id="inputNumberOfReplicates" maximum="99"
+                    <s:NumericStepper id="numberReplicatesInput" maximum="99"
                                       minimum="1"
+                                      change="numberReplicatesInput_changeHandler(event)"
                                       value="{model.number_replicates}"/>
 
                 </s:FormItem>
@@ -294,8 +325,8 @@
     </view:actionBarContent>
 
     <view:additionalContent>
-        <mx:TabNavigator id="contentTabNavigator" width="100%" height="100%" paddingLeft="8"
-                         paddingRight="0" paddingTop="0">
+        <mx:TabNavigator id="contentTabNavigator" width="100%" height="100%"
+                         paddingLeft="8" paddingRight="0" paddingTop="0">
             <s:NavigatorContent label="ISO Request">
                 <views1:IsoRequestView id="isoRequestView" width="100%"
                                        height="100%"

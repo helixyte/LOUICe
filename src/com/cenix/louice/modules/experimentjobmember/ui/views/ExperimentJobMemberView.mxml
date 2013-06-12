@@ -18,6 +18,7 @@
             import com.cenix.louice.shared.model.vos.BarcodePrintJobMember;
             import com.cenix.louice.shared.model.vos.BarcodeType;
             import com.cenix.louice.shared.model.vos.ExperimentMember;
+            import com.cenix.louice.shared.model.vos.ExperimentMetaDataTypes;
             import com.cenix.louice.shared.model.vos.ExperimentRackMember;
             import com.cenix.louice.shared.model.vos.ItemStatusMember;
             import com.cenix.louice.shared.model.vos.PlateMember;
@@ -49,7 +50,7 @@
                     if (model.experiments.length > 0)
                     {
                         plateActions.visible = true;
-                        if (model.experiments[0].experiment_type.toUpperCase() == 'MANUAL')
+                        if (model.experiments[0].experiment_metadata_type.id.toUpperCase() == ExperimentMetaDataTypes.MANUAL)
                         {
                             manualRadioBtn.selected = true;
                             manualRadioBtn.visible = false;
@@ -134,7 +135,7 @@
                 if ((manualRadioBtn.selected)||(robotRadioBtn.selected))
                 {
                     var msg:String = 'Sample volumes for *all* ISO and cell plates will be adjusted';
-                    if (model.experiments[0].experiment_type.toUpperCase() != 'MANUAL')
+                    if (model.experiments[0].experiment_metadata_type.id.toUpperCase() != ExperimentMetaDataTypes.MANUAL)
                     {
                         msg += ' and worklist download will be disabled.';
                     }

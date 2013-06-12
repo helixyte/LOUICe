@@ -19,8 +19,8 @@ package com.cenix.louice.shared.model.constants
         
         public static const EXPERIMENT_JOB_MEMBER:String = "application/vnd.everest+xml;type=ExperimentJobMember";
 
-        public static const EXPERIMENT_METADATA_COLLECTION:String = "application/vnd.everest+xml;type=ExperimentMetaDataCollection";
-        public static const EXPERIMENT_METADATA_MEMBER:String =  "application/vnd.everest+xml;type=ExperimentMetaDataMember";
+        public static const EXPERIMENT_METADATA_COLLECTION:String = "application/vnd.everest+xml;type=ExperimentMetadataCollection";
+        public static const EXPERIMENT_METADATA_MEMBER:String =  "application/vnd.everest+xml;type=ExperimentMetadataMember";
         
         public static const EXPERIMENT_DESIGN_MEMBER:String =  "application/vnd.everest+xml;type=ExperimentDesignMember";
 

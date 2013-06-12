@@ -11,7 +11,7 @@ package com.cenix.louice.shared.model.vos
         public var experiment_design:ExperimentDesignMember;
         public var iso_request:IsoRequestMember;
         public var creation_date:Date;
-        public var experiment_type:String;
+        public var experiment_metadata_type:ExperimentMetaDataTypeMember;
 
 		private var _ticket_number:uint;
 		private var _number_replicates:uint;

@@ -1,6 +1,7 @@
 package com.cenix.louice.modules.isorequestmember.ui.presenters
 {
     import com.cenix.louice.shared.model.vos.ExperimentMetaDataMember;
+    import com.cenix.louice.shared.model.vos.ExperimentMetaDataTypeMember;
     import com.cenix.louice.shared.model.vos.IsoJobMember;
     import com.cenix.louice.shared.model.vos.IsoMember;
     import com.cenix.louice.shared.model.vos.IsoRequestMember;
@@ -390,15 +391,15 @@ package com.cenix.louice.modules.isorequestmember.ui.presenters
         }
 
         [Bindable(Event="memberChanged")]
-        public function get experiment_type():String
+        public function get experiment_metadata_type():ExperimentMetaDataTypeMember
         {
-            return IsoRequestMember(_member).experiment_type;
+            return IsoRequestMember(_member).experiment_metadata_type;
         }
 
         [Bindable(Event="memberChanged")]
-        public function set experiment_type(newexperiment_type:String):void
+        public function set experiment_metadata_type(new_experiment_metadata_type:ExperimentMetaDataTypeMember):void
         {
-            IsoRequestMember(_member).experiment_type = newexperiment_type;
+            IsoRequestMember(_member).experiment_metadata_type = new_experiment_metadata_type;
         }
 
         [Bindable(Event="memberChanged")]

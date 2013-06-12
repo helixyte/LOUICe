@@ -12,8 +12,8 @@
             import com.cenix.louice.shared.model.vos.BarcodePrintJobMember;
             import com.cenix.louice.shared.model.vos.BarcodeType;
             import com.cenix.louice.shared.model.vos.ExperimentMember;
+            import com.cenix.louice.shared.model.vos.ExperimentMetaDataTypes;
             import com.cenix.louice.shared.model.vos.ExperimentRackMember;
-            import com.cenix.louice.shared.model.vos.ExperimentTypes;
             import com.cenix.louice.shared.model.vos.ItemStatusMember;
             import com.cenix.louice.shared.ui.components.FileDownloadView;
             import com.cenix.louice.shared.ui.view.BarcodePrintPreView;
@@ -33,7 +33,7 @@
                 if (value != null)
                 {
                     var experiment:ExperimentMember = ExperimentMember(value);
-                    if(experiment.experiment_type == ExperimentTypes.MANUAL)
+                    if(experiment.experiment_metadata_type.id.toUpperCase() == ExperimentMetaDataTypes.MANUAL)
                     {
 						plateActions.visible = true;
 						manualRadioBtn.selected = true;
@@ -41,7 +41,7 @@
 						robotRadioBtn.visible = false;
 						getWorklistsBtn.visible = false;
 						updateDbBtn.visible = true;
-                    } else if (experiment.experiment_type == ExperimentTypes.ISO_LESS)
+                    } else if (experiment.experiment_metadata_type.id.toUpperCase() == ExperimentMetaDataTypes.ISO_LESS)
                     {
                         plateActions.visible = true;
                         manualRadioBtn.selected = true;
@@ -106,7 +106,7 @@
                 if ((manualRadioBtn.selected)||(robotRadioBtn.selected))
                 {
                     var msg:String = 'Sample volumes for ISO and cell plates will be adjusted';
-                    if (data.experiment_type.toUpperCase() != 'MANUAL')
+                    if (data.experiment_metadata_type.id.toUpperCase() != ExperimentMetaDataTypes.MANUAL)
                     {
                         msg += ' and worklist download will be disabled';
                     }
@@ -166,8 +166,8 @@
         </s:Line>
         <s:HGroup width="100%" gap="10" paddingLeft="5" paddingTop="5">
             <s:Label width="200" fontWeight="bold"
-                     includeInLayout="{data.experiment_type != ExperimentTypes.ISO_LESS}"
-                     text="{data.experiment_type == ExperimentTypes.ISO_LESS ? '' : 'ISO Plate:'}"/>
+                     includeInLayout="{data.experiment_metadata_type.id.toUpperCase() != ExperimentMetaDataTypes.ISO_LESS}"
+                     text="{data.experiment_metadata_type.id.toUpperCase() == ExperimentMetaDataTypes.ISO_LESS ? '' : 'ISO Plate:'}"/>
             <s:Label width="125" fontWeight="bold" text="Design Plates: "/>
             <s:Label width="400" fontWeight="bold" text="Cell Plates:"/>
             <s:Spacer width="100%"/>
@@ -181,7 +181,7 @@
         <s:Scroller width="100%" maxHeight="350">
             <s:HGroup width="100%" paddingLeft="5">
                 <components1:MemberLinkButton width="200"
-                                              includeInLayout="{data.experiment_type != ExperimentTypes.ISO_LESS}"
+                                              includeInLayout="{data.experiment_metadata_type.id.toUpperCase() != ExperimentMetaDataTypes.ISO_LESS}"
                                               link="{data.source_rack}"/>
                 <s:DataGroup id="designRackList" width="140"
                              dataProvider="{data.experiment_racks}">

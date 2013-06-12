@@ -1,7 +1,7 @@
 package com.cenix.louice.shared.model.vos
 {    
     import mx.collections.ArrayCollection;
-       
+    
     import org.everest.flex.model.Member;
     import org.everest.flex.model.MembersCollection;
 
@@ -19,7 +19,7 @@ package com.cenix.louice.shared.model.vos
         public var owner:String;
         public var number_plates:int;
         public var number_aliquots:int;
-        public var experiment_type:String = null;
+        public var experiment_metadata_type:ExperimentMetaDataTypeMember = null;
         public var experiment_metadata:ExperimentMetaDataMember = null;
         public var ticket_number:int;
 
