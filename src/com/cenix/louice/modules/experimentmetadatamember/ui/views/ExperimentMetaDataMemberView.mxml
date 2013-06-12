@@ -27,6 +27,7 @@
             import spark.events.IndexChangeEvent;
             
             import org.everest.flex.events.MemberEvent;
+            import org.everest.flex.model.MembersCollection;
             import org.everest.flex.model.ResourceState;
             import org.everest.flex.ui.components.ConfirmationView;
             import org.everest.flex.ui.components.ErrorView;
@@ -35,14 +36,27 @@
 
             private var fileRef:FileReference = new FileReference();
             private var fileData:ByteArray;
-            private var _isoRequestTab:DisplayObject;
             private var _oldExperimentMetaDataTypeId:String = null;
             private var _oldNumberReplicates:Number = -1;
+            private var _tabMap:Dictionary = new Dictionary();
 			
             protected function creationCompleteHandler(event:FlexEvent):void
             {
                 model.addEventListener(MemberEvent.MEMBER_CHANGED, 
                     modelChangedHandler);
+                // Create a map metadata type string -> notebook tab.
+                var _positionToTabMap:Dictionary = new Dictionary();
+                for (var tabCount:uint=0; tabCount<3 ; tabCount++)
+                {
+                    _positionToTabMap[tabCount] = 
+                            contentTabNavigator.getChildAt(tabCount);   
+                }
+                _tabMap[ExperimentMetaDataTypes.ISO_LESS] = 
+                                [_positionToTabMap[2], _positionToTabMap[1]];
+                _tabMap[ExperimentMetaDataTypes.ORDER_ONLY] = 
+                                [_positionToTabMap[0]];
+                _tabMap['_ALL'] = [_positionToTabMap[2], _positionToTabMap[1], 
+                                   _positionToTabMap[0]];
             }
             
             private function modelChangedHandler(event:Event):void
@@ -52,13 +66,14 @@
                     _oldExperimentMetaDataTypeId = newEmdtId;
                 if (_oldNumberReplicates == -1)
                     _oldNumberReplicates = model.number_replicates;
-                if(newEmdtId == ExperimentMetaDataTypes.ISO_LESS && _isoRequestTab == null)
+                // Update notebook children according to experiment metadata type. 
+                contentTabNavigator.removeAllChildren();
+                var key:String = _tabMap[newEmdtId] == null ? '_ALL' : newEmdtId; 
+                for each (var tab:DisplayObject in _tabMap[key])
                 {
-                    _isoRequestTab = contentTabNavigator.removeChildAt(0);
-                } else if (newEmdtId != ExperimentMetaDataTypes.ISO_LESS && _isoRequestTab != null) {
-                    contentTabNavigator.addChildAt(_isoRequestTab, 0);
-                    _isoRequestTab = null;
+                    contentTabNavigator.addChildAt(tab, 0);
                 }
+                contentTabNavigator.selectedIndex = 0;
             }
             
             private function selectFile_clickHandler(event:MouseEvent):void
@@ -112,13 +127,24 @@
             
             protected function activate_clickHandler(event:MouseEvent):void
             {
-                if ((model.experimentDesign == null) || (model.experimentDesign.experiment_design_racks == null) || (model.experimentDesign.experiment_design_racks.length < 1) || (model.iso_request == null))
+                if (model.iso_request == null)
+                {
+                    ErrorView.show("Activation not possible because no " +
+                        "ISO request was found.");                    
+                }
+                else if (model.experiment_metadata_type.id != ExperimentMetaDataTypes.ORDER_ONLY
+                    && (model.experimentDesign == null || 
+                        model.experimentDesign.experiment_design_racks == null || 
+                        model.experimentDesign.experiment_design_racks.length < 1)
+                    )
                 {
                     ErrorView.show("Activation not possible because no " +
                         "experiment design was found.");
-                } else {
+                } 
+                else 
+                {
                     var msg:String = (model.iso_request.delivery_date == null) ? 'The ISO Request has no delivery date!\n\n':'';
-
+                    
                     ConfirmationView.show(msg+
                         'ISO plate request will be sent and further editing ' +
                         'will be disabled.\n\nAre you sure you want to activate?',
@@ -149,7 +175,8 @@
                 navigateToURL(new URLRequest(url));
             }
 
-            public override function submit(model:MemberPresentationModel):void{
+            public override function submit(model:MemberPresentationModel):void
+            {
                 var m:ExperimentMetaDataMemberPresentationModel = 
                                 ExperimentMetaDataMemberPresentationModel(model);
                 formValidator.validateForm(null);
@@ -162,22 +189,28 @@
                             "the Excel file upload.\n\nDo you want to continue?",
                             "Warning",
                             function():void{
-                                currentState = ResourceState.PENDING_REQUEST;
-                                m.submit();
+                                m.iso_request = null;
+                                m.experimentDesign.experiment_design_racks = new MembersCollection();
+                                _doSubmitModel(m);
                             });
                     } else {
-						// Letting the ISOs there would confuse the server (the client would send 
-						// a collection link even if there were no ISOs)
-						if (m.iso_request != null)
-						{
-							m.iso_request.isos = null;
-						}
-                        currentState = ResourceState.PENDING_REQUEST;
-						m.submit();
+                        _doSubmitModel(m);
                     }
-                    _oldExperimentMetaDataTypeId = null;
-                    _oldNumberReplicates = -1;
                 }
+            }
+            
+            private function _doSubmitModel(model:ExperimentMetaDataMemberPresentationModel):void
+            {
+                // Letting the ISOs there would confuse the server (the client would send 
+                // a collection link even if there were no ISOs)
+                if (model.iso_request != null)
+                {
+                    model.iso_request.isos = null;
+                }
+                currentState = ResourceState.PENDING_REQUEST;
+                model.submit();
+                _oldExperimentMetaDataTypeId = null;
+                _oldNumberReplicates = -1;                
             }
 
         ]]>
@@ -232,10 +265,12 @@
                 <s:layout>
                     <s:FormLayout/>
                 </s:layout>
-                <s:FormItem width="100%" label="Number of Replicates:">
+                <s:FormItem width="100%" label="Number of Replicates:"
+                            visible="{model.experiment_metadata_type.id != ExperimentMetaDataTypes.ORDER_ONLY}">
                     <s:Label width="200" text="{model.number_replicates}"/>
                 </s:FormItem>
-                <s:FormItem visible="{model.experiment_metadata_type.id.upper() != ExperimentMetaDataTypes.ISO_LESS}"
+                <s:FormItem visible="{model.experiment_metadata_type.id != ExperimentMetaDataTypes.ISO_LESS
+                                      &amp;&amp; model.experiment_metadata_type.id != ExperimentMetaDataTypes.ORDER_ONLY}"
                             width="100%" label="Floating Molecule Design Pools">
                     <s:Button height="18" label="CSV List"
                               click="downloadMoleculeDesignPools(event)"
@@ -274,9 +309,9 @@
                     <s:FormLayout/>
                 </s:layout>
                 <s:FormItem width="100%" label="Number of Replicates:">
-                    <s:NumericStepper id="numberReplicatesInput" maximum="99"
-                                      minimum="1"
+                    <s:NumericStepper id="numberReplicatesInput"
                                       change="numberReplicatesInput_changeHandler(event)"
+                                      maximum="99" minimum="1"
                                       value="{model.number_replicates}"/>
 
                 </s:FormItem>
@@ -287,19 +322,6 @@
                                                             defaultChoice="false"
                                                             selectedItem="{model.subproject}"
                                                             url="/subprojects/?q=active:equal-to:true"/>
-                </s:FormItem>
-            </s:Group>
-            <s:Group>
-                <s:layout>
-                    <s:FormLayout/>
-                </s:layout>
-                <s:FormItem width="100%" label="Creation Date:">
-                    <s:Label text="{dateToString(model.creation_date)}"/>
-                </s:FormItem>
-                <s:FormItem width="100%" label="Floating Molecule Design Pools">
-                    <s:Button height="18" label="CSV List"
-                              click="downloadMoleculeDesignPools(event)"
-                              icon="@Embed(source='/assets/icons/download.png')"/>
                 </s:FormItem>
             </s:Group>
         </s:Form>
