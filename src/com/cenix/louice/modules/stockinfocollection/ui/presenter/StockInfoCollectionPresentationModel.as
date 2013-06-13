@@ -1,8 +1,8 @@
 package com.cenix.louice.modules.stockinfocollection.ui.presenter
 {
-    import org.everest.flex.ui.presenters.CollectionPresentationModel;
-
     import flash.events.IEventDispatcher;
+    
+    import org.everest.flex.ui.presenters.CollectionPresentationModel;
 
     public class StockInfoCollectionPresentationModel extends CollectionPresentationModel
     {

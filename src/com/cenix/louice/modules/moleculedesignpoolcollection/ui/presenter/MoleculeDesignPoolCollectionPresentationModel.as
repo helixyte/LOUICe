@@ -1,6 +1,5 @@
 package com.cenix.louice.modules.moleculedesignpoolcollection.ui.presenter
-{
-    
+{    
     import flash.events.IEventDispatcher;
     
     import org.everest.flex.ui.presenters.CollectionPresentationModel;
@@ -12,5 +11,5 @@ package com.cenix.louice.modules.moleculedesignpoolcollection.ui.presenter
             super(dispatcher);
             sortFieldNames['molecule_type'] = 'molecule-type.name';
         }		
-	}
+    }
 }

@@ -8,10 +8,10 @@
 				  width="100%" height="100%" title="{'Molecule Design Pool: ' + model.title}">
     <fx:Script>
 		<![CDATA[
-			import com.cenix.louice.shared.model.vos.ChemicalStructureMember;
-			import com.cenix.louice.shared.model.vos.MoleculeDesignMember;
-			
-			import org.everest.flex.model.MembersCollection;
+            import com.cenix.louice.shared.model.vos.ChemicalStructureMember;
+            import com.cenix.louice.shared.model.vos.MoleculeDesignMember;
+            
+            import org.everest.flex.model.MembersCollection;
 
 			private function chemicalStructuresLabelFunction(item:Object, column:*):String
 			{

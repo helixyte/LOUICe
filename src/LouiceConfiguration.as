@@ -45,6 +45,7 @@ package
     import com.cenix.louice.shared.model.vos.SpeciesMember;
     import com.cenix.louice.shared.model.vos.StockInfoMember;
     import com.cenix.louice.shared.model.vos.SubprojectMember;
+    import com.cenix.louice.shared.model.vos.SupplierMoleculeDesignMember;
     import com.cenix.louice.shared.model.vos.TagMember;
     import com.cenix.louice.shared.model.vos.TaggedRackPositionSetMember;
     import com.cenix.louice.shared.model.vos.TubeMember;
@@ -170,6 +171,7 @@ package
                 res.push( new SchemaModelEntry("species", "http://schemata.cenix-bioscience.com/species", "Species",SpeciesMember, "/schemata/Species.xsd") );
                 res.push( new SchemaModelEntry("stockinfo", "http://schemata.cenix-bioscience.com/stockinfo", "StockInfo",StockInfoMember, "/schemata/StockInfo.xsd") );
                 res.push( new SchemaModelEntry("subproject", "http://schemata.cenix-bioscience.com/subproject", "Subproject",SubprojectMember, "/schemata/Subproject.xsd") );
+                res.push( new SchemaModelEntry("supplier_molecule_design", "http://schemata.cenix-bioscience.com/suppliermoleculedesign", "SupplierMoleculeDesign",SupplierMoleculeDesignMember, "/schemata/SupplierMoleculeDesign.xsd") );
                 res.push( new SchemaModelEntry("tag", "http://schemata.cenix-bioscience.com/tag", "Tag",TagMember, "/schemata/Tag.xsd") );
                 res.push( new SchemaModelEntry("tagged_rack_position_set", "http://schemata.cenix-bioscience.com/taggedrackpositionset", "TaggedRackPositionSet",TaggedRackPositionSetMember, "/schemata/TaggedRackPositionSet.xsd") );
                 res.push( new SchemaModelEntry("tube-rack", "http://schemata.cenix-bioscience.com/rack", "TubeRack",TubeRackMember) );
