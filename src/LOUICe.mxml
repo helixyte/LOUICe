@@ -28,7 +28,7 @@
 			import org.everest.flex.model.ContentType;
 			import org.everest.flex.ui.components.HTMLToolTip;
 
-            public static const VERSION:String = "1.4.1b0";
+            public static const VERSION:String = "1.4.1b1";
 			public var RELEASE_QUALIFIER:String = '';
 			public var TRAC_BASE_URL:String = '';
 
