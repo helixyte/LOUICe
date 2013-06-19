@@ -50,19 +50,18 @@ package com.cenix.louice.modules.experimentmetadatamember.ui.presenter
             super.member = member;
             //extract jobs for the experiment job view
             var experimentDesign:ExperimentDesignMember = experimentDesign;
+            if (experimentDesign != null)
+            {
+                //trigger async load of all tags and values
+                var dEvt:NavigationEvent = 
+                    new NavigationEvent(NavigationEvent.LOAD_SUBORDINATE_PAGE);
+                dEvt.pageUrl = member.selfLink + 'tags?size=1000';
+                dispatcher.dispatchEvent(dEvt);
+            }            
             if ((experimentDesign != null) 
                 && (experimentDesign.experiments != null) 
                 && (experimentDesign.experiments.length > 0))
             {
-                if (member != null)
-                {
-                    //trigger async load of all tags and values
-                    var dEvt:NavigationEvent = 
-                        new NavigationEvent(NavigationEvent.LOAD_SUBORDINATE_PAGE);
-                    dEvt.pageUrl = member.selfLink + 'tags?size=1000';
-                    dispatcher.dispatchEvent(dEvt);
-                }
-
                 var dejavue:HashSet = new HashSet();
                 experimentJobs.removeAll();
                 for each (var experiment:ExperimentMember in experimentDesign.experiments)
