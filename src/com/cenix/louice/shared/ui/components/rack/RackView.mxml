@@ -7,10 +7,10 @@
         <![CDATA[
             import com.cenix.louice.shared.model.vos.TagMember;
             import com.cenix.louice.shared.model.vos.TagPredicate;
-
+            
             import mx.collections.ArrayCollection;
             import mx.controls.Spacer;
-
+            
             import spark.components.HGroup;
             import spark.components.VGroup;
 
@@ -223,7 +223,7 @@
                 this._members = new Dictionary();
 
                 for each (var rackMember:Object in members){
-                    _members[rackMember.position] = rackMember;
+                    _members[rackMember.position.label] = rackMember;
                 }
 
                 determineLayout();
