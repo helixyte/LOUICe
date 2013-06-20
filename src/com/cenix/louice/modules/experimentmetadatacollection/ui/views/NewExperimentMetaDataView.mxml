@@ -14,10 +14,13 @@
         <![CDATA[
             import com.cenix.louice.shared.model.vos.ExperimentMetaDataMember;
             import com.cenix.louice.shared.model.vos.ExperimentMetaDataTypeMember;
+            import com.cenix.louice.shared.model.vos.ExperimentMetaDataTypes;
             import com.cenix.louice.shared.model.vos.SubprojectMember;
             
             import org.everest.flex.model.Member;
             import org.everest.flex.ui.presenters.SuggestionDropDownListPresentationModel;
+            
+            private var _needNumberReplicates:Boolean;
 
             protected override function get member():Member
             {
@@ -25,10 +28,25 @@
                 member.label= inputLabel.text;
                 member.experiment_metadata_type = new ExperimentMetaDataTypeMember();
                 member.experiment_metadata_type.link = metadataTypeInput.selectedItemAsLink;
-                member.number_replicates = inputNumberOfReplicates.value;
+                if (_needNumberReplicates)
+                {
+                    member.number_replicates = inputNumberOfReplicates.value;    
+                } else
+                {
+                    member.number_replicates = 1; // FIXME: This should not be set for ORDER-ONLY.
+                }
                 member.subproject = new SubprojectMember();
                 member.subproject.link = subprojectInput.selectedItemAsLink;
                 return member;
+            }
+            
+            protected function handle_typeChange(event:Event): void
+            {
+                formValidator.validateForm(event);
+                var expTypeId:String = ExperimentMetaDataTypes.ORDER_ONLY.toLowerCase();
+                _needNumberReplicates = metadataTypeInput.selectedItemAsLink.href.indexOf(expTypeId) == -1
+                inputNumberOfReplicates.enabled = _needNumberReplicates;
+                labelNumberOfReplicates.enabled = _needNumberReplicates;
             }
 
         ]]>
@@ -61,15 +79,10 @@
         <s:FormItem width="100%" label="Type:" required="true">
             <components1:SuggestionDropDownListView id="metadataTypeInput"
                                                     width="220"
-                                                    change="this.formValidator.validateForm(event);"
+                                                    change="handle_typeChange(event);"
                                                     defaultChoice="false"
                                                     url="/experiment-metadata-types"/>
         </s:FormItem>
-        <s:FormItem width="100%" label="Number of Replicates:" required="true">
-            <s:NumericStepper id="inputNumberOfReplicates" maximum="99"
-                              minimum="1" value="1"/>
-        </s:FormItem>
-
         <s:FormItem width="100%" label="Subproject:" required="true">
             <components1:SuggestionDropDownListView id="subprojectInput"
                                                     width="220"
@@ -77,7 +90,11 @@
                                                     defaultChoice="false"
                                                     url="/subprojects/?q=active:equal-to:true"/>
         </s:FormItem>
-
+        <s:FormItem id="labelNumberOfReplicates" width="100%"
+                    label="Number of Replicates:" required="true">
+            <s:NumericStepper id="inputNumberOfReplicates" maximum="99"
+                              minimum="1" value="1"/>
+        </s:FormItem>
         <s:FormItem>
             <s:HGroup>
                 <s:Button label="Create" click="createMember()"
