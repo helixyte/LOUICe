@@ -62,7 +62,7 @@
         <s:Spacer height="5" />
         <s:Label text="Requester:" fontWeight="bold" />
         <s:HGroup  paddingLeft="5">
-            <components1:MemberLinkButton link="{_isoRequest.requester}"/>
+            <s:Label text="{_isoRequest.requester.username}"/>
         </s:HGroup>
         <s:Spacer height="5" />
         <s:Label text="Ticket Owner:" fontWeight="bold"/>
