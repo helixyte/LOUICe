@@ -34,7 +34,7 @@
 
             public function set isoRequest(isoRequest:IsoRequestMember):void
             {
-				var url:String = "/iso-requests/" + isoRequest.id + "/completed_iso_plates/"
+				var url:String = "/iso-requests/" + isoRequest.id + "/completed-iso-plates/"
 				isoAliquotePlateInput.url = url
             }
             public function get model():FeedPresentationModel

@@ -67,7 +67,7 @@
 				inputReplicates.text =  String(this._experimentMetadataModel.number_replicates);
 				labelPatternComponent.addEventListener(Event.CHANGE, updateIsoRacks);
 				labelPatternComponent.showBusyIndicator();
-				this.currentState = model.experiment_metadata_type.id.upper() == ExperimentMetaDataTypes.ISO_LESS ? "isoless" : "normal";
+				this.currentState = model.experiment_metadata_type.id.toUpperCase() == ExperimentMetaDataTypes.ISO_LESS ? "isoless" : "normal";
 				if(this.currentState == 'normal')
 				{
 					isoPlates.addEventListener(CollectionEvent.COLLECTION_CHANGE, updateIsoRacks);	
