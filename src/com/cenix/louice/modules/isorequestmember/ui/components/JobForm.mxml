@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <s:Form xmlns:fx="http://ns.adobe.com/mxml/2009"
-		xmlns:s="library://ns.adobe.com/flex/spark"
-		xmlns:mx="library://ns.adobe.com/flex/mx"
-		xmlns:rack="com.cenix.louice.shared.ui.components.rack.*"
-		xmlns:components="com.cenix.louice.shared.ui.components.*"
-		xmlns:validators="com.cenix.louice.shared.ui.components.validators.*"
-		xmlns:components1="org.everest.flex.ui.components.*"
-		xmlns:validators1="org.everest.flex.ui.validators.*">
+        xmlns:s="library://ns.adobe.com/flex/spark"
+        xmlns:mx="library://ns.adobe.com/flex/mx"
+        xmlns:rack="com.cenix.louice.shared.ui.components.rack.*"
+        xmlns:components="com.cenix.louice.shared.ui.components.*"
+        xmlns:validators="com.cenix.louice.shared.ui.components.validators.*"
+        xmlns:components1="org.everest.flex.ui.components.*"
+        xmlns:validators1="org.everest.flex.ui.validators.*">
     <s:layout>
         <s:VerticalLayout/>
     </s:layout>
@@ -149,6 +149,12 @@
                 isoRequest.updateControlStockRack(_isoJob, inputBarcodeXL20.text);
             }
 
+            protected function onXl20OutputLoadComplete(e:Event):void
+            {
+                isoRequest.processXl20OutputData(e.target.data);
+                resetPreview();
+            }
+            
             private function cleanBarcodes(barcodes:String):String
             {
                 if (barcodes.length < 1)
@@ -188,73 +194,73 @@
     <fx:Declarations>
         <fx:Array id="xl20Validators">
             <validators:RackBarcodeValidator property="text" required="true"
-											 source="{inputBarcodeXL20}"/>
+                                             source="{inputBarcodeXL20}"/>
             <validators:RackBarcodeValidator property="text" required="false"
-											 source="{inputExcludedRacks}"/>
+                                             source="{inputExcludedRacks}"/>
             <validators:TubeBarcodeValidator property="text" required="false"
-											 source="{inputRequiredRacks}"/>
+                                             source="{inputRequiredRacks}"/>
         </fx:Array>
         <validators1:FormValidator id="xl20Validator"
-								   validators="{xl20Validators}"/>
+                                   validators="{xl20Validators}"/>
     </fx:Declarations>
 
         <s:VGroup visible="{isoRequest.rackShape == 384 &amp;&amp; isoRequest.experiment_metadata_type.id.toUpperCase() == SCREEN_EXPERIMENT_TYPE}"
-				  width="100%">
+                  width="100%">
 
             <s:Spacer height="5"/>
 
             <!--STATUS -->
 
             <s:HGroup includeIn="done" width="100%"
-					  contentBackgroundColor="#EBF4FF" paddingLeft="5"
-					  paddingTop="2" verticalAlign="middle">
+                      contentBackgroundColor="#EBF4FF" paddingLeft="5"
+                      paddingTop="2" verticalAlign="middle">
                 <s:Label width="140" fontWeight="bold" text="Status"
-						 textAlign="right"/>
+                         textAlign="right"/>
                 <s:Label color="#00CC33"
-						 text="Conrol Stock has been transfered to all ISO preparation plates."/>
+                         text="Control Stock has been transfered to all ISO preparation plates."/>
             </s:HGroup>
 
             <!--XL20 TUBE HANDLER -->
 
             <s:HGroup includeIn="new" width="100%"
-					  contentBackgroundColor="#EBF4FF" paddingLeft="5"
-					  paddingTop="4" verticalAlign="middle">
+                      contentBackgroundColor="#EBF4FF" paddingLeft="5"
+                      paddingTop="4" verticalAlign="middle">
                 <s:Label width="140" fontWeight="bold"
-						 text="ISO Control Stock Rack" textAlign="right"/>
+                         text="ISO Control Stock Rack" textAlign="right"/>
                 <s:TextInput id="inputBarcodeXL20" width="150" maxChars="8"
-							 prompt="Barcode" restrict="0-9"/>
+                             prompt="Barcode" restrict="0-9"/>
                 <components1:SmartTextArea id="inputExcludedRacks" width="100%"
-										   prompt="Excluded racks"
-										   restrict="0-9,"/>
+                                           prompt="Excluded racks"
+                                           restrict="0-9,"/>
             </s:HGroup>
             <s:HGroup includeIn="new" width="100%"
-					  contentBackgroundColor="#EBF4FF" paddingLeft="5"
-					  paddingTop="2" verticalAlign="middle">
+                      contentBackgroundColor="#EBF4FF" paddingLeft="5"
+                      paddingTop="2" verticalAlign="middle">
                 <s:Spacer width="298"/>
                 <components1:SmartTextArea id="inputRequiredRacks" width="100%"
-										   height="50" prompt="Requested tubes"
-										   restrict="0-9," verticalAlign="top"/>
+                                           height="50" prompt="Requested tubes"
+                                           restrict="0-9," verticalAlign="top"/>
             </s:HGroup>
             <s:HGroup includeIn="new" width="100%"
-					  contentBackgroundColor="#EBF4FF" paddingBottom="0"
-					  paddingLeft="5" paddingTop="2" verticalAlign="middle">
+                      contentBackgroundColor="#EBF4FF" paddingBottom="0"
+                      paddingLeft="5" paddingTop="2" verticalAlign="middle">
                 <s:Spacer width="40"/>
                 <s:RadioButton id="existingRadioBtn" width="100" label="existing"
-							   groupName="group1"/>
+                               groupName="group1"/>
                 <s:Button width="150" label="Update database"
-						  click="updateControlStockRack(event)"
-						  enabled="{inputBarcodeXL20.text.length &gt; 7 &amp;&amp; existingRadioBtn.selected}"/>
+                          click="updateControlStockRack(event)"
+                          enabled="{inputBarcodeXL20.text.length &gt; 7 &amp;&amp; existingRadioBtn.selected}"/>
             </s:HGroup>
             <s:HGroup includeIn="new" width="100%"
-					  contentBackgroundColor="#EBF4FF" paddingBottom="10"
-					  paddingLeft="5" paddingTop="0" verticalAlign="middle">
+                      contentBackgroundColor="#EBF4FF" paddingBottom="10"
+                      paddingLeft="5" paddingTop="0" verticalAlign="middle">
                 <s:Spacer width="40"/>
                 <s:RadioButton id="newRadioBtn" width="100" label="create new"
-							   groupName="group1" selected="true"/>
-                <s:Button width="150" label="Get worklist"
-						  click="downloadXL20Worklist(event)"
-						  enabled="{inputBarcodeXL20.text.length &gt; 7 &amp;&amp; newRadioBtn.selected}"
-						  icon="@Embed(source='/assets/icons/download.png')"/>
+                               groupName="group1" selected="true"/>
+                <s:Button width="150" label="Download worklist"
+                          click="downloadXL20Worklist(event)"
+                          enabled="{inputBarcodeXL20.text.length &gt; 7 &amp;&amp; newRadioBtn.selected}"
+                          icon="@Embed(source='/assets/icons/download.png')"/>
                 <s:Spacer width="25"/>
             </s:HGroup>
             <s:Line includeIn="new" width="100%">
@@ -264,28 +270,35 @@
             </s:Line>
         </s:VGroup>
         <s:HGroup excludeFrom="new"
-				  visible="{isoRequest.rackShape == 384  &amp;&amp; isoRequest.experiment_metadata_type.id.toUpperCase() == SCREEN_EXPERIMENT_TYPE}"
-				  width="100%" height="100%">
+                  visible="{isoRequest.rackShape == 384  &amp;&amp; isoRequest.experiment_metadata_type.id.toUpperCase() == SCREEN_EXPERIMENT_TYPE}"
+                  width="100%" height="100%">
             <s:VGroup width="100%" height="100%">
                     <!-- ISO CONTROL STOCK RACK -->
-                    <s:HGroup width="100%" contentBackgroundColor="#EBF4FF"
-							  paddingBottom="10" paddingLeft="5" paddingTop="10"
-							  verticalAlign="middle">
-                        <s:Label width="140" fontWeight="bold"
-								 text="ISO Control Stock Rack" textAlign="right"/>
-                        <components:BarcodeButton label="{isoJob.iso_control_stock_rack.label}"
-												  barcode="{isoJob.iso_control_stock_rack.barcode}"
-												  type="{BarcodeType.UNIRACK}"/>
-                        <s:Spacer width="100%"/>
-                        <s:Button excludeFrom="new,done" height="18"
-								  label="change" click="{currentState = 'new'}"
-								  enabled="{isoRequest.platesToLoad &lt; 1}"/>
-                        <s:Button excludeFrom="new,done" height="18"
-								  label="show &gt;"
-								  click="{quickLook(isoJob.iso_control_stock_rack.barcode, [8,12])}"
-								  enabled="{isoRequest.platesToLoad &lt; 1}"/>
-                    </s:HGroup>
-
+                    <s:VGroup width="100%" contentBackgroundColor="#EBF4FF"
+                              paddingBottom="10" paddingLeft="5" paddingTop="10"
+                              verticalAlign="middle">
+                        <s:HGroup width="100%"> 
+                            <s:Label width="140" fontWeight="bold"
+                                     text="ISO Control Stock Rack"
+                                     textAlign="right"/>
+                            <components:BarcodeButton label="{isoJob.iso_control_stock_rack.label}"
+                                                      barcode="{isoJob.iso_control_stock_rack.barcode}"
+                                                      type="{BarcodeType.UNIRACK}"/>
+                            <s:Spacer width="100%"/>
+                            <s:Button excludeFrom="new,done" height="18"
+                                      label="change"
+                                      click="{currentState = 'new'}"
+                                      enabled="{isoRequest.platesToLoad &lt; 1}"/>
+                            <s:Button excludeFrom="new,done" height="18"
+                                      label="show &gt;"
+                                      click="{quickLook(isoJob.iso_control_stock_rack.barcode, [8,12])}"
+                                      enabled="{isoRequest.platesToLoad &lt; 1}"/>
+                        </s:HGroup>
+                        <components:Xl20UploadButton id="xl20Button"
+                                                     excludeFrom="new,done"
+                                                     width="175"
+                                                     click="{xl20Button.addEventListener(Event.COMPLETE, onXl20OutputLoadComplete)}"/>
+                    </s:VGroup>
                     <s:Line width="100%">
                         <s:stroke>
                             <s:SolidColorStroke color="#EBF4FF" weight="2"/>
@@ -295,31 +308,31 @@
                     <!-- CONTROL STOCK TRANSFER -->
 
                     <s:HGroup excludeFrom="new,canceled" width="100%"
-							  contentBackgroundColor="#EBF4FF" paddingLeft="5"
-							  paddingTop="2" verticalAlign="middle">
+                              contentBackgroundColor="#EBF4FF" paddingLeft="5"
+                              paddingTop="2" verticalAlign="middle">
                         <s:Label width="140" fontWeight="bold"
-								 text="Transfer for child ISO" textAlign="right"/>
+                                 text="Transfer for child ISOs" textAlign="right"/>
                         <s:Button width="150" label="Get worklist"
-								  click="downloadTransferWorklist(event)"
-								  icon="@Embed(source='/assets/icons/download.png')"
-								  enabled.done="false"/>
+                                  click="downloadTransferWorklist(event)"
+                                  icon="@Embed(source='/assets/icons/download.png')"
+                                  enabled.done="false"/>
                         <s:Button width="150" label="Update database"
-								  click="transferStockInDB(event)"
-								  enabled.done="false"/>
+                                  click="transferStockInDB(event)"
+                                  enabled.done="false"/>
                     </s:HGroup>
                 </s:VGroup>
 
                 <!-- RACK/PLATE PREVIEW -->
                 <s:Group width="100%" height="100%">
                     <rack:RackView id="rackPreview" visible="false" left="0"
-								   right="5" top="10" bottom="5"
-								   includeInLayout="true"
-								   toolTipFunction="{PlateMemberView.toolTipFunction}"/>
+                                   right="5" top="10" bottom="5"
+                                   includeInLayout="true"
+                                   toolTipFunction="{PlateMemberView.toolTipFunction}"/>
                     <s:HGroup visible="{(isoRequest.platesToLoad &gt; 0)&amp;&amp;(!rackPreview.visible)}"
-							  left="20" top="20" verticalAlign="middle">
+                              left="20" top="20" verticalAlign="middle">
                         <s:BusyIndicator/>
                         <s:Label color="#999999"
-								 text="getting containers from server .."/>
+                                 text="getting containers from server .."/>
                     </s:HGroup>
                 </s:Group>
         </s:HGroup>

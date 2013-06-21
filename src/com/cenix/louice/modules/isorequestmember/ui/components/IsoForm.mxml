@@ -338,7 +338,7 @@
 			  paddingTop="2" verticalAlign="middle">
         <s:Label width="140" fontWeight="bold" text="Status" textAlign="right"/>
         <s:Label color="#FFBF00"
-				 text="Complete ISO Control Stock Rack before proceeding!"/>
+				 text="Complete Control Stock Rack for this ISO Job before proceeding!"/>
     </s:HGroup>
 
     <!--XL20 TUBE HANDLER -->
