@@ -202,6 +202,7 @@
 					
 					var experiment:ExperimentMember = new ExperimentMember();
 					experiment.label = sourceRack.prefix + "_exp" + count;
+                    experiment.experiment_metadata_type = this._experimentMetadataModel.experiment_metadata_type;
 					count++;
 					//                        experiment.number_replicates = inputReplicates.value;
 					experiment.destination_rack_specs = new PlateSpecsMember();
@@ -376,7 +377,7 @@
 						<mx:AdvancedDataGridColumn dataField="title"
                                                    fontWeight="bold"
                                                    headerText="Cell Plate Label"/>
-						<mx:AdvancedDataGridColumn width="55" dataField="title"
+						<mx:AdvancedDataGridColumn width="75" dataField="title"
                                                    headerText="Length"
                                                    labelFunction="{calculateCellContentLength}"/>
 					</mx:columns>

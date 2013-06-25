@@ -6,7 +6,6 @@ package com.cenix.louice.modules.experimentmetadatamember.ui.presenter
     import com.cenix.louice.shared.model.vos.ExperimentMember;
     import com.cenix.louice.shared.model.vos.ExperimentMetaDataMember;
     import com.cenix.louice.shared.model.vos.ExperimentMetaDataTypeMember;
-    import com.cenix.louice.shared.model.vos.ExperimentMetaDataTypes;
     import com.cenix.louice.shared.model.vos.IsoRequestMember;
     import com.cenix.louice.shared.model.vos.JobMember;
     import com.cenix.louice.shared.model.vos.RackLayoutMember;
@@ -49,8 +48,7 @@ package com.cenix.louice.modules.experimentmetadatamember.ui.presenter
         {
             super.member = member;
             //extract jobs for the experiment job view
-            var experimentDesign:ExperimentDesignMember = experimentDesign;
-            if (experimentDesign != null)
+            if (member != null)
             {
                 //trigger async load of all tags and values
                 var dEvt:NavigationEvent = 
@@ -58,6 +56,7 @@ package com.cenix.louice.modules.experimentmetadatamember.ui.presenter
                 dEvt.pageUrl = member.selfLink + 'tags?size=1000';
                 dispatcher.dispatchEvent(dEvt);
             }            
+            var experimentDesign:ExperimentDesignMember = experimentDesign;
             if ((experimentDesign != null) 
                 && (experimentDesign.experiments != null) 
                 && (experimentDesign.experiments.length > 0))
