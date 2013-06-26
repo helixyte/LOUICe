@@ -348,10 +348,12 @@
         <s:Label width="140" fontWeight="bold" text="XL20 Tube Handler"
 				 textAlign="right"/>
         <s:TextInput id="inputBarcode1XL20" width="80"
+                     change="{isoRequest.rackShape == 384 ? xl20Validator384.validateForm(event) : xl20Validator.validateForm(event)}"
 					 enter="{inputBarcode2XL20.setFocus()}" maxChars="8"
 					 prompt="Barcode 1" restrict="0-9"/>
         <s:TextInput id="inputBarcode2XL20"
 					 visible="{isoRequest.experiment_metadata_type.id.toUpperCase() == ExperimentMetaDataTypes.SCREEN &amp;&amp; numberPreparationPlateWells == 384}"
+                     change="{xl20Validator384.validateForm(event)}"
 					 width="80" enter="{inputBarcode3XL20.setFocus()}"
 					 maxChars="8" prompt="Barcode 2" restrict="0-9"/>
         <s:Spacer width="10"/>
@@ -364,9 +366,11 @@
         <s:TextInput id="inputBarcode3XL20"
 					 visible="{isoRequest.experiment_metadata_type.id.toUpperCase() == ExperimentMetaDataTypes.SCREEN &amp;&amp; numberPreparationPlateWells == 384}"
 					 width="80" enter="{inputBarcode4XL20.setFocus()}"
+                     change="{xl20Validator384.validateForm(event)}"
 					 maxChars="8" prompt="Barcode 3" restrict="0-9"/>
         <s:TextInput id="inputBarcode4XL20"
 					 visible="{isoRequest.experiment_metadata_type.id.toUpperCase() == ExperimentMetaDataTypes.SCREEN &amp;&amp; numberPreparationPlateWells == 384}"
+                     change="{xl20Validator384.validateForm(event)}"
 					 width="80" maxChars="8" prompt="Barcode 4" restrict="0-9"/>
         <s:Spacer width="10"/>
         <components1:SmartTextArea id="inputRequiredRacks" width="100%"
@@ -378,7 +382,7 @@
         <s:Spacer width="140"/>
         <s:Button width="150" label="Download worklist"
 				  click="downloadXL20Worklist(event)"
-				  enabled="{inputBarcode1XL20.text.length &gt; 7}"
+				  enabled="{isoRequest.rackShape == 384 ? xl20Validator384.formIsValid : xl20Validator.formIsValid}"
 				  icon="@Embed(source='/assets/icons/download.png')"/>
         <s:Spacer width="25"/>
         <s:CheckBox id="checkboxMultipleRacks"
