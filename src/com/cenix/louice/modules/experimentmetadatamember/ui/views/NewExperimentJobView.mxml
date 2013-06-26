@@ -142,6 +142,7 @@
 				
 				var experiment:ExperimentMember = new ExperimentMember();
 				experiment.label = batchLabel.text + "_exp";								
+                experiment.experiment_metadata_type = this._experimentMetadataModel.experiment_metadata_type;
 				experiment.destination_rack_specs = new PlateSpecsMember();
 				experiment.destination_rack_specs.link = 
 					new Link(plateTypeInput.selectedItem.label, 
@@ -371,7 +372,7 @@
 						<mx:AdvancedDataGridColumn width="110"
                                                    dataField="source_rack"
                                                    headerText="ISO Plate"/>
-						<mx:AdvancedDataGridColumn width="70"
+						<mx:AdvancedDataGridColumn width="130"
                                                    dataField="design_rack"
                                                    headerText="Design Plate"/>
 						<mx:AdvancedDataGridColumn dataField="title"
