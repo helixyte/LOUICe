@@ -66,6 +66,13 @@
             {
                 return VERSION;
             }
+            
+            public function get appUrl():String
+            {
+                return URLUtil.getProtocol(browserManager.url)
+                       + "://"
+                       + URLUtil.getServerNameWithPort(browserManager.url);
+            }
 
             public function loadMenu(e:Event=null):void
             {
