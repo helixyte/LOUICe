@@ -14,5 +14,12 @@ package com.cenix.louice.shared.model.vos
         {
             super(title, selfLink);
         }
+        
+        public function get geneIdLabel():String
+        {
+            
+            return accession + ':' + locus_name + ':' + species.acronym;
+        }
+
     }
 }

@@ -1,21 +1,45 @@
 <?xml version="1.0" encoding="utf-8"?>
 <views:CollectionView xmlns:fx="http://ns.adobe.com/mxml/2009"
-					  xmlns:s="library://ns.adobe.com/flex/spark"
-					  xmlns:mx="library://ns.adobe.com/flex/mx"
-					  xmlns:components="com.cenix.louice.shared.ui.components.*"
-					  xmlns:view="org.everest.flex.ui.views.*"
-					  xmlns:maps1="org.everest.flex.maps.*"
-					  xmlns:components1="org.everest.flex.ui.components.*"
-					  xmlns:views="org.everest.flex.ui.views.*"
-					  width="100%" height="100%" title="Molecule Designs">
+                      xmlns:s="library://ns.adobe.com/flex/spark"
+                      xmlns:mx="library://ns.adobe.com/flex/mx"
+                      xmlns:components="com.cenix.louice.shared.ui.components.*"
+                      xmlns:view="org.everest.flex.ui.views.*"
+                      xmlns:maps1="org.everest.flex.maps.*"
+                      xmlns:components1="org.everest.flex.ui.components.*"
+                      xmlns:views="org.everest.flex.ui.views.*"
+                      width="100%" height="100%" title="Molecule Designs">
     <fx:Script>
         <![CDATA[
             import com.cenix.louice.shared.model.vos.MoleculeDesignPoolMember;
-            import com.cenix.louice.shared.model.vos.SupplierMoleculeDesignMember;
             
+            import mx.core.FlexGlobals;
+            import mx.events.FlexEvent;
+            
+            import org.everest.flex.events.NavigationEvent;
             import org.everest.flex.ui.presenters.SuggestionDropDownListPresentationModel;
 			
-			protected function singleDesignButton_clickHandler(event:MouseEvent):void
+            [Bindable]
+            private var _application:Object = FlexGlobals.topLevelApplication;
+
+            protected override function creationCompleteHandler(event:FlexEvent):void
+            {
+                super.creationCompleteHandler(event);
+                // Insert the stock info context menu item.
+                resultGrid.addFollowLinkWithSelectedContextMenu(
+                                "Show stock info for selected rows",
+                                "/stock-info/?q=molecule-design-pool-id:contained:");
+            }
+            
+            protected function stockInfoButton_clickHandler(event:MouseEvent):void
+            {
+                var e:NavigationEvent = new NavigationEvent(NavigationEvent.NEW_WINDOW);
+                var pageUrl:String = "/stock-info/?q=molecule-design-pool:contained:" + _application.appUrl + model.filterUrl;
+                trace("- Stock Info URL: " + pageUrl);
+                e.pageUrl = pageUrl;
+                dispatchEvent(e);
+            }
+            
+            protected function singleDesignButton_clickHandler(event:MouseEvent):void
 			{
 				idInputPool.textValue = '';
 				numberDesignsInput.textValue = '';
@@ -31,168 +55,211 @@
 	
     <fx:Declarations>
         <maps1:SuggestionEventMap dispatcher="{moleculeTypeInput}"
-								  presenter="{SuggestionDropDownListPresentationModel}"
-								  view="{SuggestionDropDownListView}"/>
+                                  presenter="{SuggestionDropDownListPresentationModel}"
+                                  view="{SuggestionDropDownListView}"/>
 		<maps1:SuggestionEventMap dispatcher="{supplierInput}"
-								  presenter="{SuggestionDropDownListPresentationModel}"
-								  view="{SuggestionDropDownListView}"/>
+                                  presenter="{SuggestionDropDownListPresentationModel}"
+                                  view="{SuggestionDropDownListView}"/>
         <maps1:SuggestionEventMap dispatcher="{structureTypeInput}"
-								  memberAttribute="name"
-								  presenter="{SuggestionDropDownListPresentationModel}"
-								  view="{SuggestionDropDownListView}"/>
+                                  memberAttribute="name"
+                                  presenter="{SuggestionDropDownListPresentationModel}"
+                                  view="{SuggestionDropDownListView}"/>
 		<s:RadioButtonGroup id="moleculeDesignTypeGroup"/>
     </fx:Declarations>
 
 	<view:filterFormContent>
-		<s:FormItem width="100%" height="100%">
-			<s:layout>
-				<s:ConstraintLayout>
-					<s:constraintColumns>
-						<s:ConstraintColumn id="col01" width="20%"/>
-						<s:ConstraintColumn id="col02" width="30%"/>
-						<s:ConstraintColumn id="col03" width="50%"/>
-					</s:constraintColumns>
-					<s:constraintRows>
-						<s:ConstraintRow id="row01" height="16%"/>
-						<s:ConstraintRow id="row02" height="28%"/>
-						<s:ConstraintRow id="row03" height="28%"/>
-						<s:ConstraintRow id="row04" height="28%"/>
-					</s:constraintRows>
-				</s:ConstraintLayout>
-			</s:layout>
-			<s:Label left="col01:0" right="col03:0" top="row01:0"
-					 fontStyle="italic" fontWeight="bold" text="by ID"/> 
-			<s:RadioButton id="singleDesignRadioBtn" left="col01:0"
-						   right="col01:0" top="row02:5" bottom="row02:0"
-						   label="Single Design"
-						   click="singleDesignButton_clickHandler(event)"
-						   groupName="moleculeDesignTypeGroup"/>
-			<components1:SmartTextArea id="idInputSingle" left="col02:0"
-									   right="col03:0" top="row02:5"
-									   bottom="row02:0"
-									   criteria="{model.criteria}"
-									   enabled="{singleDesignRadioBtn.selected}"
-									   name="molecule-designs.id"
-									   operator="equal-to"
-									   prompt="Enter single design ID(s)"
-									   restrict="0-9 ,"/>						
-			<s:RadioButton id="poolDesignRadioBtn" left="col01:0" right="col01:0"
-						   top="row03:5" bottom="row03:0" label="Pool Design"
-						   click="poolDesignButton_clickHandler(event)"
-						   groupName="moleculeDesignTypeGroup"/>
-			<components1:SmartTextArea id="idInputPool" left="col02:0"
-									   right="col03:0" top="row03:5"
-									   bottom="row03:0" width="100%"
-									   criteria="{model.criteria}"
-									   enabled="{poolDesignRadioBtn.selected}"
-									   name="id" operator="equal-to"
-									   prompt="Enter pool design ID(s)"
-									   restrict="0-9 ,"/>
-			<s:Label right="col02:3" top="row04:5" bottom="row04:0"
-					 enabled="{poolDesignRadioBtn.selected}" text="# Designs:"/>
-			<components1:NumberInput id="numberDesignsInput" left="col03:0"
-									 right="col03:0" top="row04:5"
-									 criteria="{model.criteria}"
-									 enabled="{poolDesignRadioBtn.selected}"
-									 name="number-designs" operator="equal-to"
-									 prompt="Enter number of designs"/>								
-		</s:FormItem>                    
-		<s:FormItem width="100%" height="100%">
-			<s:layout>
-				<s:ConstraintLayout>
-					<s:constraintColumns>
-						<s:ConstraintColumn id="col11" width="15%"/>
-						<s:ConstraintColumn id="col12" width="85%"/>
-					</s:constraintColumns>
-					<s:constraintRows>
-						<s:ConstraintRow id="row11" height="20%"/>
-						<s:ConstraintRow id="row12" height="40%"/>
-						<s:ConstraintRow id="row13" height="40%"/>
-					</s:constraintRows>
-				</s:ConstraintLayout>
-			</s:layout>
-			<s:Label left="col11:0" right="col12:0" top="row11:0"
-					 fontStyle="italic" fontWeight="bold"
-					 text="by Supplier Information"/>
-			<s:Label left="col11:0" right="col11:0" top="row12:5"
-					 bottom="row12:0" text="Supplier"/>
-			<components1:SuggestionDropDownListView id="supplierInput"
-													left="col12:0"
-													right="col12:0"
-													top="row12:5"
-													bottom="row12:0"
-													criteria="{model.criteria}"
-													name="supplier-molecule-designs.supplier"
-													operator="equal-to"
-													url="/organizations"/>
-			<s:Label left="col11:0" right="col11:0" top="row13:5"
-					 bottom="row13:0" text="Product ID"/>
-			<components1:SmartTextArea id="productIdInput" left="col12:0"
-									   right="col12:0" top="row13:5"
-									   bottom="row13:0"
-									   criteria="{model.criteria}"
-									   name="supplier-molecule-designs.product-id"
-									   operator="equal-to"
-									   prompt="Enter supplier product ID"/>
-		</s:FormItem>
-		<s:FormItem width="100%" height="100%">
-			<s:layout>
-				<s:ConstraintLayout>
-					<s:constraintColumns>
-						<s:ConstraintColumn id="col21" width="20%"/>
-						<s:ConstraintColumn id="col22" width="80%"/>
-					</s:constraintColumns>
-					<s:constraintRows>
-						<s:ConstraintRow id="row21" height="16%"/>
-						<s:ConstraintRow id="row22" height="28%"/>
-						<s:ConstraintRow id="row23" height="28%"/>
-						<s:ConstraintRow id="row24" height="28%"/>
-					</s:constraintRows>
-				</s:ConstraintLayout>
-			</s:layout>
-			<s:Label left="col21:0" right="col22:0" top="row21:0"
-					 fontStyle="italic" fontWeight="bold"
-					 text="by Chemical Structure"/>
-			<s:Label left="col21:0" right="col21:0" top="row22:5"
-					 bottom="row22:0" text="Molecule Type"/>
-			<components1:SuggestionDropDownListView id="moleculeTypeInput"
-													left="col22:0"
-													right="col22:0"
-													top="row22:5"
-													bottom="row22:0" width="256"
-													criteria="{model.criteria}"
-													name="molecule-type"
-													operator="equal-to"
-													url="/molecule-types"/>
-			<s:Label left="col21:0" right="col21:0" top="row23:5"
-					 bottom="row23:0" text="Structure Type"/>
-			<components1:SuggestionDropDownListView id="structureTypeInput"
-													left="col22:0"
-													right="col22:0"
-													top="row23:5"
-													bottom="row23:0" width="256"
-													criteria="{model.criteria}"
-													name="molecule-designs.chemical-structures.structure-type-id"
-													operator="equal-to"
-													url="{moleculeTypeInput.selectedItem.value ? '/chemical-structure-types/?q=molecule-types:contains:' + moleculeTypeInput.selectedItem.value : null}"/>
-			<s:Label left="col21:0" right="col21:0" top="row24:5"
-					 bottom="row24:0" text="Representation"/>
-			<components1:SmartTextArea id="representationInput" left="col22:0"
-									   right="col22:0" top="row24:5"
-									   bottom="row24:0"
-									   criteria="{model.criteria}"
-									   name="molecule-designs.chemical-structures.representation"
-									   operator="contains"
-									   prompt="Enter search string"/>
-		</s:FormItem>			
+        <s:Form width="100%">
+            <s:layout>
+                <s:HorizontalLayout gap="5"/>
+            </s:layout>
+            <s:FormItem width="100%" height="100%">
+                <s:layout>
+                    <s:ConstraintLayout>
+                        <s:constraintColumns>
+                            <s:ConstraintColumn id="col01" width="30%"/>
+                            <s:ConstraintColumn id="col02" width="20%"/>
+                            <s:ConstraintColumn id="col03" width="50%"/>
+                        </s:constraintColumns>
+                        <s:constraintRows>
+                            <s:ConstraintRow id="row01" height="16%"/>
+                            <s:ConstraintRow id="row02" height="28%"/>
+                            <s:ConstraintRow id="row03" height="28%"/>
+                            <s:ConstraintRow id="row04" height="28%"/>
+                        </s:constraintRows>
+                    </s:ConstraintLayout>
+                </s:layout>
+                <s:Label left="col01:0" right="col03:0" top="row01:0"
+                         fontStyle="italic" fontWeight="bold" text="by ID"/> 
+                <s:RadioButton id="singleDesignRadioBtn" left="col01:0"
+                               right="col01:0" top="row02:5" bottom="row02:0"
+                               label="Single Design"
+                               click="singleDesignButton_clickHandler(event)"
+                               groupName="moleculeDesignTypeGroup"/>
+                <components1:SmartTextArea id="idInputSingle" left="col02:0"
+                                           right="col03:0" top="row02:5"
+                                           bottom="row02:0"
+                                           criteria="{model.criteria}"
+                                           enabled="{singleDesignRadioBtn.selected}"
+                                           name="molecule-designs.id"
+                                           operator="contained"
+                                           prompt="Enter single design ID(s)"
+                                           restrict="0-9 ,"/>						
+                <s:RadioButton id="poolDesignRadioBtn" left="col01:0"
+                               right="col01:0" top="row03:5" bottom="row03:0"
+                               label="Pool Design"
+                               click="poolDesignButton_clickHandler(event)"
+                               groupName="moleculeDesignTypeGroup"/>
+                <components1:SmartTextArea id="idInputPool" left="col02:0"
+                                           right="col03:0" top="row03:5"
+                                           bottom="row03:0" width="100%"
+                                           criteria="{model.criteria}"
+                                           enabled="{poolDesignRadioBtn.selected}"
+                                           name="id" operator="contained"
+                                           prompt="Enter pool design ID(s)"
+                                           restrict="0-9 ,"/>
+                <s:Label right="col02:3" top="row04:5" bottom="row04:0"
+                         enabled="{poolDesignRadioBtn.selected}"
+                         text="# Designs:"/>
+                <components1:NumberInput id="numberDesignsInput" left="col03:0"
+                                         right="col03:0" top="row04:5"
+                                         criteria="{model.criteria}"
+                                         enabled="{poolDesignRadioBtn.selected}"
+                                         name="number-designs"
+                                         operator="equal-to"
+                                         prompt="Enter number of designs"/>								
+            </s:FormItem>                    
+            <s:FormItem width="100%" height="100%">
+                <s:layout>
+                    <s:ConstraintLayout>
+                        <s:constraintColumns>
+                            <s:ConstraintColumn id="col11" width="20%"/>
+                            <s:ConstraintColumn id="col12" width="80%"/>
+                        </s:constraintColumns>
+                        <s:constraintRows>
+                            <s:ConstraintRow id="row11" height="20%"/>
+                            <s:ConstraintRow id="row12" height="40%"/>
+                            <s:ConstraintRow id="row13" height="40%"/>
+                        </s:constraintRows>
+                    </s:ConstraintLayout>
+                </s:layout>
+                <s:Label left="col11:0" right="col12:0" top="row11:0"
+                         fontStyle="italic" fontWeight="bold"
+                         text="by Supplier Information"/>
+                <s:Label left="col11:0" right="col11:0" top="row12:5"
+                         bottom="row12:0" text="Supplier"/>
+                <components1:SuggestionDropDownListView id="supplierInput"
+                                                        left="col12:0"
+                                                        right="col12:0"
+                                                        top="row12:5"
+                                                        bottom="row12:0"
+                                                        criteria="{model.criteria}"
+                                                        name="supplier-molecule-designs.supplier"
+                                                        operator="equal-to"
+                                                        url="/organizations"/>
+                <s:Label left="col11:0" right="col11:0" top="row13:5"
+                         bottom="row13:0" text="Product ID"/>
+                <components1:SmartTextArea id="productIdInput" left="col12:0"
+                                           right="col12:0" top="row13:5"
+                                           bottom="row13:0"
+                                           criteria="{model.criteria}"
+                                           name="supplier-molecule-designs.product-id"
+                                           operator="equal-to"
+                                           prompt="Enter supplier product ID"/>
+            </s:FormItem>
+            <s:FormItem width="100%" height="100%">
+                <s:layout>
+                    <s:ConstraintLayout>
+                        <s:constraintColumns>
+                            <s:ConstraintColumn id="col21" width="30%"/>
+                            <s:ConstraintColumn id="col22" width="70%"/>
+                        </s:constraintColumns>
+                        <s:constraintRows>
+                            <s:ConstraintRow id="row21" height="16%"/>
+                            <s:ConstraintRow id="row22" height="28%"/>
+                            <s:ConstraintRow id="row23" height="28%"/>
+                            <s:ConstraintRow id="row24" height="28%"/>
+                        </s:constraintRows>
+                    </s:ConstraintLayout>
+                </s:layout>
+                <s:Label left="col21:0" right="col22:0" top="row21:0"
+                         fontStyle="italic" fontWeight="bold"
+                         text="by Chemical Structure"/>
+                <s:Label left="col21:0" right="col21:0" top="row22:5"
+                         bottom="row22:0" text="Molecule Type"/>
+                <components1:SuggestionDropDownListView id="moleculeTypeInput"
+                                                        left="col22:0"
+                                                        right="col22:0"
+                                                        top="row22:5"
+                                                        bottom="row22:0"
+                                                        width="256"
+                                                        criteria="{model.criteria}"
+                                                        name="molecule-type"
+                                                        operator="equal-to"
+                                                        url="/molecule-types"/>
+                <s:Label left="col21:0" right="col21:0" top="row23:5"
+                         bottom="row23:0" text="Structure Type"/>
+                <components1:SuggestionDropDownListView id="structureTypeInput"
+                                                        left="col22:0"
+                                                        right="col22:0"
+                                                        top="row23:5"
+                                                        bottom="row23:0"
+                                                        width="256"
+                                                        criteria="{model.criteria}"
+                                                        name="molecule-designs.chemical-structures.structure-type-id"
+                                                        operator="equal-to"
+                                                        url="{moleculeTypeInput.selectedItem.value ? '/chemical-structure-types/?q=molecule-types:contains:' + moleculeTypeInput.selectedItem.value : null}"/>
+                <s:Label left="col21:0" right="col21:0" top="row24:5"
+                         bottom="row24:0" text="Representation"/>
+                <components1:SmartTextArea id="representationInput"
+                                           left="col22:0" right="col22:0"
+                                           top="row24:5" bottom="row24:0"
+                                           criteria="{model.criteria}"
+                                           name="molecule-designs.chemical-structures.representation"
+                                           operator="contains"
+                                           prompt="Enter search string"/>
+            </s:FormItem>			
+            <s:FormItem width="100%" height="100%">
+                <s:layout>
+                    <s:ConstraintLayout>
+                        <s:constraintColumns>
+                            <s:ConstraintColumn id="col31" width="28%"/>
+                            <s:ConstraintColumn id="col32" width="72%"/>
+                        </s:constraintColumns>
+                        <s:constraintRows>
+                            <s:ConstraintRow id="row31" height="40%"/>
+                            <s:ConstraintRow id="row32" height="55%"/>
+                        </s:constraintRows>
+                    </s:ConstraintLayout>
+                </s:layout>
+                <s:Label left="col31:0" right="col32:0" top="row31:0"
+                         fontStyle="italic" fontWeight="bold" text="by Target"/>
+                <s:Label left="col31:0" right="col31:0" top="row32:5"
+                         bottom="row32:0" text="Gene Accession"/>
+                <components1:SmartTextArea id="accessionInput" left="col32:0"
+                                           right="col32:0" top="row32:5"
+                                           bottom="row32:0"
+                                           criteria="{model.criteria}"
+                                           name="genes.accession"
+                                           operator="contained"
+                                           prompt="Enter accession number(s)"/>
+            </s:FormItem>
+        </s:Form>
     </view:filterFormContent>
 
     <view:collectionGridColumns>
         <s:GridColumn dataField="id" headerText="Molecule Design Pool ID"/>
         <s:GridColumn dataField="molecule_type" headerText="Molecule Type"
-					  itemRenderer="org.everest.flex.ui.renderers.DataGridLinkRenderer"/>	
+                      itemRenderer="org.everest.flex.ui.renderers.DataGridLinkRenderer"/>	
 		<s:GridColumn dataField="number_designs" headerText="Number of Designs"/>
         <s:GridColumn headerText="Product IDs"
                       labelFunction="{function (item:Object, column:*):String { return MoleculeDesignPoolMember(item).productIdsLabel; }}"/>
+        <s:GridColumn headerText="Targeted Genes"
+                      labelFunction="{function (item:Object, column:*):String { return MoleculeDesignPoolMember(item).targetsLabel; }}"/>
     </view:collectionGridColumns>
+    
+    <views:footerContent>
+        <s:Button id="stockInfoButton" label="Show Full Stock Info"
+                  click="stockInfoButton_clickHandler(event)"
+                  toolTip="Shows stock availability of all filtered rows"/>
+    </views:footerContent>
 </views:CollectionView>

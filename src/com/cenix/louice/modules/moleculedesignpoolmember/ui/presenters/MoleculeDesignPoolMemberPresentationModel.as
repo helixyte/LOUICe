@@ -41,6 +41,12 @@ package com.cenix.louice.modules.moleculedesignpoolmember.ui.presenters
 		}		
 		
         [Bindable(Event="memberChanged")]
+        public function get genes():MembersCollection
+        {
+            return MoleculeDesignPoolMember(_member).genes;
+        }
+        
+        [Bindable(Event="memberChanged")]
         public function get supplier_molecule_designs():MembersCollection
         {
             return MoleculeDesignPoolMember(_member).supplier_molecule_designs;
