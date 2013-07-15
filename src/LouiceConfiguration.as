@@ -153,7 +153,7 @@ package
                 res.push( new SchemaModelEntry("location", "http://schemata.cenix-bioscience.com/location", "Location",LocationMember, "/schemata/Location.xsd" ) );
                 res.push( new SchemaModelEntry("location_type", "http://schemata.cenix-bioscience.com/locationtype", "LocationType",LocationTypeMember, "/schemata/LocationType.xsd") );
                 res.push( new SchemaModelEntry("molecule_design", "http://schemata.cenix-bioscience.com/moleculedesign", "MoleculeDesign",MoleculeDesignMember, "/schemata/MoleculeDesign.xsd") );
-                res.push( new SchemaModelEntry("molecule_design_pool", "http://schemata.cenix-bioscience.com/moleculedesignset", "MoleculeDesignPool",MoleculeDesignPoolMember) );
+                res.push( new SchemaModelEntry("molecule_design_pool", "http://schemata.cenix-bioscience.com/moleculedesignset", "MoleculeDesignPool",MoleculeDesignPoolMember, "/schemata/MoleculeDesignSet.xsd") );
                 res.push( new SchemaModelEntry("molecule_design_pool_set", "http://schemata.cenix-bioscience.com/moleculedesignpoolset", "MoleculeDesignPoolSet",MoleculeDesignPoolSetMember, "/schemata/MoleculeDesignPoolSet.xsd") );
                 res.push( new SchemaModelEntry("molecule_design_set", "http://schemata.cenix-bioscience.com/moleculedesignset", "MoleculeDesignSet",MoleculeDesignSetMember, "/schemata/MoleculeDesignSet.xsd") );
                 res.push( new SchemaModelEntry("molecule_type", "http://schemata.cenix-bioscience.com/moleculetype", "MoleculeType",MoleculeTypeMember, "/schemata/MoleculeType.xsd") );

@@ -6,6 +6,7 @@ package com.cenix.louice.shared.model.vos
     {
         public var molecule_type:MoleculeTypeMember;
         public var number_designs:Number;
+        public var genes:MembersCollection;
         public var supplier_molecule_designs:MembersCollection;
 
         public function MoleculeDesignPoolMember(title:String=null, selfLink:String=null)
@@ -19,6 +20,16 @@ package com.cenix.louice.shared.model.vos
             for each (var smd:SupplierMoleculeDesignMember in supplier_molecule_designs)
             {
                 labels.push(smd.productIdLabel);
+            }
+            return labels.join('\n');
+        }
+        
+        public function get targetsLabel():String
+        {
+            var labels:Array = new Array();
+            for each (var gene:GeneMember in genes)
+            {
+                labels.push(gene.geneIdLabel);
             }
             return labels.join('\n');
         }
