@@ -23,14 +23,19 @@
 			<location>/Users/gathmann/Webapp/thelma/public</location>
 		</link>
 		<link>
-			<name>bin-release</name>
+			<name>bin-release-production</name>
 			<type>2</type>
 			<location>/Volumes/buffalo/home/cenixadm/Webapps/thelma/public</location>
 		</link>
 		<link>
-			<name>bin-release1</name>
+			<name>bin-release-dev</name>
 			<type>2</type>
-			<location>/Volumes/raven/home/cenixadm/Webapps/thelma/public</location>
+			<location>/Volumes/raven/home/cenixadm/Webapps/thelma/public/dev</location>
+		</link>
+		<link>
+			<name>bin-release-demo</name>
+			<type>2</type>
+			<location>/Volumes/raven/home/cenixadm/Webapps/thelma/public/demo</location>
 		</link>
 	</linkedResources>
 </projectDescription>
