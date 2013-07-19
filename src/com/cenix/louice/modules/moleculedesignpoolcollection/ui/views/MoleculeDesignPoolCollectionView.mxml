@@ -73,7 +73,7 @@
 									   criteria="{model.criteria}"
 									   enabled="{singleDesignRadioBtn.selected}"
 									   name="molecule-designs.id"
-									   operator="equal-to"
+									   operator="contained"
 									   prompt="Enter single design ID(s)"
 									   restrict="0-9 ,"/>						
 			<s:RadioButton id="poolDesignRadioBtn" left="col01:0" right="col01:0"
@@ -85,7 +85,7 @@
 									   bottom="row03:0" width="100%"
 									   criteria="{model.criteria}"
 									   enabled="{poolDesignRadioBtn.selected}"
-									   name="id" operator="equal-to"
+									   name="id" operator="contained"
 									   prompt="Enter pool design ID(s)"
 									   restrict="0-9 ,"/>
 			<s:Label right="col02:3" top="row04:5" bottom="row04:0"
