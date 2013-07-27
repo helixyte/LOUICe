@@ -26,12 +26,21 @@ package com.cenix.louice.shared.model.vos
         
         public function get targetsLabel():String
         {
+            var label:String = "";
             var labels:Array = new Array();
             for each (var gene:GeneMember in genes)
             {
                 labels.push(gene.geneIdLabel);
             }
-            return labels.join('\n');
+            if (labels.length > 5) 
+            {
+                label = labels.slice(0, 5).join(', ') + ", [..." + (labels.length-5) + " more...]";
+            }
+            else
+            {
+                label = labels.join(', ');
+            }
+            return label
         }
 		
     }
