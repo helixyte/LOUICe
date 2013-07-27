@@ -33,7 +33,12 @@
             protected function stockInfoButton_clickHandler(event:MouseEvent):void
             {
                 var e:NavigationEvent = new NavigationEvent(NavigationEvent.NEW_WINDOW);
-                var pageUrl:String = "/stock-info/?q=molecule-design-pool:contained:" + _application.appUrl + model.filterUrl;
+                var modelFilterUrl:String = model.filterUrl;
+                // We have to cut out the "&size=" parameter from the nested query.
+                // FIXME: Improve this in everest.
+                var pos:int = modelFilterUrl.indexOf("&size=");
+                var pageUrl:String = "/stock-info/?q=molecule-design-pool:contained:" 
+                    + "'" + _application.appUrl + modelFilterUrl.substr(0, pos) + "'";
                 trace("- Stock Info URL: " + pageUrl);
                 e.pageUrl = pageUrl;
                 dispatchEvent(e);
