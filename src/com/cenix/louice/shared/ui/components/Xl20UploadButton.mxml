@@ -17,7 +17,7 @@
 				fileRef.addEventListener(Event.SELECT, selectHandler);
 				fileRef.addEventListener(Event.COMPLETE, onLoadComplete);
 				fileRef.addEventListener(IOErrorEvent.IO_ERROR, onLoadError);
-				fileRef.browse([new FileFilter("XL20 Output Files (*.txt)", "*.txt")]);
+				fileRef.browse([new FileFilter("XL20 Output Files (*.tpo)", "*.tpo")]);
 			}
 			
 			private function onLoadComplete(e:Event):void
