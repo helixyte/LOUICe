@@ -97,7 +97,7 @@
                          fontStyle="italic" fontWeight="bold" text="by ID"/> 
                 <s:RadioButton id="singleDesignRadioBtn" left="col01:0"
                                right="col01:0" top="row02:5" bottom="row02:0"
-                               label="Single Design"
+                               label="Old Design"
                                click="singleDesignButton_clickHandler(event)"
                                groupName="moleculeDesignTypeGroup"/>
                 <components1:SmartTextArea id="idInputSingle" left="col02:0"
@@ -107,7 +107,7 @@
                                            enabled="{singleDesignRadioBtn.selected}"
                                            name="molecule-designs.id"
                                            operator="contained"
-                                           prompt="Enter single design ID(s)"
+                                           prompt="Enter old Cenix design ID(s)"
                                            restrict="0-9 ,"/>						
                 <s:RadioButton id="poolDesignRadioBtn" left="col01:0"
                                right="col01:0" top="row03:5" bottom="row03:0"
@@ -120,7 +120,7 @@
                                            criteria="{model.criteria}"
                                            enabled="{poolDesignRadioBtn.selected}"
                                            name="id" operator="contained"
-                                           prompt="Enter pool design ID(s)"
+                                           prompt="Enter Cenix pool design ID(s)"
                                            restrict="0-9 ,"/>
                 <s:Label right="col02:3" top="row04:5" bottom="row04:0"
                          enabled="{poolDesignRadioBtn.selected}"
