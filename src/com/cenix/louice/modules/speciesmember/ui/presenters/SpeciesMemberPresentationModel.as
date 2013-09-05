@@ -47,7 +47,7 @@ package com.cenix.louice.modules.speciesmember.ui.presenters
         [Bindable(Event="memberChanged")]
         public function get genes():INavigationLink
         {
-            return new Link('Genes','/genes/?q=species:equal-to:' + _member.selfLink);
+            return new Link('Genes','/genes/?q=species:equal-to:\'' + _member.selfLink + '\'');
         }
 
     }
