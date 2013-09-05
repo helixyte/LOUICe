@@ -212,7 +212,7 @@
                                                         criteria="{model.criteria}"
                                                         name="molecule-designs.chemical-structures.structure-type-id"
                                                         operator="equal-to"
-                                                        url="{moleculeTypeInput.selectedItem.value ? '/chemical-structure-types/?q=molecule-types:contains:' + moleculeTypeInput.selectedItem.value : null}"/>
+                                                        url="{moleculeTypeInput.selectedItem.value ? '/chemical-structure-types/?q=molecule-types:contains:\'' + moleculeTypeInput.selectedItem.value + '\'': null}"/>
                 <s:Label left="col21:0" right="col21:0" top="row24:5"
                          bottom="row24:0" text="Representation"/>
                 <components1:SmartTextArea id="representationInput"

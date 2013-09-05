@@ -67,7 +67,8 @@ package com.cenix.louice.modules.devicemember.ui.presenters
         [Bindable(Event="memberChanged")]
         public function get locations():INavigationLink
         {
-            return new Link('Locations','/locations/?q=device:equal-to:' + _member.selfLink);
+            return new Link('Locations',
+                            '/locations/?q=device:equal-to:\'' + _member.selfLink + '\'');
         }
     }
 }

@@ -45,8 +45,8 @@
                                                     name="chemical-structures.structure-type-id"
                                                     operator="equal-to"
                                                     url="{moleculeTypeInput.selectedItem.value ? 
-													'/chemical-structure-types/?q=molecule-types:contains:' +                        
-													moleculeTypeInput.selectedItem.value :                      
+													'/chemical-structure-types/?q=molecule-types:contains:\'' +                        
+													moleculeTypeInput.selectedItem.value + '\'':                      
 													null}"/>
         </s:FormItem>
         <s:FormItem label="Representation">

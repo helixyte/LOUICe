@@ -108,7 +108,7 @@
                           contentType="{ContentType.EXPERIMENT_METADATA_COLLECTION}" />
 
        <!--     <vos:MenuItem uid="10"
-                          url="/experiment-jobs/?q=job-type:equal-to:http://thelma/job-types/rnai-experiment/"
+                          url="/experiment-jobs/?q=job-type:equal-to:'http://thelma/job-types/rnai-experiment/'"
                           title="Experiment Jobs"
                           description="Manage experiment jobs"
                           imageUrl="/static/images/jobs.png"
