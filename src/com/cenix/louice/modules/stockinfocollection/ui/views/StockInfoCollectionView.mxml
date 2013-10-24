@@ -86,7 +86,7 @@
     </fx:Declarations>
 
     <view:filterFormContent>
-        <s:FormItem width="100%" label="Molecule Design Pool ID">
+        <s:FormItem width="100%" label="Pool Design ID">
             <components1:SmartTextArea criteria="{model.criteria}"
                                        name="molecule-design-pool-id"
                                        operator="contained" restrict="0-9 ,"/>
@@ -149,7 +149,7 @@
                       itemRenderer="org.everest.flex.ui.renderers.DataGridLinkRenderer"/>
 -->     
 		<s:GridColumn minWidth="64" dataField="molecule_design_pool_id"
-                      headerText="Molecule Design Pool ID"/>
+                      headerText="Pool Design ID"/>
 		<s:GridColumn minWidth="64" dataField="molecule_type"
                       headerText="Molecule Type"
                       itemRenderer="org.everest.flex.ui.renderers.DataGridLinkRenderer"/>

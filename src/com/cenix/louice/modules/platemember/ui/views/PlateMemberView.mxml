@@ -30,10 +30,10 @@
                     toolTip += ("Volume: " + 
                                 UnitConvUtils.volumeLabelFunction(container.sample_volume) +
                                 ' µl<br/>');
-                    toolTip += ("Molecule Design Pool ID: " + 
+                    toolTip += ("Pool Design ID: " + 
                                 container.sample_molecule_design_pool_id + '<br/>');
                     toolTip = maybeAppend(toolTip, container, 
-                        "molecule_design_id", "Molecule Design ID");
+                        "molecule_design_id", "Old Design ID");
                     toolTip = maybeAppend(toolTip, container,
                         "supplier", "Supplier");
                     toolTip = maybeAppend(toolTip, container,

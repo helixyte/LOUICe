@@ -1,7 +1,7 @@
 package com.cenix.louice.shared.model.vos
 {
-	import org.everest.flex.model.Member;
-	import org.everest.flex.model.MembersCollection;
+    import org.everest.flex.model.Member;
+    import org.everest.flex.model.MembersCollection;
 
     public class ContainerMember extends Member
     {
@@ -13,7 +13,6 @@ package com.cenix.louice.shared.model.vos
         public var sample_molecules:MembersCollection;
         public var container_specs:ContainerSpecsMember;
         public var itemstatus:ItemStatusMember;
-
 
         public function ContainerMember(title:String=null, selfLink:String=null)
         {

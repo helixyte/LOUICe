@@ -22,7 +22,7 @@
                 <components:MemberLinkButton link="{model.molecule_design_pool}"/>
             </s:FormItem>
 -->
-			<s:FormItem width="100%" label="Molecule Design Pool ID">
+			<s:FormItem width="100%" label="Pool Design ID">
 				<s:Label text="{model.molecule_design_pool_id}"/>
 			</s:FormItem>
 			<s:FormItem width="100%" label="Molecule Type">

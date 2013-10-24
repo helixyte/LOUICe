@@ -68,10 +68,27 @@ package com.cenix.louice.modules.tubemember.ui.presenters
         }
 
         [Bindable(Event="memberChanged")]
+        public function get sample_molecule_design_pool_id():String
+        {
+            return TubeMember(_member).sample_molecule_design_pool_id;
+        }
+        
+        [Bindable(Event="memberChanged")]
         public function get sample_molecules():MembersCollection
         {
             return TubeMember(_member).sample_molecules;
         }
 
-    }
+        [Bindable(Event="memberChanged")]
+        public function get sample_supplier():INavigationLink
+        {
+            return TubeMember(_member).sample_supplier;
+        }
+
+        [Bindable(Event="memberChanged")]
+        public function get sample_product_id():String
+        {
+            return TubeMember(_member).sample_product_id;
+        }
+}
 }
