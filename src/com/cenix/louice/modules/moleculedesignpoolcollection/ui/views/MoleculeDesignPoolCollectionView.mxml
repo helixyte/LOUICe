@@ -252,7 +252,7 @@
     </view:filterFormContent>
 
     <view:collectionGridColumns>
-        <s:GridColumn dataField="id" headerText="Molecule Design Pool ID"/>
+        <s:GridColumn dataField="id" headerText="Pool Design ID"/>
         <s:GridColumn dataField="molecule_type" headerText="Molecule Type"
                       itemRenderer="org.everest.flex.ui.renderers.DataGridLinkRenderer"/>	
 		<s:GridColumn dataField="number_designs" headerText="Number of Designs"/>

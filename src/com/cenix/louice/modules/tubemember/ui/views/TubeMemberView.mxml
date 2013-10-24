@@ -40,19 +40,22 @@
         <s:FormItem width="100%" label="Sample Volume (µl)">
             <s:Label text="{UnitConvUtils.volumeLabelFunction(model.sample_volume)}"/>
         </s:FormItem>
+        <s:FormItem width="100%" label="Supplier">
+            <components:MemberLinkButton link="{model.sample_supplier}"/>
+        </s:FormItem>
+        <s:FormItem width="100%" label="Product ID">
+            <s:Label text="{model.sample_product_id}"/>
+        </s:FormItem>
+        <s:FormItem width="100%" label="Sample Pool Design ID">
+            <s:Label text="{model.sample_molecule_design_pool_id}"/>
+        </s:FormItem>
         <s:FormItem width="100%" label="Sample Molecules">
             <components:DataGrid width="100%" minHeight="200"
                                  dataProvider="{model.sample_molecules}">
                 <components:columns>
                     <s:ArrayList>
-                        <s:GridColumn dataField="sample_molecule_design_pool_id"
-                                      headerText="Molecule Design Pool ID"/>
                         <s:GridColumn dataField="molecule_design_id"
-                                      headerText="Molecule Design ID"/>
-                        <s:GridColumn dataField="supplier" headerText="Supplier"
-                                      itemRenderer="org.everest.flex.ui.renderers.DataGridLinkRenderer"/>
-                        <s:GridColumn dataField="product_id"
-                                      headerText="Product ID"/>
+                                      headerText="Old Design ID"/>
                         <s:GridColumn dataField="concentration"
                                       headerText="Concentration (µM)"
                                       labelFunction="{UnitConvUtils.dataGridConcentrationLabelFunction}"/>

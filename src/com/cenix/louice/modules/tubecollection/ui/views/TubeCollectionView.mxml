@@ -124,19 +124,19 @@
 										 operator="greater-than"/>
             </s:HGroup>
         </s:FormItem>
-        <s:FormItem width="100%" label="Molecule Design Pool Id">
+        <s:FormItem width="100%" label="Pool Design Id">
             <components1:SmartTextArea criteria="{model.criteria}"
 									   name="sample-molecule-design-pool-id"
 									   operator="contained" restrict="0-9 ,"/>
         </s:FormItem>
-        <s:FormItem width="100%" label="Molecule Design Id">
+        <s:FormItem width="100%" label="Old Design Id">
             <components1:SmartTextArea criteria="{model.criteria}"
 									   name="sample-molecules.molecule-design-id"
 									   operator="contained" restrict="0-9 ,"/>
         </s:FormItem>
         <s:FormItem width="100%" label="Product Id">
             <components1:SmartTextArea criteria="{model.criteria}"
-									   name="sample-molecules.supplier-molecule-design.product-id"
+									   name="sample-product-id"
 									   operator="equal-to"
 									   restrict="a-zA-Z0-9 ,-_"/>
         </s:FormItem>
@@ -166,17 +166,14 @@
 					  headerText="Tube Specs"
 					  itemRenderer="org.everest.flex.ui.renderers.DataGridLinkRenderer"
 					  sortable="false"/>
+        <s:GridColumn minWidth="60" dataField="sample_supplier" headerText="Supplier"
+                      itemRenderer="org.everest.flex.ui.renderers.DataGridLinkRenderer"/>
+        <s:GridColumn minWidth="60" dataField="sample_product_id"
+                      headerText="Product ID"/>
         <s:GridColumn minWidth="90" dataField="sample_molecule_design_pool_id"
-					  headerText="Design Pool ID" sortable="false"/>
+					  headerText="Pool Design ID" sortable="false"/>
         <s:GridColumn width="90" dataField="molecule_design_id"
-					  headerText="Design ID"
-					  labelFunction="{sampleMoleculeAttrLabelFunction}"
-					  sortable="false"/>
-        <s:GridColumn minWidth="64" dataField="supplier" headerText="Supplier"
-					  labelFunction="{sampleMoleculeAttrLabelFunction}"
-					  sortable="false"/>
-        <s:GridColumn minWidth="64" dataField="product_id"
-					  headerText="Product ID"
+					  headerText="Old Design ID"
 					  labelFunction="{sampleMoleculeAttrLabelFunction}"
 					  sortable="false"/>
         <s:GridColumn minWidth="64" dataField="concentration"

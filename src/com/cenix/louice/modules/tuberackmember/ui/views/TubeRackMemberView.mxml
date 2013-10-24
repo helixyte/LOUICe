@@ -35,14 +35,15 @@
                     toolTip += ("Volume: " +
                                 UnitConvUtils.volumeLabelFunction(tube.sample_volume) +
                                 ' µl<br/>');
-                    toolTip += ("Molecule Design Pool ID: " + 
+                    toolTip += ("Pool Design ID: " + 
                         tube.sample_molecule_design_pool_id + '<br/>');
                     toolTip = maybeAppend(toolTip, tube, 
-                        "molecule_design_id", "Molecule Design ID");
+                        "molecule_design_id", "Old Design ID");
                     toolTip = maybeAppend(toolTip, tube,
                         "supplier", "Supplier");
-                    toolTip = maybeAppend(toolTip, tube,
-                        "product_id", "Product ID");
+                    toolTip += ("Product ID: " + tube.sample_product_id + '<br/>');
+//                    toolTip = maybeAppend(toolTip, tube,
+//                        "product_id", "Product ID");
                     toolTip = maybeAppend(toolTip, tube, 
                         "concentration", "Concentration", "µM");
                     toolTip = maybeAppend(toolTip, tube, 
@@ -153,20 +154,19 @@
                                           sortable="false"/>
                             <s:GridColumn minWidth="96"
                                           dataField="sample_molecule_design_pool_id"
-                                          headerText="Molecule Design Pool ID"
+                                          headerText="Pool Design ID"
                                           sortable="false"/>
                             <s:GridColumn minWidth="96"
                                           dataField="molecule_design_id"
-                                          headerText="Molecule Design ID"
+                                          headerText="Old Design ID"
                                           labelFunction="{sampleMoleculeAttrLabelFunction}"
                                           sortable="false"/>
                             <s:GridColumn minWidth="64" dataField="supplier"
                                           headerText="Supplier"
                                           labelFunction="{sampleMoleculeAttrLabelFunction}"
                                           sortable="false"/>
-                            <s:GridColumn minWidth="64" dataField="product_id"
+                            <s:GridColumn minWidth="64" dataField="sample_product_id"
                                           headerText="Product ID"
-                                          labelFunction="{sampleMoleculeAttrLabelFunction}"
                                           sortable="false"/>
                             <s:GridColumn minWidth="64" dataField="concentration"
                                           headerText="Concentration (µM)"
