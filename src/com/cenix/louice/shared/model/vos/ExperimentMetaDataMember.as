@@ -9,7 +9,7 @@ package com.cenix.louice.shared.model.vos
         public var subproject:SubprojectMember;
         public var molecule_design_pool_set:MoleculeDesignPoolSetMember;
         public var experiment_design:ExperimentDesignMember;
-        public var iso_request:IsoRequestMember;
+        public var iso_request:LabIsoRequestMember;
         public var creation_date:Date;
         public var experiment_metadata_type:ExperimentMetaDataTypeMember;
 

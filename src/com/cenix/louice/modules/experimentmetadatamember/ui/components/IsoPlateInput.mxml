@@ -12,7 +12,7 @@
     <fx:Script>
         <![CDATA[
             import org.everest.flex.events.SuggestionEvent;
-            import com.cenix.louice.shared.model.vos.IsoRequestMember;
+            import com.cenix.louice.shared.model.vos.LabIsoRequestMember;
             import org.everest.flex.query.Criteria;
             import org.everest.flex.ui.presenters.FeedPresentationModel;
             import org.everest.flex.ui.presenters.SuggestionDropDownListPresentationModel;
@@ -32,7 +32,7 @@
             private var _model:FeedPresentationModel;
 
 
-            public function set isoRequest(isoRequest:IsoRequestMember):void
+            public function set isoRequest(isoRequest:LabIsoRequestMember):void
             {
 				var url:String = "/iso-requests/" + isoRequest.id + "/completed-iso-plates/"
 				isoAliquotePlateInput.url = url

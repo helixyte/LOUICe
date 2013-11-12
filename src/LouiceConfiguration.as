@@ -18,9 +18,9 @@ package
     import com.cenix.louice.shared.model.vos.ExperimentRackMember;
     import com.cenix.louice.shared.model.vos.GeneMember;
     import com.cenix.louice.shared.model.vos.IsoJobMember;
-    import com.cenix.louice.shared.model.vos.IsoMember;
-    import com.cenix.louice.shared.model.vos.IsoRequestMember;
-    import com.cenix.louice.shared.model.vos.IsoSampleStockRackMember;
+    import com.cenix.louice.shared.model.vos.LabIsoMember;
+    import com.cenix.louice.shared.model.vos.LabIsoRequestMember;
+    import com.cenix.louice.shared.model.vos.IsoSectorStockRackMember;
     import com.cenix.louice.shared.model.vos.ItemStatusMember;
     import com.cenix.louice.shared.model.vos.JobMember;
     import com.cenix.louice.shared.model.vos.JobTypeMember;
@@ -143,10 +143,10 @@ package
                 res.push( new SchemaModelEntry("experimentdesignrack", "http://schemata.cenix-bioscience.com/experimentdesignrack", "ExperimentDesignRack",ExperimentDesignRackMember, "/schemata/ExperimentDesignRack.xsd") );
                 res.push( new SchemaModelEntry("experiment_rack", "http://schemata.cenix-bioscience.com/experimentrack", "ExperimentRack",ExperimentRackMember, "/schemata/ExperimentRack.xsd") );
                 res.push( new SchemaModelEntry("gene", "http://schemata.cenix-bioscience.com/gene", "Gene",GeneMember, "/schemata/Gene.xsd") );
-                res.push( new SchemaModelEntry("iso", "http://schemata.cenix-bioscience.com/iso", "Iso",IsoMember, "/schemata/Iso.xsd") );
+                res.push( new SchemaModelEntry("iso", "http://schemata.cenix-bioscience.com/iso", "Iso",LabIsoMember, "/schemata/Iso.xsd") );
                 res.push( new SchemaModelEntry("iso_job", "http://schemata.cenix-bioscience.com/job", "IsoJob",IsoJobMember) );
-                res.push( new SchemaModelEntry("iso_request", "http://schemata.cenix-bioscience.com/isorequest", "IsoRequest",IsoRequestMember, "/schemata/IsoRequest.xsd") );
-                res.push( new SchemaModelEntry("iso_sample_stock_rack", "http://schemata.cenix-bioscience.com/isosamplestockrack", "IsoSampleStockRack",IsoSampleStockRackMember, "/schemata/IsoSampleStockRack.xsd") );
+                res.push( new SchemaModelEntry("iso_request", "http://schemata.cenix-bioscience.com/isorequest", "IsoRequest",LabIsoRequestMember, "/schemata/IsoRequest.xsd") );
+                res.push( new SchemaModelEntry("iso_sample_stock_rack", "http://schemata.cenix-bioscience.com/isosamplestockrack", "IsoSampleStockRack",IsoSectorStockRackMember, "/schemata/IsoSampleStockRack.xsd") );
                 res.push( new SchemaModelEntry("itemstatus", "http://schemata.cenix-bioscience.com/itemstatus", "ItemStatus",ItemStatusMember, "/schemata/ItemStatus.xsd") );
                 res.push( new SchemaModelEntry("job", "http://schemata.cenix-bioscience.com/job", "Job",JobMember, "/schemata/Job.xsd") );
                 res.push( new SchemaModelEntry("job_type", "http://schemata.cenix-bioscience.com/jobtype", "JobType",JobTypeMember, "/schemata/JobType.xsd") );

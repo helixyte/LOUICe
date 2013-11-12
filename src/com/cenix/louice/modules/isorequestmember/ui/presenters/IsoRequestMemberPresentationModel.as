@@ -1,10 +1,9 @@
 package com.cenix.louice.modules.isorequestmember.ui.presenters
 {
     import com.cenix.louice.shared.model.vos.ExperimentMetaDataMember;
-    import com.cenix.louice.shared.model.vos.ExperimentMetaDataTypeMember;
     import com.cenix.louice.shared.model.vos.IsoJobMember;
-    import com.cenix.louice.shared.model.vos.IsoMember;
-    import com.cenix.louice.shared.model.vos.IsoRequestMember;
+    import com.cenix.louice.shared.model.vos.LabIsoMember;
+    import com.cenix.louice.shared.model.vos.LabIsoRequestMember;
     import com.cenix.louice.shared.model.vos.RackLayoutMember;
     import com.cenix.louice.shared.model.vos.RackMember;
     import com.cenix.louice.shared.model.vos.RackShapeMember;
@@ -74,7 +73,7 @@ package com.cenix.louice.modules.isorequestmember.ui.presenters
             super.member = member;
             if (member != null)
             {
-                var shape:RackShapeMember = IsoRequestMember(_member).rack_layout.rack_shape;
+                var shape:RackShapeMember = LabIsoRequestMember(_member).rack_layout.rack_shape;
                 rackShape = shape.number_columns * shape.number_rows;
                 // Trigger async load of the isos.
                 var dLink:INavigationLink = isosLink;
@@ -125,7 +124,7 @@ package com.cenix.louice.modules.isorequestmember.ui.presenters
                     platesToLoad--;
                     dispatchEvent(new MemberEvent(MemberEvent.MEMBER_CHANGED));
 
-                } else if (member is IsoMember){
+                } else if (member is LabIsoMember){
                     var mbs:MembersCollection = new MembersCollection();
                     mbs.addItem(member);
                     subMembers = mbs;
@@ -153,8 +152,8 @@ package com.cenix.louice.modules.isorequestmember.ui.presenters
         public function changeOwner(newOwner:String):void
         {
             owner = newOwner;
-            IsoRequestMember(_member).isos = null;
-            IsoRequestMember(_member).rack_layout = null; // We do not need to send all that again.
+            LabIsoRequestMember(_member).isos = null;
+            LabIsoRequestMember(_member).rack_layout = null; // We do not need to send all that again.
             submit();
         }
 
@@ -166,7 +165,7 @@ package com.cenix.louice.modules.isorequestmember.ui.presenters
 
             for (var i:int = 0; i < numberOfIsos; i++)
             {
-                var iso:IsoMember = new IsoMember();
+                var iso:LabIsoMember = new LabIsoMember();
                     iso.label = "new iso";
                     iso.status = "NEW";
                     iso.optimizer_excluded_racks = optimizer_excluded_racks;
@@ -174,8 +173,8 @@ package com.cenix.louice.modules.isorequestmember.ui.presenters
                 newIsos.addItem(iso);
             }
 
-            IsoRequestMember(_member).isos = newIsos;
-            IsoRequestMember(_member).rack_layout = null; //We do not need to send all that again.
+            LabIsoRequestMember(_member).isos = newIsos;
+            LabIsoRequestMember(_member).rack_layout = null; //We do not need to send all that again.
             submit();
         }
 
@@ -195,7 +194,7 @@ package com.cenix.louice.modules.isorequestmember.ui.presenters
             //need to find one parent iso
             for each (var iso:* in isos)
             {
-                if ((iso is IsoMember) && (iso.iso_job.id == isoJob.id))
+                if ((iso is LabIsoMember) && (iso.iso_job.id == isoJob.id))
                 {
                     submitIsoChange(iso, "UPDATE_CONTROL_STOCK_RACK"+barcode);
                     break;
@@ -208,7 +207,7 @@ package com.cenix.louice.modules.isorequestmember.ui.presenters
             //need to find one parent iso
             for each (var iso:* in isos)
             {
-                if ((iso is IsoMember) && (iso.iso_job.id == isoJob.id))
+                if ((iso is LabIsoMember) && (iso.iso_job.id == isoJob.id))
                 {
                     // transfer the stock in the database
                     submitIsoChange(iso,"TRANSFER_CONTROL_STOCK");
@@ -227,65 +226,64 @@ package com.cenix.louice.modules.isorequestmember.ui.presenters
 			dispatcher.dispatchEvent(event);
         }
 
-        public function transferStockInDB(iso:IsoMember):void
+        public function transferStockInDB(iso:LabIsoMember):void
         {
             submitIsoChange(iso, "TRANSFER_STOCK");
         }
         
 
-        public function transferToIsoInDB(iso:IsoMember):void
+        public function transferToIsoInDB(iso:LabIsoMember):void
         {
             // verify and save the stock rack
             submitIsoChange(iso, "TRANSFER_TO_ISO");
         }
 
-        public function transferToAliquotInDB(iso:IsoMember, barcode:String):void
+        public function transferToAliquotInDB(iso:LabIsoMember, barcode:String):void
         {
             submitIsoChange(iso, "TRANSFER_TO_ADD_ALIQUOT"+barcode);
         }
 
-        public function cancelIso(iso:IsoMember):void
+        public function cancelIso(iso:LabIsoMember):void
         {
             submitIsoChange(iso, "CANCEL_ISO");
         }
 
-        public function closeIso(iso:IsoMember):void
+        public function closeIso(iso:LabIsoMember):void
         {
             submitIsoChange(iso, "CLOSE_ISO");
         }
 
-        public function reopenIso(iso:IsoMember):void
+        public function reopenIso(iso:LabIsoMember):void
         {
             submitIsoChange(iso, "REOPEN_ISO");
         }
 
-        public function addAliquotePlate(iso:IsoMember):void
+        public function addAliquotePlate(iso:LabIsoMember):void
         {
             submitIsoChange(iso, "ADD_ALIQUOT");
         }
 
-        public function copyIso(iso:IsoMember, withOptimization:Boolean):void
+        public function copyIso(iso:LabIsoMember, withOptimization:Boolean):void
         {
             submitIsoChange(iso, withOptimization ? 
                 "COPY_ISO_WITH_OPTIMIZATION" : "COPY_ISO_WITHOUT_OPTIMIZATION");
         }
 
-        private function submitIsoChange(iso:IsoMember, status:String):void
+        private function submitIsoChange(iso:LabIsoMember, status:String):void
         {
             // We only need to send a lightweight clone to the server.
-            var isoClone:IsoMember = new IsoMember();
+            var isoClone:LabIsoMember = new LabIsoMember();
             isoClone.id = iso.id;
             isoClone.label = iso.label;
             isoClone.status = status;
-            var isoReqClone:IsoRequestMember = new IsoRequestMember();
+            var isoReqClone:LabIsoRequestMember = new LabIsoRequestMember();
             isoReqClone.id = _member.id;
-            isoReqClone.selfLink = IsoRequestMember(_member).selfLink;
-            isoReqClone.iso_type = IsoRequestMember(_member).iso_type;
-            isoReqClone.plate_set_label = IsoRequestMember(_member).plate_set_label;
-            isoReqClone.requester = IsoRequestMember(_member).requester;
+            isoReqClone.selfLink = LabIsoRequestMember(_member).selfLink;
+            isoReqClone.iso_type = LabIsoRequestMember(_member).iso_type;
+            isoReqClone.plate_set_label = LabIsoRequestMember(_member).plate_set_label;
+            isoReqClone.requester = LabIsoRequestMember(_member).requester;
             isoReqClone.isos = new MembersCollection();
-			isoReqClone.ticket_number = IsoRequestMember(_member).ticket_number
-			isoReqClone.owner = IsoRequestMember(_member).owner
+			isoReqClone.owner = LabIsoRequestMember(_member).owner
             isoReqClone.isos.addItem(isoClone);
             submit(isoReqClone);
         }
@@ -293,31 +291,31 @@ package com.cenix.louice.modules.isorequestmember.ui.presenters
         [Bindable(Event="memberChanged")]
         public function get iso_type():String
         {
-            return IsoRequestMember(_member).iso_type;
+            return LabIsoRequestMember(_member).iso_type;
         }
 
         [Bindable(Event="memberChanged")]
         public function get plate_set_label():String
         {
-            return IsoRequestMember(_member).plate_set_label;
+            return LabIsoRequestMember(_member).plate_set_label;
         }
 
         [Bindable(Event="memberChanged")]
         public function get rack_layout():RackLayoutMember
         {
-            return IsoRequestMember(_member).rack_layout;
+            return LabIsoRequestMember(_member).rack_layout;
         }
 
         [Bindable(Event="memberChanged")]
         public function set rack_layout(rl:RackLayoutMember):void
         {
-            IsoRequestMember(_member).rack_layout = rl;
+            LabIsoRequestMember(_member).rack_layout = rl;
         }
 
         [Bindable(Event="memberChanged")]
         public function get delivery_date():Date
         {
-            return IsoRequestMember(_member).delivery_date;
+            return LabIsoRequestMember(_member).delivery_date;
         }
 
         [Bindable]
@@ -341,7 +339,7 @@ package com.cenix.louice.modules.isorequestmember.ui.presenters
                 isos.refresh();
                 for each (var iso:* in isos)
                 {
-                    if (iso is IsoMember)
+                    if (iso is LabIsoMember)
                     {
                         if (iso.iso_job.id != lastJobId)
                         {
@@ -357,67 +355,49 @@ package com.cenix.louice.modules.isorequestmember.ui.presenters
         [Bindable(Event="memberChanged")]
         public function get requester():UserMember
         {
-            return IsoRequestMember(_member).requester;
+            return LabIsoRequestMember(_member).requester;
         }
         
         [Bindable(Event="memberChanged")]
         public function get owner():String
         {
-            return IsoRequestMember(_member).owner;
+            return LabIsoRequestMember(_member).owner;
         }
         
         [Bindable(Event="memberChanged")]
         public function set owner(newOwner:String):void
         {
-            IsoRequestMember(_member).owner = newOwner;
+            LabIsoRequestMember(_member).owner = newOwner;
         }
         
         [Bindable(Event="memberChanged")]
-        public function get number_plates():int
+        public function get expected_number_isos():int
         {
-            return IsoRequestMember(_member).number_plates;
+            return LabIsoRequestMember(_member).expected_number_isos;
         }
         
         [Bindable(Event="memberChanged")]
         public function get number_aliquots():int
         {
-            return IsoRequestMember(_member).number_aliquots;
+            return LabIsoRequestMember(_member).number_aliquots;
         }
         
         [Bindable(Event="memberChanged")]
-        public function get ticket_number():uint
-        {
-            return IsoRequestMember(_member).ticket_number;
-        }
-
-        [Bindable(Event="memberChanged")]
-        public function get experiment_metadata_type():ExperimentMetaDataTypeMember
-        {
-            return IsoRequestMember(_member).experiment_metadata_type;
-        }
-
-        [Bindable(Event="memberChanged")]
-        public function set experiment_metadata_type(new_experiment_metadata_type:ExperimentMetaDataTypeMember):void
-        {
-            IsoRequestMember(_member).experiment_metadata_type = new_experiment_metadata_type;
-        }
-
-        [Bindable(Event="memberChanged")]
         public function get experiment_metadata():ExperimentMetaDataMember
         {
-            return IsoRequestMember(_member).experiment_metadata;
+            return LabIsoRequestMember(_member).experiment_metadata;
         }
         
         [Bindable(Event="memberChanged")]
         public function get tagPredicates():ArrayCollection
         {
-            return IsoRequestMember(_member).rack_layout.tagPredicates;
+            return LabIsoRequestMember(_member).rack_layout.tagPredicates;
         }
 
         [Bindable(Event="memberChanged")]
         public function get isosLink():INavigationLink
         {
-            return IsoRequestMember(_member).isos;
+            return LabIsoRequestMember(_member).isos;
         }
         
         [Bindable]
@@ -452,7 +432,7 @@ package com.cenix.louice.modules.isorequestmember.ui.presenters
                 var currentUser:String = 
                     FlexGlobals.topLevelApplication.currentUser.directory_user_id;
 
-                if (owner.indexOf(IsoRequestMember.STOCKMANAGEMENT_USER) > -1)
+                if (owner.indexOf(LabIsoRequestMember.STOCKMANAGEMENT_USER) > -1)
                 {
                     if (iso_type == 'STANDARD' 
                         && owner.indexOf(currentUser) < 0)

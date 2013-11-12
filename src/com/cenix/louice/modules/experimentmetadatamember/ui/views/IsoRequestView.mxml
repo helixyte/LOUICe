@@ -8,7 +8,7 @@
          xmlns:components1="org.everest.flex.ui.components.*">
     <fx:Script>
         <![CDATA[
-            import com.cenix.louice.shared.model.vos.IsoRequestMember;
+            import com.cenix.louice.shared.model.vos.LabIsoRequestMember;
             
             import mx.events.CalendarLayoutChangeEvent;
             
@@ -17,12 +17,12 @@
             import org.everest.flex.model.Link;
 
             [Bindable]
-            private var _isoRequest:IsoRequestMember;
+            private var _isoRequest:LabIsoRequestMember;
 
             private static const dtf:DateTimeFormatter = new DateTimeFormatter();
                                  dtf.dateTimePattern = "MMM dd yyyy";
 
-            public function set isoRequest(isoRequest:IsoRequestMember):void
+            public function set isoRequest(isoRequest:LabIsoRequestMember):void
             {
                 this._isoRequest = isoRequest;
                 tagForHighlightSelector.tagPredicates = isoRequest.rack_layout.tagPredicates;
@@ -72,7 +72,7 @@
         <s:Label text="{_isoRequest.plate_set_label}" paddingLeft="5"/>
         <s:Spacer height="5" />
         <s:Label text="ISO Plate(s):" fontWeight="bold"/>
-        <s:Label text="{_isoRequest.number_plates}" paddingLeft="5"/>
+        <s:Label text="{_isoRequest.expected_number_isos}" paddingLeft="5"/>
         <s:Label text="Aliquot(s) per ISO Plate:" fontWeight="bold"/>
         <s:Label text="{_isoRequest.number_aliquots}" paddingLeft="5"/>
         <s:Spacer height="5" />

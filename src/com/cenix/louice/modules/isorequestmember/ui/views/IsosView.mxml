@@ -7,7 +7,7 @@
     <fx:Script>
         <![CDATA[
             import com.cenix.louice.modules.isorequestmember.ui.presenters.IsoRequestMemberPresentationModel;
-            import com.cenix.louice.shared.model.vos.IsoMember;
+            import com.cenix.louice.shared.model.vos.LabIsoMember;
             import com.cenix.louice.shared.model.vos.JobMember;
 
             import mx.events.FlexEvent;
@@ -47,7 +47,7 @@
                     <s:ItemRenderer height="28" >
                         <fx:Script>
                             <![CDATA[
-                                import com.cenix.louice.shared.model.vos.IsoMember;
+                                import com.cenix.louice.shared.model.vos.LabIsoMember;
                                 [Bindable]
                                 private var color:uint = 0x000000;
                                 [Bindable]
@@ -56,7 +56,7 @@
                                 override public function set data(value:Object):void
                                 {
                                     super.data = value;
-                                    if (data is IsoMember)
+                                    if (data is LabIsoMember)
                                     {
                                         title = " - " + data.label;
                                     } else {
@@ -97,9 +97,9 @@
         </s:Line>
         <s:Scroller width="100%" height="100%">
             <s:Group width="100%" height="100%">
-                <components:IsoForm width="100%" height="100%" visible="{isoList.selectedItem is IsoMember}"
+                <components:IsoForm width="100%" height="100%" visible="{isoList.selectedItem is LabIsoMember}"
                                     isoRequest="{isoRequest}"
-                                    iso="{(isoList.selectedItem is IsoMember) ? isoList.selectedItem : null}" />
+                                    iso="{(isoList.selectedItem is LabIsoMember) ? isoList.selectedItem : null}" />
 
                 <components:JobForm width="100%" height="100%" visible="{isoList.selectedItem is JobMember}"
                                     isoRequest="{isoRequest}"

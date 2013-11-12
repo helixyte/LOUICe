@@ -6,7 +6,7 @@ package com.cenix.louice.shared.model.vos
     import org.everest.flex.model.MembersCollection;
 
     [Bindable]
-    public class LibraryCreationIsoMember extends IsoMember
+    public class LibraryCreationIsoMember extends LabIsoMember
     {
 
     }

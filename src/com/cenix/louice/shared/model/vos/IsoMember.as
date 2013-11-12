@@ -9,8 +9,8 @@ package com.cenix.louice.shared.model.vos
     [Bindable]
     public class IsoMember extends Member
     {
+        public var iso_type:String;
         public var label:String;
-        public var iso_request:IsoRequestMember;
         public var molecule_design_pool_set:MoleculeDesignPoolSetMember;
         public var rack:RackMember;
         public var status:String;

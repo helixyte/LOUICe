@@ -11,12 +11,12 @@
     <fx:Script>
         <![CDATA[
             import com.cenix.louice.modules.isorequestcollection.ui.manager.OwnerSuggestionManager;
-            import com.cenix.louice.shared.model.vos.IsoRequestMember;
+            import com.cenix.louice.shared.model.vos.LabIsoRequestMember;
             
             import org.everest.flex.model.SelectionChoice;
             import org.everest.flex.ui.presenters.SuggestionDropDownListPresentationModel;
 
-            private static const STOCK_USR:String = IsoRequestMember.STOCKMANAGEMENT_USER;
+            private static const STOCK_USR:String = LabIsoRequestMember.STOCKMANAGEMENT_USER;
 
             protected override function filterButton_clickHandler(event:MouseEvent):void
             {

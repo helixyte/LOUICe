@@ -29,7 +29,7 @@
 			import com.cenix.louice.shared.model.vos.BarcodePrintJobMember;
 			import com.cenix.louice.shared.model.vos.BarcodeType;
 			import com.cenix.louice.shared.model.vos.ExperimentMetaDataTypes;
-			import com.cenix.louice.shared.model.vos.IsoMember;
+			import com.cenix.louice.shared.model.vos.LabIsoMember;
 			import com.cenix.louice.shared.model.vos.PlateMember;
 			import com.cenix.louice.shared.model.vos.RackMember;
 			import com.cenix.louice.shared.model.vos.RackShapeMember;
@@ -52,11 +52,11 @@
             public var isoRequest:IsoRequestMemberPresentationModel;
 
             [Bindable]
-            private var _iso:IsoMember;
+            private var _iso:LabIsoMember;
 
             private static var loadRack:Function;
 
-            public function set iso(isoMember:IsoMember):void
+            public function set iso(isoMember:LabIsoMember):void
             {
                 if (isoMember != null)
                 {
@@ -104,7 +104,7 @@
             }
 
             [Bindable]
-            public function get iso():IsoMember
+            public function get iso():LabIsoMember
             {
                 return this._iso;
             }

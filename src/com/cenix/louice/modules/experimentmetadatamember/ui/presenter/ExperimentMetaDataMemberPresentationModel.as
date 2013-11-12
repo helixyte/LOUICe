@@ -6,7 +6,7 @@ package com.cenix.louice.modules.experimentmetadatamember.ui.presenter
     import com.cenix.louice.shared.model.vos.ExperimentMember;
     import com.cenix.louice.shared.model.vos.ExperimentMetaDataMember;
     import com.cenix.louice.shared.model.vos.ExperimentMetaDataTypeMember;
-    import com.cenix.louice.shared.model.vos.IsoRequestMember;
+    import com.cenix.louice.shared.model.vos.LabIsoRequestMember;
     import com.cenix.louice.shared.model.vos.JobMember;
     import com.cenix.louice.shared.model.vos.RackLayoutMember;
     import com.cenix.louice.shared.model.vos.SubprojectMember;
@@ -156,12 +156,12 @@ package com.cenix.louice.modules.experimentmetadatamember.ui.presenter
         }
 
         [Bindable(Event="memberChanged")]
-        public function get iso_request():IsoRequestMember
+        public function get iso_request():LabIsoRequestMember
         {
             return ExperimentMetaDataMember(_member).iso_request;
         }
 
-        public function set iso_request(iso_request:IsoRequestMember):void
+        public function set iso_request(iso_request:LabIsoRequestMember):void
         {
             ExperimentMetaDataMember(_member).iso_request = iso_request;
             dispatchEvent(new Event(MemberEvent.MEMBER_CHANGED));
@@ -249,7 +249,7 @@ package com.cenix.louice.modules.experimentmetadatamember.ui.presenter
 				return false;
 			}
 			
-			var isoRequest:IsoRequestMember = ExperimentMetaDataMember(_member).iso_request;
+			var isoRequest:LabIsoRequestMember = ExperimentMetaDataMember(_member).iso_request;
 			var owner:String = isoRequest.owner;
 			if (owner == null) {
 				return false;

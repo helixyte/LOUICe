@@ -14,7 +14,7 @@
             import org.everest.flex.events.RestFaultEvent;
             import com.cenix.louice.shared.model.constants.ContentType;
             import org.everest.flex.model.ResourceState;
-            import com.cenix.louice.shared.model.vos.IsoRequestMember;
+            import com.cenix.louice.shared.model.vos.LabIsoRequestMember;
 
             import mx.core.FlexGlobals;
 
@@ -29,7 +29,7 @@
                 if(FlexGlobals.topLevelApplication.currentUser != null){
                     var username:String = 
                         FlexGlobals.topLevelApplication.currentUser.directory_user_id;                    
-                    return '"' + IsoRequestMember.STOCKMANAGEMENT_USER + 
+                    return '"' + LabIsoRequestMember.STOCKMANAGEMENT_USER + 
                            '","' + username + '"';
                 } else {
                     return '';

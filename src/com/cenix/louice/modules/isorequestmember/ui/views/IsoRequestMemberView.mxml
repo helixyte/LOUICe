@@ -14,7 +14,7 @@
 				 title="{model.iso_type == 'STANDARD' ? 'Internal Sample Order Request for: ' + model.experiment_metadata.title : 'Library Creation Internal Sample Order'}" >
     <fx:Script>
         <![CDATA[
-			import com.cenix.louice.shared.model.vos.IsoRequestMember;
+			import com.cenix.louice.shared.model.vos.LabIsoRequestMember;
 			
 			import mx.core.FlexGlobals;
 			import mx.managers.PopUpManager;
@@ -45,7 +45,7 @@
             {
                 model.changeOwner(
                     FlexGlobals.topLevelApplication.currentUser.directory_user_id 
-                    + ', ' + IsoRequestMember.STOCKMANAGEMENT_USER);
+                    + ', ' + LabIsoRequestMember.STOCKMANAGEMENT_USER);
             }
 
             protected function reopenTicket_clickHandler(event:MouseEvent):void

@@ -24,7 +24,7 @@
 			import com.cenix.louice.shared.model.vos.BarcodeType;
 			import com.cenix.louice.shared.model.vos.ExperimentMetaDataTypes;
 			import com.cenix.louice.shared.model.vos.IsoJobMember;
-			import com.cenix.louice.shared.model.vos.IsoMember;
+			import com.cenix.louice.shared.model.vos.LabIsoMember;
 			import com.cenix.louice.shared.model.vos.RackMember;
 			import com.cenix.louice.shared.ui.components.FileDownloadView;
 			
@@ -69,7 +69,7 @@
 
                         for each (var iso:* in isoRequest.isos)
                         {
-                            if ((iso is IsoMember)&&(iso.iso_job.id == isoJobMember.id))
+                            if ((iso is LabIsoMember)&&(iso.iso_job.id == isoJobMember.id))
                             {
                                 if( (iso.iso_preparation_plate != null) && (iso.iso_preparation_plate.status.toString().toUpperCase() == 'MANAGED' ))
                                 {

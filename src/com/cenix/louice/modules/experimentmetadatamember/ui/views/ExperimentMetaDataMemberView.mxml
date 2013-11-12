@@ -18,7 +18,7 @@
             import com.cenix.louice.modules.experimentmetadatamember.ui.presenter.ExperimentMetaDataMemberPresentationModel;
             import com.cenix.louice.shared.model.vos.ExperimentMetaDataTypeMember;
             import com.cenix.louice.shared.model.vos.ExperimentMetaDataTypes;
-            import com.cenix.louice.shared.model.vos.IsoRequestMember;
+            import com.cenix.louice.shared.model.vos.LabIsoRequestMember;
             import com.cenix.louice.shared.model.vos.SubprojectMember;
             
             import mx.core.FlexGlobals;
@@ -156,7 +156,7 @@
             {
                 model.iso_request.isos = null;
                 model.iso_request.owner = 
-                            IsoRequestMember.STOCKMANAGEMENT_USER;
+                            LabIsoRequestMember.STOCKMANAGEMENT_USER;
                 model.submit();
             }
 
