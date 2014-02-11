@@ -46,7 +46,7 @@
         <s:FormItem width="100%" label="Number of ISOs:" required="true">
             <s:HGroup verticalAlign="middle">
                 <s:NumericStepper id="inputNumberOfIsos"  minimum="1" maximum="999" value="1"/>
-                <s:Label text=" (Total: {model.number_plates})" fontWeight="bold" />
+                <s:Label text=" (Total: {model.expected_number_isos})" fontWeight="bold" />
             </s:HGroup>
         </s:FormItem>
 

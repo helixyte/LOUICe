@@ -5,18 +5,17 @@ package com.cenix.louice.modules.experimentjobmember.ui.presenter
     import com.cenix.louice.shared.model.vos.ExperimentMetaDataMember;
     import com.cenix.louice.shared.model.vos.ExperimentRackMember;
     import com.cenix.louice.shared.model.vos.JobMember;
-    import com.cenix.louice.shared.model.vos.JobTypeMember;
     import com.cenix.louice.shared.model.vos.PlateMember;
     import com.cenix.louice.shared.model.vos.SubprojectMember;
     import com.cenix.louice.shared.model.vos.UserMember;
-    import org.everest.flex.ui.presenters.MemberPresentationModel;
-
+    
+    import flash.events.Event;
+    import flash.events.IEventDispatcher;
+    
     import org.everest.flex.events.MemberEvent;
     import org.everest.flex.model.Member;
     import org.everest.flex.model.MembersCollection;
-
-    import flash.events.Event;
-    import flash.events.IEventDispatcher;
+    import org.everest.flex.ui.presenters.MemberPresentationModel;
 
     public class ExperimentJobMemberPresentationModel extends MemberPresentationModel
     {
@@ -53,18 +52,6 @@ package com.cenix.louice.modules.experimentjobmember.ui.presenter
         }
 
         [Bindable(Event="memberChanged")]
-        public function get job_type():JobTypeMember
-        {
-            return JobMember(_member).job_type;
-        }
-
-        public function set job_type(job_type:JobTypeMember):void
-        {
-            JobMember(_member).job_type = job_type;
-            dispatchEvent(new Event(MemberEvent.MEMBER_CHANGED));
-        }
-
-        [Bindable(Event="memberChanged")]
         public function get subproject():SubprojectMember
         {
             return JobMember(_member).subproject;
@@ -85,18 +72,6 @@ package com.cenix.louice.modules.experimentjobmember.ui.presenter
         public function set user(user:UserMember):void
         {
             JobMember(_member).user = user;
-            dispatchEvent(new Event(MemberEvent.MEMBER_CHANGED));
-        }
-
-        [Bindable(Event="memberChanged")]
-        public function get status():String
-        {
-            return JobMember(_member).status;
-        }
-
-        public function set status(status:String):void
-        {
-            JobMember(_member).status = status;
             dispatchEvent(new Event(MemberEvent.MEMBER_CHANGED));
         }
 
@@ -143,7 +118,9 @@ package com.cenix.louice.modules.experimentjobmember.ui.presenter
             return ExperimentJobMember(_member).experiments;
         }
 
-        public override function submit(member:Member=null):void
+        public override function submit(member:Member=null, 
+                                        processInBackground:Boolean=false,
+                                        editMode:String=MemberEvent.EDIT_MODE_UPDATE):void
         {
             trace("- Editing Member using XML\n");
 

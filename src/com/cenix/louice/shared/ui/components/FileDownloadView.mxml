@@ -31,8 +31,8 @@
             [Bindable]
             private var loader:URLLoader;
 
-
-            public static function show(url:String, fileName:String):FileDownloadView{
+            public static function show(url:String, fileName:String):FileDownloadView
+            {
                 var parent:DisplayObject = 
                     Sprite(FlexGlobals.topLevelApplication);
                 var  p:IFlexDisplayObject = 
@@ -45,7 +45,7 @@
                 return FileDownloadView(p)
             }
 
-            //Handle the close button and Cancel button.
+            // Handle the close button and Cancel button.
             public function close(event:Event=null):void {
                 PopUpManager.removePopUp(this);
                 if(loader != null){
@@ -55,7 +55,7 @@
                 }
             }
 
-            //Handle the close button and Cancel button.
+            // Handle the close button and Cancel button.
             public function closeWithEvent(event:Event=null):void {
                 close(event);
                 dispatchEvent(new CloseEvent(CloseEvent.CLOSE));
@@ -72,7 +72,6 @@
                 loader.dataFormat = URLLoaderDataFormat.BINARY;
                 progressBar.label = "loading ..";
                 configureListeners(loader);
-
                 var request:URLRequest = new URLRequest(url);
                 try {
                     loader.load(request);
@@ -88,28 +87,28 @@
 
             private function completeHandler(event:Event):void {
                 var byteArray:ByteArray = ByteArray(loader.data);
-
-                //this is bad .. but flex does not allow us to use error response codes
-                //and the REST framework can not cope with binary data :-(
-                if(byteArray.length > 60){
+                // This is bad .. but flex does not allow us to use error response codes
+                // and the REST framework can not cope with binary data :-(
+                if (byteArray.length > 60){
                     var str:String = byteArray.readMultiByte(60,'UTF-8');
-
-                    //examine if this is an error response from the flexfilter
+                    // Examine if this is an error response from the flexfilter.
                     if (str.indexOf('<error>') > 0)
                     {
                         str = byteArray.toString();
-                        var message:String = StringUtils.substringBetween(str,'<message>','</message>')
+                        var message:String = 
+                            StringUtils.substringBetween(str,'<message>','</message>')
                         if (str.indexOf('<code>307 Temporary Redirect</code>') > 0)
                         {
-                            //error seems to be a warning .. let us ask the user!
+                            // The error seems to be a warning .. let us ask the user!
                             WarningView.show(message, function():void {
                                 //resend the original request to the redirect location
-                                var newUrl:String = StringUtils.substringBetween(str,'<location>','</location>')
+                                var newUrl:String = 
+                                    StringUtils.substringBetween(str,'<location>','</location>')
                                 download(newUrl, fileName);
                             },close);
 
                         } else {
-                            //show the error and close myself
+                            // Show the error and close myself.
                             ErrorView.show(message);
                             close();
                         }
@@ -129,7 +128,6 @@
             private function ioErrorHandler(event:IOErrorEvent):void {
                 ErrorView.show("ioErrorHandler: " + event);
             }
-
 
             protected function saveFile(event:Event):void
             {

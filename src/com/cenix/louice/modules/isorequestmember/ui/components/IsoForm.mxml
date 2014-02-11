@@ -1,694 +1,226 @@
 <?xml version="1.0" encoding="utf-8"?>
 <s:Form xmlns:fx="http://ns.adobe.com/mxml/2009"
-		xmlns:s="library://ns.adobe.com/flex/spark"
-		xmlns:mx="library://ns.adobe.com/flex/mx"
-		xmlns:rack="com.cenix.louice.shared.ui.components.rack.*"
-		xmlns:components="com.cenix.louice.shared.ui.components.*"
-		xmlns:validators="com.cenix.louice.shared.ui.components.validators.*"
-		xmlns:components1="org.everest.flex.ui.components.*"
-		xmlns:validators1="org.everest.flex.ui.validators.*"
-		removedFromStage="resetPreview()">
+        xmlns:s="library://ns.adobe.com/flex/spark"
+        xmlns:mx="library://ns.adobe.com/flex/mx"
+        xmlns:rack="com.cenix.louice.shared.ui.components.rack.*"
+        xmlns:components="com.cenix.louice.shared.ui.components.*"
+        xmlns:components1="org.everest.flex.ui.components.*"
+        xmlns:components2="com.cenix.louice.modules.isorequestmember.ui.components.*">
     <s:layout>
         <s:VerticalLayout/>
     </s:layout>
     <s:states>
         <s:State name="xl20"/>
-        <s:State name="transferAndProcessing"/>
-        <s:State name="processing"/>
-        <s:State name="waitForControlRack"/>
+        <s:State name="pipetting"/>
         <s:State name="completed"/>
         <s:State name="canceled"/>
         <s:State name="reopened"/>
         <s:State name="unknown"/>
     </s:states>
-
+    
     <fx:Script>
         <![CDATA[
-			import com.cenix.louice.modules.isorequestmember.ui.presenters.IsoRequestMemberPresentationModel;
-			import com.cenix.louice.modules.platemember.ui.views.PlateMemberView;
-			import com.cenix.louice.shared.model.vos.BarcodePrintJobMember;
-			import com.cenix.louice.shared.model.vos.BarcodeType;
-			import com.cenix.louice.shared.model.vos.ExperimentMetaDataTypes;
-			import com.cenix.louice.shared.model.vos.LabIsoMember;
-			import com.cenix.louice.shared.model.vos.PlateMember;
-			import com.cenix.louice.shared.model.vos.RackMember;
-			import com.cenix.louice.shared.model.vos.RackShapeMember;
-			import com.cenix.louice.shared.ui.components.FileDownloadView;
-			import com.cenix.louice.shared.ui.view.BarcodePrintPreView;
-			
-			import mx.core.FlexGlobals;
-			import mx.events.CloseEvent;
-			
-			import org.everest.flex.events.MemberEvent;
-			import org.everest.flex.ui.components.ConfirmationView;
-
-			private var tubeHandlerWorklistFileRef:FileReference = new FileReference();
-			private var tubeHandlerWorklistFileData:ByteArray;
-			
-			[Bindable]
-			private var _application:Object = FlexGlobals.topLevelApplication;
-
-			[Bindable]
+            import com.cenix.louice.modules.isorequestmember.ui.presenters.IsoRequestMemberPresentationModel;
+            import com.cenix.louice.modules.isorequestmember.ui.views.IsosView;
+            import com.cenix.louice.shared.model.vos.BarcodeType;
+            import com.cenix.louice.shared.model.vos.ExperimentMetaDataTypes;
+            import com.cenix.louice.shared.model.vos.LabIsoMember;
+            
+            import org.everest.flex.ui.components.ConfirmationView;
+            
+            [Bindable]
             public var isoRequest:IsoRequestMemberPresentationModel;
-
+            
+            [Bindable]
+            public var isosView:IsosView;
+            
             [Bindable]
             private var _iso:LabIsoMember;
-
-            private static var loadRack:Function;
-
+            
             public function set iso(isoMember:LabIsoMember):void
             {
                 if (isoMember != null)
                 {
-                    if (isoMember.status == 'done'){
-                        setCurrentState("completed");
-                    }else if (isoMember.status == 'canceled'){
-                        setCurrentState("canceled");
-                    }else if( (isoMember.iso_sample_stock_racks == null)
-                              || (isoMember.iso_sample_stock_racks.length < 1) ){
-                        setCurrentState("xl20");
-                    }else if(isoMember.status == 'queued') {
-                        if((isoRequest.experiment_metadata_type.id.toUpperCase() == ExperimentMetaDataTypes.SCREEN) 
-                            && (isoRequest.rackShape == 384))
-                        {
-                            setCurrentState("waitForControlRack");
-                        } else {
-                            setCurrentState("transferAndProcessing");
-                        }
-                    }else if (isoMember.status == 'prepared'){
-                        setCurrentState("transferAndProcessing");
-                    }else if (isoMember.status == 'in_progress'){
-                        setCurrentState("processing");
-                    }else if (isoMember.status == 'reopened'){
-                        setCurrentState("reopened");
+                    // First, check if we need to create stock racks.
+                    if (isoMember.number_stock_racks > 0 && 
+                        ((isoMember.stock_racks == null) 
+                            || (isoMember.stock_racks.length < 1))) {
+                        setCurrentState("xl20");                                                                
                     } else {
-                        setCurrentState("unknown");
+                        switch (isoMember.status) {
+                            case 'done':
+                                setCurrentState("completed");
+                                break;
+                            case 'canceled':
+                                setCurrentState("canceled");
+                                break;
+                            case 'queued':
+                            case 'in_progress':
+                                setCurrentState("pipetting");
+                                break;
+                            case 'reopened':
+                                setCurrentState("reopened");
+                                break;
+                            default:
+                                setCurrentState("unknown");
+                                break;
+                        }
                     }
-
                     _iso = isoMember;
-
-                    resetPreview();
+                    processingForm.data = _iso;
+                    isosView.resetPreview();
                 }
             }
-
-            private function resetPreview():void
-            {
-                //reset quick look
-                rackPreview.visible = false;
-                isoRequest.platesToLoad = 0;
-                if (loadRack != null)
-                {
-                    //remove the preview listener
-                    isoRequest.removeEventListener(MemberEvent.MEMBER_CHANGED, loadRack);
-                }
-            }
-
+            
             [Bindable]
             public function get iso():LabIsoMember
             {
                 return this._iso;
             }
-
-            private function get filename():String
-            {
-                var t:String = _iso.label;
-                name = t.replace(/ /g, '');
-
-                return 'ISO' + name;
-            }
-			
-			private function get numberPreparationPlateWells():int
-			{
-				var shape:RackShapeMember = _iso.iso_preparation_plate.plate_specs.shape;
-				return shape.number_columns * shape.number_rows;
-			}
-
-			private function downloadXL20Worklist(event:MouseEvent):void
-			{
-                // Reset the ISO racks.
-				isoRequest.racks = new Dictionary()
-				var validator:FormValidator = (isoRequest.rackShape == 384) ? xl20Validator384 : xl20Validator;
-				validator.validateForm();
-				if(validator.formIsValid){
-					var url:String = _iso.selfLink + "worklists.zip";
-					url += "?type=XL20";
-					url += "&rack1=" + inputBarcode1XL20.text;
-					url += "&rack2=" + inputBarcode2XL20.text;
-					url += "&rack3=" + inputBarcode3XL20.text;
-					url += "&rack4=" + inputBarcode4XL20.text;
-					url += "&shape=" + isoRequest.rackShape;
-					url += "&optimizer_excluded_racks=" + cleanBarcodes(inputExcludedRacks.text);
-					url += "&optimizer_required_racks=" + cleanBarcodes(inputRequiredRacks.text);
-					url += "&enforce_multiple_racks=" + checkboxMultipleRacks.selected;
-					if (_application.RELEASE_QUALIFIER != '')
-						url += "&include_dummy_output=true";
-					var downloadView:FileDownloadView = FileDownloadView.show(url,  filename + "_XL20.zip")
-					downloadView.addEventListener(CloseEvent.CLOSE, isoRequest.resetPage);
-				}	
-			}
-			
-            private function cleanBarcodes(barcodes:String):String
-            {
-                if (barcodes.length < 1)
-                {
-                    return barcodes;
-                }
-
-                barcodes = barcodes.replace(/ /g, '');
-                if (barcodes.charAt(barcodes.length -1) == ',')
-                {
-                    barcodes = barcodes.substr(0, barcodes.length - 1);
-                }
-                return barcodes;
-            }
-
-            protected function printBarcodes(event:Event):void
-            {
-                var job:BarcodePrintJobMember = new BarcodePrintJobMember();
-                    job.addBarcodeLabelPair(_iso.iso_preparation_plate.barcode, _iso.iso_preparation_plate.label);
-
-                for each (var p:PlateMember in _iso.iso_aliquot_plates)
-                {
-                    job.addBarcodeLabelPair(p.barcode, p.label);
-                }
-                job.type = BarcodeType.UNIRACK;
-
-                BarcodePrintPreView.show(this.parent.parent.parent, job);
-            }
-
-            protected function downloadTransferWorklist(event:MouseEvent):void
-            {
-                var url:String = _iso.selfLink + "worklists.zip";
-                    url += "?type=STOCK_TRANSFER";
-                FileDownloadView.show(url,filename + "_stock_transfer.zip");
-            }
-
-            protected function onXl20OutputLoadComplete(e:Event):void
-            {
-                // Reset the ISO racks.
-                isoRequest.racks = new Dictionary();
-				isoRequest.processXl20OutputData(e.target.data);
-                resetPreview();
-            }
-				
-            protected function transferStockInDB(event:MouseEvent=null):void
-            {
-                // Reset the ISO racks.
-                isoRequest.racks = new Dictionary();
-                isoRequest.transferStockInDB(iso);
-                //                ConfirmationView.show('Worklist download will be disabled.\n\nAre you sure to proceed?','Update Database',
-                //                    function():void{
-                //                        isoRequest.transferStockInDB(iso);
-                //                    });
-            }
-
-            protected function downloadProcessingWorklist(event:MouseEvent):void
-            {
-                var url:String = _iso.selfLink + "worklists.zip";
-                    url += "?type=ISO_PROCESSING";
-               FileDownloadView.show(url, filename + "_dilutions.zip");
-            }
-						
-            protected function transferToIsoInDB(event:MouseEvent=null):void
-            {
-                ConfirmationView.show('Worklist download will be disabled.\n\nAre you sure to proceed?','Update Database',
-                    function():void{
-                        isoRequest.racks = new Dictionary();
-                        isoRequest.transferToIsoInDB(iso);
-                    });
-            }
-
-            public function downloadProcessingWorklistAliquotPlate(barcode:String):void
-            {
-                var url:String = _iso.selfLink + "worklists.zip";
-                url += "?type=ISO_PROCESSING_ALIQUOT";
-                url += "&rack=" + barcode;
-                FileDownloadView.show(url, filename + "_processing_for_" + barcode + ".zip");
-            }
-			
-            public function transferToAliquotInDB(barcode:String):void
-            {
-                // Reset the ISO racks.
-                isoRequest.racks = new Dictionary();
-                isoRequest.transferToAliquotInDB(iso, barcode);
-            }
-
-
+            
             protected function completeIso(event:MouseEvent):void
             {
                 isoRequest.closeIso(_iso);
             }
-
+            
             protected function cancelIso(event:MouseEvent):void
             {
-                ConfirmationView.show('ISO cancel can not be uncompleted. Are you sure to proceed?',
-                                      'Cancel ISO',
+                ConfirmationView.show(
+                    'ISO cancel can not be undone. Are you sure to proceed?',
+                    'Cancel ISO',
                     function():void{
                         isoRequest.cancelIso(_iso);
                     });
             }
-
+            
             protected function reopenIso(event:MouseEvent):void
             {
                 isoRequest.reopenIso(_iso);
             }
-
-            protected function addAliquotePlate(event:MouseEvent):void
-            {
-                isoRequest.addAliquotePlate(_iso);
-            }
-
-            public function quickLook(barcode:String, dimensions:Array=null):void
-            {
-                rackPreview.visible = false;
-                rackPreview.label = barcode;
-                var rack:RackMember = isoRequest.racks[barcode];
-
-                if (rack == null)
-                {
-                    //trigger async load
-                    isoRequest.loadRack(barcode);
-                    isoRequest.addEventListener(MemberEvent.MEMBER_CHANGED,
-                                                loadRack = function (event:Event):void { quickLook(barcode, dimensions) });
-                } else {
-                    isoRequest.removeEventListener(MemberEvent.MEMBER_CHANGED, loadRack);
-                    rackPreview.members = rack.containers;
-                    rackPreview.dimension = dimensions;
-                    rackPreview.visible = true;
-                }
-            }
-
+            
             protected function copy(withOptimization:Boolean):void
             {
                 isoRequest.copyIso(_iso, withOptimization);
-
+                
             }
-
+            
         ]]>
     </fx:Script>
-
-    <fx:Declarations>
-        <!-- 96 tube-rack validator -->
-        <fx:Array id="xl20Validators">
-            <validators:RackBarcodeValidator property="text" required="true"
-											 source="{inputBarcode1XL20}"/>
-            <validators:RackBarcodeValidator property="text" required="false"
-											 source="{inputExcludedRacks}"/>
-            <validators:TubeBarcodeValidator property="text" required="false"
-											 source="{inputRequiredRacks}"/>
-        </fx:Array>
-        <validators1:FormValidator id="xl20Validator"
-								   validators="{xl20Validators}"/>
-
-        <!-- 384 tube-rack validator -->
-        <fx:Array id="xl20Validators384">
-            <validators:RackBarcodeValidator property="text" required="true"
-											 source="{inputBarcode1XL20}"/>
-            <validators:RackBarcodeValidator property="text" required="true"
-											 source="{inputBarcode2XL20}"/>
-            <validators:RackBarcodeValidator property="text" required="true"
-											 source="{inputBarcode3XL20}"/>
-            <validators:RackBarcodeValidator property="text" required="true"
-											 source="{inputBarcode4XL20}"/>
-            <validators:RackBarcodeValidator property="text" required="false"
-											 source="{inputExcludedRacks}"/>
-            <validators:TubeBarcodeValidator property="text" required="false"
-											 source="{inputRequiredRacks}"/>
-        </fx:Array>
-        <validators1:FormValidator id="xl20Validator384"
-								   validators="{xl20Validators384}"/>
-    </fx:Declarations>
-
+    
     <s:Spacer height="5"/>
-
-    <!--STATUS -->
-
+    
+    <!--CURRENTSTATUS -->
     <s:HGroup includeIn="completed" width="100%" paddingLeft="5" paddingTop="2"
-			  verticalAlign="middle">
+              verticalAlign="middle">
         <s:Label width="140" fontWeight="bold" text="Status" textAlign="right"/>
         <s:Label color="#00CC33" text="ISO has been marked as completed."/>
     </s:HGroup>
     <s:HGroup includeIn="canceled" width="100%" paddingLeft="5" paddingTop="2"
-			  verticalAlign="middle">
+              verticalAlign="middle">
         <s:Label width="140" fontWeight="bold" text="Status" textAlign="right"/>
         <s:Label color="#FF0000" text="ISO has been marked as canceled."/>
     </s:HGroup>
-
-    <s:HGroup includeIn="waitForControlRack" width="100%" paddingLeft="5"
-			  paddingTop="2" verticalAlign="middle">
-        <s:Label width="140" fontWeight="bold" text="Status" textAlign="right"/>
-        <s:Label color="#FFBF00"
-				 text="Complete Control Stock Rack before proceeding (click on ISO Job for this ISO)!"/>
-    </s:HGroup>
-
-    <!--XL20 TUBE HANDLER -->
-
-    <s:HGroup includeIn="xl20" width="100%" contentBackgroundColor="#EBF4FF"
-			  paddingLeft="5" paddingTop="2" verticalAlign="middle">
-        <s:Label width="140" fontWeight="bold" text="XL20 Tube Handler"
-				 textAlign="right"/>
-        <s:TextInput id="inputBarcode1XL20" width="80"
-                     change="{isoRequest.rackShape == 384 ? xl20Validator384.validateForm(event) : xl20Validator.validateForm(event)}"
-					 enter="{inputBarcode2XL20.setFocus()}" maxChars="8"
-					 prompt="Barcode 1" restrict="0-9"/>
-        <s:TextInput id="inputBarcode2XL20"
-					 visible="{isoRequest.experiment_metadata_type.id.toUpperCase() == ExperimentMetaDataTypes.SCREEN &amp;&amp; numberPreparationPlateWells == 384}"
-                     change="{xl20Validator384.validateForm(event)}"
-					 width="80" enter="{inputBarcode3XL20.setFocus()}"
-					 maxChars="8" prompt="Barcode 2" restrict="0-9"/>
-        <s:Spacer width="10"/>
-        <components1:SmartTextArea id="inputExcludedRacks" width="100%"
-								   prompt="Excluded racks" restrict="0-9,"/>
-    </s:HGroup>
-    <s:HGroup includeIn="xl20" width="100%" contentBackgroundColor="#EBF4FF"
-			  paddingLeft="5" paddingTop="2" verticalAlign="top">
-        <s:Spacer width="140"/>
-        <s:TextInput id="inputBarcode3XL20"
-					 visible="{isoRequest.experiment_metadata_type.id.toUpperCase() == ExperimentMetaDataTypes.SCREEN &amp;&amp; numberPreparationPlateWells == 384}"
-					 width="80" enter="{inputBarcode4XL20.setFocus()}"
-                     change="{xl20Validator384.validateForm(event)}"
-					 maxChars="8" prompt="Barcode 3" restrict="0-9"/>
-        <s:TextInput id="inputBarcode4XL20"
-					 visible="{isoRequest.experiment_metadata_type.id.toUpperCase() == ExperimentMetaDataTypes.SCREEN &amp;&amp; numberPreparationPlateWells == 384}"
-                     change="{xl20Validator384.validateForm(event)}"
-					 width="80" maxChars="8" prompt="Barcode 4" restrict="0-9"/>
-        <s:Spacer width="10"/>
-        <components1:SmartTextArea id="inputRequiredRacks" width="100%"
-								   height="50" prompt="Requested tubes"
-								   restrict="0-9," verticalAlign="top"/>
-    </s:HGroup>
-    <s:HGroup includeIn="xl20" width="100%" contentBackgroundColor="#EBF4FF"
-			  paddingBottom="0" paddingLeft="5" verticalAlign="top">
-        <s:Spacer width="140"/>
-        <s:Button width="150" label="Download worklist"
-				  click="downloadXL20Worklist(event)"
-				  enabled="{isoRequest.rackShape == 384 ? xl20Validator384.formIsValid : xl20Validator.formIsValid}"
-				  icon="@Embed(source='/assets/icons/download.png')"/>
-        <s:Spacer width="25"/>
-        <s:CheckBox id="checkboxMultipleRacks"
-					visible="{isoRequest.rackShape == 384}"
-					label="enforce Cybio compatibility"/>
-    </s:HGroup>
-    <s:Line includeIn="xl20" width="100%">
-        <s:stroke>
-            <s:SolidColorStroke color="#EBF4FF" weight="2"/>
-        </s:stroke>
-    </s:Line>
-
-    <s:HGroup width="100%" height="100%" gap="18">
-        <s:VGroup>
-            <!-- STOCK RACKS -->
-            <s:HGroup width="100%" contentBackgroundColor="#EBF4FF"
-					  paddingBottom="10" paddingLeft="5" paddingTop="10"
-					  verticalAlign="middle">
-                <s:Label width="140" fontWeight="bold" text="Stock racks"
-						 textAlign="right"/>
-                <s:DataGroup width="100%"
-							 dataProvider="{_iso.iso_sample_stock_racks}">
-                    <s:layout>
-                        <s:VerticalLayout paddingTop="5" useVirtualLayout="true"/>
-                    </s:layout>
-                    <s:itemRenderer>
-                        <fx:Component>
-                            <s:ItemRenderer width="100%"
-											autoDrawBackground="false"
-											currentState="{outerDocument.currentState}">
-                                <fx:Script>
-                                    <![CDATA[
-                                        import com.cenix.louice.shared.model.vos.BarcodeType;
-                                    ]]>
-                                </fx:Script>
-                                <s:states>
-                                    <s:State name="xl20"/>
-                                    <s:State name="transferAndProcessing"/>
-                                    <s:State name="processing"/>
-                                    <s:State name="waitForControlRack"/>
-                                    <s:State name="completed"/>
-                                    <s:State name="canceled"/>
-                                    <s:State name="reopened"/>
-                                    <s:State name="unknown"/>
-                                </s:states>
-                                <s:HGroup width="100%" verticalAlign="middle">
-                                    <s:Label text="Sector {data.index + 1}:"/>
-                                    <components:BarcodeButton label="{data.rack.label}"
-															  barcode="{data.rack.barcode}"
-															  type="{BarcodeType.UNIRACK}"/>
+    
+    <!-- ISO PROCESSING -->
+    <components2:IsoProcessingForm id="processingForm" width="100%" height="100%"
+                                   data="{_iso}" isoRequest="{isoRequest}"
+                                   isosView="{isosView}"
+                                   currentState="{this.currentState}"/>
+    
+    <!-- ALIQUOT PLATES -->
+    <s:HGroup visible="{isoRequest.experiment_metadata_type.id.toUpperCase() != ExperimentMetaDataTypes.MANUAL}"
+              width="100%" contentBackgroundColor="#EBF4FF"
+              paddingLeft="5" paddingTop="2" verticalAlign="top">
+        <s:Label width="140" fontWeight="bold" paddingTop="5"
+                 text="Aliquot plate(s)" textAlign="right"/>
+        <s:HGroup visible="{_iso.aliquot_plates != null}" width="100%"
+                  verticalAlign="middle">
+            <s:DataGroup width="100%"
+                         dataProvider="{_iso.aliquot_plates}">
+                <s:layout>
+                    <s:VerticalLayout paddingTop="5"
+                                      useVirtualLayout="true"/>
+                </s:layout>
+                <s:itemRenderer>
+                    <fx:Component>
+                        <s:ItemRenderer width="100%"
+                                        autoDrawBackground="false"
+                                        currentState="{outerDocument.currentState}">
+                            <fx:Script>
+                                <![CDATA[
+                                    import com.cenix.louice.shared.model.vos.BarcodeType;
+                                ]]>
+                            </fx:Script>
+                            <s:states>
+                                <s:State name="xl20"/>
+                                <s:State name="pipetting"/>
+                                <s:State name="completed"/>
+                                <s:State name="canceled"/>
+                                <s:State name="reopened"/>
+                                <s:State name="unknown"/>
+                            </s:states>
+                            <s:VGroup width="100%">
+                                <s:HGroup width="100%"
+                                          verticalAlign="middle">
+                                    <components:BarcodeButton label="{data.label}"
+                                                              barcode="{data.barcode}"
+                                                              type="{BarcodeType.UNIRACK}"/>
+                                    <s:Label text="{data.status}"/>
+                                    <s:Label color="{(data.specs.title.indexOf('deep') &gt; 0) ? 0xFF0000 : 0x000000}"
+                                             text="- {data.specs.title}"/>
                                     <s:Spacer width="100%"/>
-                                    <s:Button excludeFrom="completed,reopened,canceled"
-											  height="18" label="change"
-											  click="{outerDocument.currentState = 'xl20'}"
-											  enabled="{outerDocument.isoRequest.platesToLoad &lt; 1}"
-											  enabled.reopened="false"/>
-                                    <s:Button excludeFrom="completed,reopened,canceled"
-											  height="18" label="show &gt;"
-											  click="{outerDocument.quickLook(data.rack.barcode, [8,12])}"
-											  enabled="{outerDocument.isoRequest.platesToLoad &lt; 1}"/>
+                                    <s:Button height="18"
+                                              label="show &gt;"
+                                              click="{outerDocument.isosView.quickLook(data.barcode)}"
+                                              enabled="{outerDocument.isoRequest.platesToLoad &lt; 1}"/>
                                 </s:HGroup>
-                            </s:ItemRenderer>
-                        </fx:Component>
-                    </s:itemRenderer>
-                </s:DataGroup>
-            </s:HGroup>
-
-            <s:HGroup>
-                <s:Spacer width="140"/>
-                <components:Xl20UploadButton id="xl20Button"
-                                             width="175"
-                                             click="{xl20Button.addEventListener(Event.COMPLETE, onXl20OutputLoadComplete)}"
-                                             enabled="false"
-                                             enabled.transferAndProcessing="true"/>                
-            </s:HGroup>
-            <s:Line width="100%">
-                <s:stroke>
-                    <s:SolidColorStroke color="#EBF4FF" weight="2"/>
-                </s:stroke>
-            </s:Line>
-
-            <!-- PLATES -->
-            <s:HGroup width="100%" contentBackgroundColor="#EBF4FF"
-					  paddingLeft="5" paddingTop="10" verticalAlign="middle">
-                <s:Label width="140" fontWeight="bold" text="Preparation plate"
-						 textAlign="right"/>
-                <s:HGroup visible="{_iso.iso_preparation_plate != null}"
-						  width="100%" verticalAlign="middle">
-                    <components:BarcodeButton label="{_iso.iso_preparation_plate.label}"
-											  barcode="{_iso.iso_preparation_plate.barcode}"
-											  type="{BarcodeType.UNIRACK}"/>
-                    <s:Label id="bla" text="{_iso.iso_preparation_plate.status}"/>
-                    <s:Label color="{(_iso.iso_preparation_plate.specs.title.indexOf('deep') &gt; 0) ? 0xFF0000 : 0x000000}"
-							 text="- {_iso.iso_preparation_plate.specs.title}"/>
-                    <s:Spacer width="100%"/>
-                    <s:Button height="18" label="show &gt;"
-							  click="{quickLook(_iso.iso_preparation_plate.barcode)}"
-							  enabled="{isoRequest.platesToLoad &lt; 1}"/>
-                </s:HGroup>
-            </s:HGroup>
-            <s:HGroup visible="{isoRequest.experiment_metadata_type.id.toUpperCase() != ExperimentMetaDataTypes.MANUAL}"
-					  width="100%" contentBackgroundColor="#EBF4FF"
-					  paddingLeft="5" paddingTop="2" verticalAlign="top">
-                <s:Label width="140" fontWeight="bold" paddingTop="5"
-						 text="Aliquot plate(s)" textAlign="right"/>
-                <s:HGroup visible="{_iso.iso_aliquot_plates != null}"
-						  width="100%" verticalAlign="middle">
-                    <s:DataGroup width="100%"
-								 dataProvider="{_iso.iso_aliquot_plates}">
-                        <s:layout>
-                            <s:VerticalLayout paddingTop="5"
-											  useVirtualLayout="true"/>
-                        </s:layout>
-                        <s:itemRenderer>
-                            <fx:Component>
-                                <s:ItemRenderer width="100%"
-												autoDrawBackground="false"
-												currentState="{outerDocument.currentState}">
-                                    <fx:Script>
-                                        <![CDATA[
-                                            import com.cenix.louice.shared.model.vos.BarcodeType;
-                                        ]]>
-                                    </fx:Script>
-                                    <s:states>
-                                        <s:State name="xl20"/>
-                                        <s:State name="transferAndProcessing"/>
-                                        <s:State name="processing"/>
-                                        <s:State name="waitForControlRack"/>
-                                        <s:State name="completed"/>
-                                        <s:State name="canceled"/>
-                                        <s:State name="reopened"/>
-                                        <s:State name="unknown"/>
-                                    </s:states>
-                                    <s:VGroup width="100%">
-                                        <s:HGroup width="100%"
-												  verticalAlign="middle">
-                                            <components:BarcodeButton label="{data.label}"
-																	  barcode="{data.barcode}"
-																	  type="{BarcodeType.UNIRACK}"/>
-                                            <s:Label text="{data.status}"/>
-                                            <s:Label color="{(data.specs.title.indexOf('deep') &gt; 0) ? 0xFF0000 : 0x000000}"
-													 text="- {data.specs.title}"/>
-                                            <s:Spacer width="100%"/>
-                                            <s:Button height="18"
-													  label="show &gt;"
-													  click="{outerDocument.quickLook(data.barcode)}"
-													  enabled="{outerDocument.isoRequest.platesToLoad &lt; 1}"/>
-                                        </s:HGroup>
-                                        <s:HGroup visible="{(data.label.indexOf('add') == 0 &amp;&amp; data.isFuture())}"
-												  includeInLayout="{(data.label.indexOf('add') == 0 &amp;&amp; data.isFuture())}"
-												  paddingTop="-4">
-                                            <!-- special actions for additional aliquot plates -->
-                                            <s:Button excludeFrom="xl20,completed,canceled"
-													  height="18"
-													  label="Download worklist"
-													  click="{outerDocument.downloadProcessingWorklistAliquotPlate(data.barcode)}"
-													  icon="@Embed(source='/assets/icons/download.png')"
-													  toolTip="worklist for this additional aliquote plate"/>
-                                            <s:Button excludeFrom="xl20,completed,canceled"
-													  height="18"
-													  label="Update database"
-													  click="{outerDocument.transferToAliquotInDB(data.barcode)}"
-													  toolTip="database update for this aliquot plate"/>
-                                        </s:HGroup>
-                                    </s:VGroup>
-                                </s:ItemRenderer>
-                            </fx:Component>
-                        </s:itemRenderer>
-                    </s:DataGroup>
-                </s:HGroup>
-            </s:HGroup>
-            <s:HGroup excludeFrom="xl20,completed,canceled" width="100%">
-                <s:Spacer width="100%"/>
-                <s:Button visible="{isoRequest.rackShape == 384}" height="18"
-						  label="+ add" click="addAliquotePlate(event)"
-						  enabled="{!btnUpdateDb.enabled}"
-						  toolTip="add an aliquot plate"/>
-            </s:HGroup>
-
-            <s:HGroup excludeFrom="xl20,completed,canceled"
-					  visible="{_iso.iso_preparation_plate != null}"
-					  width="100%" contentBackgroundColor="#EBF4FF"
-					  paddingBottom="10" paddingLeft="5" paddingTop="2"
-					  verticalAlign="middle">
-                <s:Spacer width="140"/>
-                <s:Button width="150" label="print barcodes"
-						  click="printBarcodes(event)"
-						  icon="@Embed(source='/assets/icons/barcode.png')"/>
-            </s:HGroup>
-
-            <s:Line excludeFrom="xl20,completed,canceled" width="100%">
-                <s:stroke>
-                    <s:SolidColorStroke color="#EBF4FF" weight="2"/>
-                </s:stroke>
-            </s:Line>
-
-            <!-- STOCK TRANSFER -->
-
-            <s:HGroup excludeFrom="xl20,completed,canceled" width="100%"
-					  contentBackgroundColor="#EBF4FF" paddingBottom="10"
-					  paddingLeft="5" paddingTop="10" verticalAlign="middle">
-                <s:Label width="140" fontWeight="bold" text="Stock transfer"
-						 textAlign="right"/>
-                <s:Button width="175" label="Download worklist"
-						  click="downloadTransferWorklist(event)"
-						  enabled="false"
-						  icon="@Embed(source='/assets/icons/download.png')"
-						  enabled.transferAndProcessing="true"/>
-                <s:Button width="175" label="Update database" click="transferStockInDB(event)"
-                          enabled="false"
-                          enabled.transferAndProcessing="true"/>
-            </s:HGroup>
-
-
-            <s:Line excludeFrom="xl20,completed,canceled" width="100%">
-                <s:stroke>
-                    <s:SolidColorStroke color="#EBF4FF" weight="2"/>
-                </s:stroke>
-            </s:Line>
-
-            <!-- PREP PLATE PROCESSING -->
-
-            <s:HGroup excludeFrom="xl20,completed,canceled" width="100%"
-					  contentBackgroundColor="#EBF4FF" paddingBottom="10"
-					  paddingLeft="5" paddingTop="7" verticalAlign="middle">
-                <s:Label width="140" fontWeight="bold"
-						 text="Prep. plate processing" textAlign="right"/>
-                <s:Button excludeFrom="xl20,completed,canceled" width="175"
-						  label="Download worklist"
-						  click="downloadProcessingWorklist(event)"
-						  enabled="false"
-						  icon="@Embed(source='/assets/icons/download.png')"
-						  enabled.processing="true"
-						  enabled.transferAndProcessing="true"/>
-                <s:Button id="btnUpdateDb" excludeFrom="xl20,completed,canceled"
-						  width="175" label="Update database"
-						  click="transferToIsoInDB(event)" enabled="false"
-						  enabled.processing="true"
-						  enabled.transferAndProcessing="true"/>
-            </s:HGroup>
-
-
-            <s:Line width="100%">
-                <s:stroke>
-                    <s:SolidColorStroke color="#EBF4FF" weight="2"/>
-                </s:stroke>
-            </s:Line>
-
-            <!-- STATUS -->
-
-            <s:HGroup width="100%" contentBackgroundColor="#EBF4FF"
-					  paddingLeft="5" paddingTop="10" verticalAlign="middle">
-                <s:Label width="140" fontWeight="bold" text="Change Status"
-						 textAlign="right"/>
-                <s:Button excludeFrom="completed,canceled" label="Complete"
-						  click="completeIso(event)"
-						  enabled="{(_iso.iso_aliquot_plates.length &gt; 0) &amp;&amp; !_iso.iso_aliquot_plates.getItemAt(0).isFuture() || !_iso.iso_preparation_plate.isFuture()}"/>
-                <s:Button includeIn="completed" label="Reopen"
-						  click="reopenIso(event)"/>
-                <s:Button excludeFrom="canceled" label="Cancel"
-						  click="cancelIso(event)"/>
-                <s:CalloutButton id="buttonCopy" label="Copy"
-								 horizontalPosition="start"
-								 verticalPosition="after">
-                    <s:calloutContent>
-                        <s:BorderContainer width="100%" height="100%"
-										   borderWeight="2" cornerRadius="3">
-                            <s:borderStroke>
-                                <s:LinearGradientStroke rotation="270" weight="5">
-                                    <s:GradientEntry color="#efefef"/>
-                                    <s:GradientEntry color="#efefef"/>
-                                </s:LinearGradientStroke>
-                            </s:borderStroke>
-                            <s:backgroundFill>
-                                <s:LinearGradient rotation="90">
-                                    <s:GradientEntry color="#FFFFFF"/>
-                                    <s:GradientEntry color="#EFEFEF"/>
-                                </s:LinearGradient>
-                            </s:backgroundFill>
-                            <s:VGroup gap="0">
-                                <s:Button width="100%"
-										  label="Without Optimization"
-										  click="buttonCopy.closeDropDown();copy(false)"/>
-                                <s:Button width="100%" label="With Optimization"
-										  click="buttonCopy.closeDropDown();copy(true)"/>
                             </s:VGroup>
-                        </s:BorderContainer>
-                    </s:calloutContent>
-                </s:CalloutButton>
-            </s:HGroup>
-         <!--  <s:Label text="{_iso.status}" color="#efefef" /> -->
-        </s:VGroup>
-
-        <!-- RACK/PLATE PREVIEW -->
-        <s:Group width="100%" height="100%">
-            <rack:RackView id="rackPreview" visible="true" left="0" right="5"
-						   top="10" bottom="5" includeInLayout="true"
-						   toolTipFunction="{PlateMemberView.toolTipFunction}"/>
-            <s:HGroup id="rackPreviewSpinner"
-					  visible="{(isoRequest.platesToLoad &gt; 0)&amp;&amp;(!rackPreview.visible)}"
-					  left="20" top="20" verticalAlign="middle">
-                <s:BusyIndicator/>
-                <s:Label color="#999999" text="getting containers from server .."/>
-            </s:HGroup>
-        </s:Group>
-
+                        </s:ItemRenderer>
+                    </fx:Component>
+                </s:itemRenderer>
+            </s:DataGroup>
+        </s:HGroup>
     </s:HGroup>
-
+    
+    <!-- CHANGE STATUS -->
+    <s:HGroup width="100%" contentBackgroundColor="#EBF4FF"
+              paddingLeft="5" paddingTop="10" verticalAlign="middle">
+        <s:Label width="140" fontWeight="bold" text="Change Status"
+                 textAlign="right"/>
+        <s:Button excludeFrom="completed,canceled" label="Complete"
+                  click="completeIso(event)"
+                  enabled="{(_iso.aliquot_plates.length &gt; 0) &amp;&amp; !_iso.aliquot_plates.getItemAt(0).isFuture() || !_iso.preparation_plates.getItemAt(0).isFuture()}"/>
+        <s:Button includeIn="completed" label="Reopen"
+                  click="reopenIso(event)"/>
+        <s:Button excludeFrom="canceled" label="Cancel"
+                  click="cancelIso(event)"/>
+        <s:CalloutButton id="buttonCopy" label="Copy"
+                         horizontalPosition="start"
+                         verticalPosition="after">
+            <s:calloutContent>
+                <s:BorderContainer width="100%" height="100%"
+                                   borderWeight="2" cornerRadius="3">
+                    <s:borderStroke>
+                        <s:LinearGradientStroke rotation="270" weight="5">
+                            <s:GradientEntry color="#efefef"/>
+                            <s:GradientEntry color="#efefef"/>
+                        </s:LinearGradientStroke>
+                    </s:borderStroke>
+                    <s:backgroundFill>
+                        <s:LinearGradient rotation="90">
+                            <s:GradientEntry color="#FFFFFF"/>
+                            <s:GradientEntry color="#EFEFEF"/>
+                        </s:LinearGradient>
+                    </s:backgroundFill>
+                    <s:VGroup gap="0">
+                        <s:Button width="100%"
+                                  label="Without Optimization"
+                                  click="buttonCopy.closeDropDown();copy(false)"/>
+                        <s:Button width="100%" label="With Optimization"
+                                  click="buttonCopy.closeDropDown();copy(true)"/>
+                    </s:VGroup>
+                </s:BorderContainer>
+            </s:calloutContent>
+        </s:CalloutButton>
+    </s:HGroup>    
 </s:Form>

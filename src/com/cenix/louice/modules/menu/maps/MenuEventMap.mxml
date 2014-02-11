@@ -10,13 +10,14 @@
             import com.cenix.louice.modules.menu.model.managers.MenuManager;
             import com.cenix.louice.modules.menu.ui.presenters.MenuPresentationModel;
             import com.cenix.louice.modules.menu.ui.views.MenuView;
+            import com.cenix.louice.shared.model.constants.ContentType;
+            import com.cenix.louice.shared.model.vos.IsoRequestMember;
+            
+            import mx.core.FlexGlobals;
+            
             import org.everest.flex.events.DocumentEvent;
             import org.everest.flex.events.RestFaultEvent;
-            import com.cenix.louice.shared.model.constants.ContentType;
             import org.everest.flex.model.ResourceState;
-            import com.cenix.louice.shared.model.vos.LabIsoRequestMember;
-
-            import mx.core.FlexGlobals;
 
             private function stopDocumentLoadedHandler(scope:IScope):Boolean
             {
@@ -29,7 +30,7 @@
                 if(FlexGlobals.topLevelApplication.currentUser != null){
                     var username:String = 
                         FlexGlobals.topLevelApplication.currentUser.directory_user_id;                    
-                    return '"' + LabIsoRequestMember.STOCKMANAGEMENT_USER + 
+                    return '"' + IsoRequestMember.STOCKMANAGEMENT_USER + 
                            '","' + username + '"';
                 } else {
                     return '';
@@ -195,7 +196,7 @@
                           contentType="{ContentType.TUBE_COLLECTION}" />
 
             <vos:MenuItem uid="20"
-                          url="{'/iso-requests/?q=owner:contains:' + getIsoOwnerFilter()}"
+                          url="{'/lab-iso-requests/?q=owner:contains:' + getIsoOwnerFilter()}"
                           title="ISO Requests"
                           description="Manage ISO Requests"
                           imageUrl="/static/images/iso-requests.png"

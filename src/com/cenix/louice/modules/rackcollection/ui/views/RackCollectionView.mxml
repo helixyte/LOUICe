@@ -47,7 +47,7 @@
         <s:FormItem width="100%" label="Barcode">
 
             <components1:SmartTextArea criteria="{model.criteria}" name="barcode"
-                                       operator="equal-to" restrict="0-9 ,"/>
+                                       operator="contained" restrict="0-9 ,"/>
 
         </s:FormItem>
         <s:FormItem width="100%" label="Label">

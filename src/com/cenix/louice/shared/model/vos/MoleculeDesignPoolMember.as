@@ -5,13 +5,26 @@ package com.cenix.louice.shared.model.vos
     public class MoleculeDesignPoolMember extends MoleculeDesignSetMember
     {
         public var molecule_type:MoleculeTypeMember;
-        public var number_designs:Number;
         public var genes:MembersCollection;
         public var supplier_molecule_designs:MembersCollection;
+
+        private var _number_designs:uint = 0;
 
         public function MoleculeDesignPoolMember(title:String=null, selfLink:String=null)
         {
             super(title, selfLink);
+        }
+        
+        public function get number_designs():* {
+            if (_number_designs == 0) {
+                return undefined;
+            } else {
+                return _number_designs;
+            }
+        }
+        
+        public function set number_designs(number_designs:uint):void {
+            _number_designs = number_designs;
         }
         
         public function get productIdsLabel():String

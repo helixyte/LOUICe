@@ -33,19 +33,16 @@
                         if (selectedRack.rack_layout.rack_shape != null)
                         {
                             rackViewContainer.visible = true;
-
                             rackView.tagMap = selectedRack.rack_layout.tagPredicateMap;
-                            rackView.dimension = [selectedRack.rack_layout.rack_shape.number_rows,
-                                selectedRack.rack_layout.rack_shape.number_columns];
+                            rackView.dimension = 
+                                [selectedRack.rack_layout.rack_shape.number_rows,
+                                 selectedRack.rack_layout.rack_shape.number_columns];
                             rackView.label = 'Design Rack ' + selectedRack.label;
                             tagForHighlightSelector.refresh();
-
                             setCurrentState("normal");
-
                         } else {
-
-                            var dEvt:NavigationEvent = new NavigationEvent(NavigationEvent.LOAD_SUBORDINATE_PAGE);
-
+                            var dEvt:NavigationEvent = 
+                                new NavigationEvent(NavigationEvent.LOAD_SUBORDINATE_PAGE);
                             dEvt.pageUrl = selectedRack.rack_layout.href;
                             dispatchEvent(dEvt);
                             setCurrentState("busy");
@@ -58,13 +55,17 @@
 
             public function set experimentDesign(experimentDesign:ExperimentDesignMember):void
             {
-                //refresh the current rack in case the collection has changed
-                experimentDesign.experiment_design_racks.addEventListener(
+                if (experimentDesign != null)
+                {
+                    // Refresh the current rack in case the collection has changed.
+                    experimentDesign.experiment_design_racks.addEventListener(
                         CollectionEvent.COLLECTION_CHANGE, designList_changeHandler);
-                designList.dataProvider = experimentDesign.experiment_design_racks;
-                rackViewContainer.visible = false;
+                    designList.dataProvider = experimentDesign.experiment_design_racks;
+                } else {
+                    designList.dataProvider = new ArrayCollection();
+                }
+                rackViewContainer.visible = false;                
             }
-
 
             protected function downloadCsvFile(event:MouseEvent):void
             {

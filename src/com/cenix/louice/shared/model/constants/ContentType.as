@@ -32,8 +32,8 @@ package com.cenix.louice.shared.model.constants
         public static const ISO_JOB_COLLECTION:String = "application/vnd.everest+xml;type=IsoJobCollection";
         public static const ISO_JOB_MEMBER:String = "application/vnd.everest+xml;type=IsoJobMember";
         
-        public static const ISO_REQUEST_COLLECTION:String = "application/vnd.everest+xml;type=IsoRequestCollection";
-        public static const ISO_REQUEST_MEMBER:String = "application/vnd.everest+xml;type=IsoRequestMember";
+        public static const ISO_REQUEST_COLLECTION:String = "application/vnd.everest+xml;type=LabIsoRequestCollection";
+        public static const ISO_REQUEST_MEMBER:String = "application/vnd.everest+xml;type=LabIsoRequestMember";
         
         public static const ITEM_STATUS_COLLECTION:String = "application/vnd.everest+xml;type=ItemStatusCollection";
         public static const ITEM_STATUS_MEMBER:String = "application/vnd.everest+xml;type=ItemStatusMember";

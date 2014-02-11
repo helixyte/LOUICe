@@ -18,6 +18,7 @@
             import com.cenix.louice.modules.experimentmetadatamember.ui.presenter.ExperimentMetaDataMemberPresentationModel;
             import com.cenix.louice.shared.model.vos.ExperimentMetaDataTypeMember;
             import com.cenix.louice.shared.model.vos.ExperimentMetaDataTypes;
+            import com.cenix.louice.shared.model.vos.IsoRequestMember;
             import com.cenix.louice.shared.model.vos.LabIsoRequestMember;
             import com.cenix.louice.shared.model.vos.SubprojectMember;
             
@@ -27,7 +28,6 @@
             import spark.events.IndexChangeEvent;
             
             import org.everest.flex.events.MemberEvent;
-            import org.everest.flex.model.MembersCollection;
             import org.everest.flex.model.ResourceState;
             import org.everest.flex.ui.components.ConfirmationView;
             import org.everest.flex.ui.components.ErrorView;
@@ -42,8 +42,6 @@
 			
             protected function creationCompleteHandler(event:FlexEvent):void
             {
-                model.addEventListener(MemberEvent.MEMBER_CHANGED, 
-                    modelChangedHandler);
                 // Create a map metadata type string -> notebook tab.
                 var _positionToTabMap:Dictionary = new Dictionary();
                 for (var tabCount:uint=0; tabCount<3 ; tabCount++)
@@ -57,6 +55,8 @@
                                 [_positionToTabMap[0]];
                 _tabMap['_ALL'] = [_positionToTabMap[2], _positionToTabMap[1], 
                                    _positionToTabMap[0]];
+                model.addEventListener(MemberEvent.MEMBER_CHANGED, 
+                    modelChangedHandler);
             }
             
             private function modelChangedHandler(event:Event):void
@@ -87,9 +87,9 @@
             private function onLoadComplete(e:Event):void
             {
                 this.fileData = fileRef.data;
-                model.updateMemberFromData(fileData, 
-										   'application/vnd.xls', 
-										   'application/atom+xml');
+                model.editMemberFromData(fileData,
+                                         'application/vnd.xls', 
+										 'application/atom+xml');
             }
 
             private function onLoadError(e:IOErrorEvent):void
@@ -100,7 +100,6 @@
             private function selectHandler(event:Event):void
             {
                 fileRef.load();
-
             }
 
             protected function subprojectInput_changeHandler(event:IndexChangeEvent):void
@@ -156,8 +155,11 @@
             {
                 model.iso_request.isos = null;
                 model.iso_request.owner = 
-                            LabIsoRequestMember.STOCKMANAGEMENT_USER;
-                model.submit();
+                            IsoRequestMember.STOCKMANAGEMENT_USER;
+                var irq_clone:LabIsoRequestMember = model.iso_request.blank();
+                irq_clone.selfLink = '/lab-iso-requests/' + irq_clone.id;
+                irq_clone.owner = model.iso_request.owner;
+                model.submit(irq_clone, true);
             }
 
             protected function downloadMoleculeDesignPools(event:MouseEvent):void
@@ -189,8 +191,7 @@
                             "the Excel file upload.\n\nDo you want to continue?",
                             "Warning",
                             function():void{
-                                m.iso_request = null;
-                                m.experimentDesign.experiment_design_racks = new MembersCollection();
+                                m.reset();
                                 _doSubmitModel(m);
                             });
                     } else {
@@ -208,7 +209,7 @@
                     model.iso_request.isos = null;
                 }
                 currentState = ResourceState.PENDING_REQUEST;
-                model.submit();
+                model.submit(null, false, MemberEvent.EDIT_MODE_REPLACE);
                 _oldExperimentMetaDataTypeId = null;
                 _oldNumberReplicates = -1;                
             }
@@ -265,12 +266,11 @@
                 <s:layout>
                     <s:FormLayout/>
                 </s:layout>
-                <s:FormItem width="100%" label="Number of Replicates:"
-                            visible="{model.experiment_metadata_type.id != ExperimentMetaDataTypes.ORDER_ONLY}">
+                <s:FormItem visible="{model.experiment_metadata_type.id != ExperimentMetaDataTypes.ORDER_ONLY}"
+                            width="100%" label="Number of Replicates:">
                     <s:Label width="200" text="{model.number_replicates}"/>
                 </s:FormItem>
-                <s:FormItem visible="{model.experiment_metadata_type.id != ExperimentMetaDataTypes.ISO_LESS
-                                      &amp;&amp; model.experiment_metadata_type.id != ExperimentMetaDataTypes.ORDER_ONLY}"
+                <s:FormItem visible="{model.experiment_metadata_type.id != ExperimentMetaDataTypes.ISO_LESS                                       &amp;&amp; model.experiment_metadata_type.id != ExperimentMetaDataTypes.ORDER_ONLY}"
                             width="100%" label="Floating Molecule Design Pools">
                     <s:Button height="18" label="CSV List"
                               click="downloadMoleculeDesignPools(event)"
@@ -328,9 +328,10 @@
     </view:editorContent>
 
     <view:actionBarContent>
-        <s:Button label="{model.hasCompletedIsoRequest?'Reactivate':'Activate'}"
+        <s:Button visible="{model.iso_request != null || model.experimentDesign != null}"
+                  label="{model.hasCompletedIsoRequest?'Reactivate':'Activate'}"
                   click="activate_clickHandler(event)"
-                  enabled="{model.iso_request.owner.indexOf('stockmanagement') &lt; 0}"
+                  enabled="{model.iso_request != null &amp;&amp; model.iso_request.owner.indexOf('stockmanagement') &lt; 0}"
                   fontWeight="bold"
                   toolTip="Assign ticket to stock manager and start ISO process."/>
         <s:Spacer width="30"/>
