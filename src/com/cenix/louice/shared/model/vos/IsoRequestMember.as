@@ -11,18 +11,13 @@ package com.cenix.louice.shared.model.vos
         public static const STOCKMANAGEMENT_USER:String = 'stockmanagement';
 
         public var iso_type:String;
-        public var plate_set_label:String;
-        public var rack_layout:RackLayoutMember;
-        public var delivery_date:Date;
-        public var isos:MembersCollection;
-        public var requester:UserMember;
+        public var label:String;
         public var owner:String;
-        public var number_plates:int;
-        public var number_aliquots:int;
-        public var experiment_metadata_type:ExperimentMetaDataTypeMember = null;
-        public var experiment_metadata:ExperimentMetaDataMember = null;
-        public var ticket_number:int;
+        public var isos:MembersCollection;
+        public var jobs:MembersCollection;
 
+        private var _number_aliquots:uint = 0;
+        private var _expected_number_isos:uint = 0;
         private var _tagPredicates:ArrayCollection;
 
         public function IsoRequestMember(title:String=null, selfLink:String=null)
@@ -30,7 +25,30 @@ package com.cenix.louice.shared.model.vos
             super(title, selfLink);
         }
 
-
+        public function get number_aliquots():* {
+            if (_number_aliquots == 0) {
+                return undefined;
+            } else {
+                return _number_aliquots;
+            }
+        }
+        
+        public function set number_aliquots(number_aliquots:uint):void {
+            _expected_number_isos = number_aliquots;
+        }
+        
+        public function get expected_number_isos():* {
+            if (_expected_number_isos == 0) {
+                return undefined;
+            } else {
+                return _expected_number_isos;
+            }
+        }
+        
+        public function set expected_number_isos(expected_number_isos:uint):void {
+            _expected_number_isos = expected_number_isos;
+        }
+        
         public function get isosCount():Number{
 
             if(isos == null){
@@ -39,5 +57,6 @@ package com.cenix.louice.shared.model.vos
                 return isos.length;
             }
         }
+
     }
 }

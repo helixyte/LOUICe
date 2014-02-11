@@ -1,13 +1,15 @@
 package com.cenix.louice.modules.experimentmetadatamember.ui.presenter
 {
     import com.adobe.utils.DictionaryUtil;
+    import com.cenix.louice.modules.moleculedesignpoolcollection.MoleculeDesignPoolCollection;
     import com.cenix.louice.shared.model.vos.ExperimentDesignMember;
     import com.cenix.louice.shared.model.vos.ExperimentDesignRackMember;
     import com.cenix.louice.shared.model.vos.ExperimentMember;
     import com.cenix.louice.shared.model.vos.ExperimentMetaDataMember;
     import com.cenix.louice.shared.model.vos.ExperimentMetaDataTypeMember;
-    import com.cenix.louice.shared.model.vos.IsoRequestMember;
     import com.cenix.louice.shared.model.vos.JobMember;
+    import com.cenix.louice.shared.model.vos.LabIsoRequestMember;
+    import com.cenix.louice.shared.model.vos.MoleculeDesignPoolSetMember;
     import com.cenix.louice.shared.model.vos.RackLayoutMember;
     import com.cenix.louice.shared.model.vos.SubprojectMember;
     import com.cenix.louice.shared.model.vos.TagMember;
@@ -29,6 +31,7 @@ package com.cenix.louice.modules.experimentmetadatamember.ui.presenter
     import org.everest.flex.model.MembersCollection;
     import org.everest.flex.ui.presenters.MemberPresentationModel;
     import org.everest.flex.utils.HashSet;
+    import org.hamcrest.object.nullValue;
 
     public class ExperimentMetaDataMemberPresentationModel extends MemberPresentationModel
     {
@@ -112,6 +115,13 @@ package com.cenix.louice.modules.experimentmetadatamember.ui.presenter
 
             dispatcher.dispatchEvent(event);
         }
+        
+        public function reset():void
+        {
+            ExperimentMetaDataMember(_member).lab_iso_request = null;
+            ExperimentMetaDataMember(_member).experiment_design = null;
+            ExperimentMetaDataMember(_member).molecule_design_pool_set = null;
+        }
 
         [Bindable(Event="memberChanged")]
         public function get label():String
@@ -148,22 +158,27 @@ package com.cenix.louice.modules.experimentmetadatamember.ui.presenter
         {
             return ExperimentMetaDataMember(_member).experiment_design;
         }
+        
+        public function set experimentDesign(experiment_design:ExperimentDesignMember):void
+        {
+            ExperimentMetaDataMember(_member).experiment_design = experiment_design;
+        }
 
         [Bindable(Event="memberChanged")]
         public function get molecule_design_pool_set():INavigationLink
         {
             return ExperimentMetaDataMember(_member).molecule_design_pool_set;
         }
-
+        
         [Bindable(Event="memberChanged")]
-        public function get iso_request():IsoRequestMember
+        public function get iso_request():LabIsoRequestMember
         {
-            return ExperimentMetaDataMember(_member).iso_request;
+            return ExperimentMetaDataMember(_member).lab_iso_request;
         }
 
-        public function set iso_request(iso_request:IsoRequestMember):void
+        public function set iso_request(iso_request:LabIsoRequestMember):void
         {
-            ExperimentMetaDataMember(_member).iso_request = iso_request;
+            ExperimentMetaDataMember(_member).lab_iso_request = iso_request;
             dispatchEvent(new Event(MemberEvent.MEMBER_CHANGED));
         }
 
@@ -203,7 +218,7 @@ package com.cenix.louice.modules.experimentmetadatamember.ui.presenter
                 }
 
                 this.tagPredicates = new ArrayCollection(DictionaryUtil.getValues(predicateMap));
-                //add sorting
+                // Sort by label.
                 var sortfield:SortField = new SortField("label");
                 var sort:Sort = new Sort();
                 sort.fields = [sortfield];
@@ -249,7 +264,7 @@ package com.cenix.louice.modules.experimentmetadatamember.ui.presenter
 				return false;
 			}
 			
-			var isoRequest:IsoRequestMember = ExperimentMetaDataMember(_member).iso_request;
+			var isoRequest:LabIsoRequestMember = ExperimentMetaDataMember(_member).lab_iso_request;
 			var owner:String = isoRequest.owner;
 			if (owner == null) {
 				return false;

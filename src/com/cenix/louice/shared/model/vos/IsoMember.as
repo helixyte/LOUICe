@@ -8,20 +8,21 @@ package com.cenix.louice.shared.model.vos
 
     [Bindable]
     public class IsoMember extends Member
-    {
+    {   
+        public var iso_type:String = 'BASE';
         public var label:String;
-        public var iso_request:IsoRequestMember;
-        public var molecule_design_pool_set:MoleculeDesignPoolSetMember;
-        public var rack:RackMember;
         public var status:String;
+        public var rack_layout:RackLayoutMember;
+        public var iso_job:IsoJobMember;
+        public var stock_racks:MembersCollection;
+        public var preparation_plates:MembersCollection;
+        public var molecule_design_pool_set:MoleculeDesignPoolSetMember;
         public var optimizer_excluded_racks:String;
         public var optimizer_required_racks:String;
-        public var rack_layout:RackLayoutMember;
-        public var iso_sample_stock_racks:MembersCollection;
-        public var iso_preparation_plate:PlateMember;
-        private var _iso_aliquot_plates:MembersCollection;
-        public var iso_job:IsoJobMember;
 
+        private var _aliquot_plates:MembersCollection;
+        private var _number_stock_racks:uint = 0;
+        
         public function IsoMember(title:String=null, selfLink:String=null)
         {
             super(title, selfLink);
@@ -32,12 +33,12 @@ package com.cenix.louice.shared.model.vos
             return iso_job.id + label.replace("_","");
         }
 
-        public function get iso_aliquot_plates():MembersCollection
+        public function get aliquot_plates():MembersCollection
         {
-            return _iso_aliquot_plates;
+            return _aliquot_plates;
         }
-
-        public function set iso_aliquot_plates(value:MembersCollection):void
+        
+        public function set aliquot_plates(value:MembersCollection):void
         {
             if (value != null)
             {
@@ -47,8 +48,20 @@ package com.cenix.louice.shared.model.vos
                 value.sort = sort;
                 value.refresh();
             }
-            _iso_aliquot_plates = value;
+            _aliquot_plates = value;
         }
-
+        
+        public function get number_stock_racks():* {
+            if (_number_stock_racks == 0) {
+                return undefined;
+            } else {
+                return _number_stock_racks;
+            }
+        }
+        
+        public function set number_stock_racks(number_stock_racks:uint):void {
+            _number_stock_racks = number_stock_racks;
+        }
+        
     }
 }

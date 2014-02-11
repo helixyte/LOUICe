@@ -8,7 +8,7 @@
          xmlns:components1="org.everest.flex.ui.components.*">
     <fx:Script>
         <![CDATA[
-            import com.cenix.louice.shared.model.vos.IsoRequestMember;
+            import com.cenix.louice.shared.model.vos.LabIsoRequestMember;
             
             import mx.events.CalendarLayoutChangeEvent;
             
@@ -17,18 +17,26 @@
             import org.everest.flex.model.Link;
 
             [Bindable]
-            private var _isoRequest:IsoRequestMember;
+            private var _isoRequest:LabIsoRequestMember;
 
             private static const dtf:DateTimeFormatter = new DateTimeFormatter();
                                  dtf.dateTimePattern = "MMM dd yyyy";
 
-            public function set isoRequest(isoRequest:IsoRequestMember):void
+            public function set isoRequest(isoRequest:LabIsoRequestMember):void
             {
                 this._isoRequest = isoRequest;
-                tagForHighlightSelector.tagPredicates = isoRequest.rack_layout.tagPredicates;
-                rackView.tagMap = isoRequest.rack_layout.tagPredicateMap;
-                rackView.dimension = [isoRequest.rack_layout.rack_shape.number_rows,
-                    isoRequest.rack_layout.rack_shape.number_columns];
+                if (isoRequest != null)
+                {
+                    tagForHighlightSelector.tagPredicates = isoRequest.rack_layout.tagPredicates;
+                    rackView.tagMap = isoRequest.rack_layout.tagPredicateMap;
+                    rackView.dimension = [isoRequest.rack_layout.rack_shape.number_rows,
+                        isoRequest.rack_layout.rack_shape.number_columns];                    
+                }
+                else
+                {
+                    tagForHighlightSelector.tagPredicates = null;
+                    rackView.tagMap = null;
+                }
             }
 
             protected function deliveryDateSelector_changeHandler(event:CalendarLayoutChangeEvent):void
@@ -58,7 +66,7 @@
     <s:VGroup width="178" paddingTop="10" left="0" top="5" bottom="0">
 
         <components1:MemberLinkButton 
-            link="{new Link('Show ISO request','/iso-requests/' + _isoRequest.id)}"/>
+            link="{new Link('Show ISO request','/lab-iso-requests/' + _isoRequest.id)}"/>
         <s:Spacer height="5" />
         <s:Label text="Requester:" fontWeight="bold" />
         <s:HGroup  paddingLeft="5">
@@ -69,10 +77,10 @@
         <s:Label text="{_isoRequest.owner}" paddingLeft="5"/>
         <s:Spacer height="5" />
         <s:Label text="Plate Set label:" fontWeight="bold"/>
-        <s:Label text="{_isoRequest.plate_set_label}" paddingLeft="5"/>
+        <s:Label text="{_isoRequest.label}" paddingLeft="5"/>
         <s:Spacer height="5" />
         <s:Label text="ISO Plate(s):" fontWeight="bold"/>
-        <s:Label text="{_isoRequest.number_plates}" paddingLeft="5"/>
+        <s:Label text="{_isoRequest.expected_number_isos}" paddingLeft="5"/>
         <s:Label text="Aliquot(s) per ISO Plate:" fontWeight="bold"/>
         <s:Label text="{_isoRequest.number_aliquots}" paddingLeft="5"/>
         <s:Spacer height="5" />
@@ -82,7 +90,7 @@
                       selectedDate="{_isoRequest.delivery_date}"
                       disabledRanges="{[ {rangeEnd: new Date()} ]}"
                       enabled="false" enabled.edit="true"
-                      toolTip.view="Please push 'Edit' to change the delivery date."
+                      toolTip.view="Please press 'Edit' to change the delivery date."
                       change="deliveryDateSelector_changeHandler(event)"/>
     </s:VGroup>
 

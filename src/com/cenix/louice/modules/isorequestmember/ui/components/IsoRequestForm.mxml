@@ -5,11 +5,11 @@
         xmlns:components="com.cenix.louice.shared.ui.components.*"
         xmlns:components1="org.everest.flex.ui.components.*"
         width="400" height="200"
-        currentState="{isoRequest.iso_type == ISO_TYPE_STANDARD ? 'standard' : 'library'}">
+        currentState="{isoRequest.iso_type == ISO_TYPE_LAB ? 'lab' : 'library'}">
     <fx:Declarations>
     </fx:Declarations>
     <s:states>
-        <s:State name="standard"/>
+        <s:State name="lab"/>
         <s:State name="library"/>
     </s:states>    
     <fx:Script>
@@ -18,7 +18,7 @@
             
             import spark.formatters.DateTimeFormatter;
             
-            private static const ISO_TYPE_STANDARD:String = 'STANDARD';
+            private static const ISO_TYPE_LAB:String = 'LAB';
 
             [Bindable]
             public var isoRequest:IsoRequestMemberPresentationModel;
@@ -35,11 +35,11 @@
         <s:layout>
             <s:FormLayout/>
         </s:layout>
-        <s:FormItem includeIn="standard" label="Ticket Number">
+        <s:FormItem includeIn="lab" label="Ticket Number">
             <components:TracButton ticketNumber="{isoRequest.ticket_number}"/>
         </s:FormItem>
         <s:FormItem label="ISO Plates:">
-            <s:Label text="{isoRequest.number_plates}"/>
+            <s:Label text="{isoRequest.expected_number_isos}"/>
         </s:FormItem>
         <s:FormItem label="Aliquot(s) per ISO plate:">
             <s:Label text="{isoRequest.number_aliquots}"/>
@@ -56,14 +56,14 @@
             <s:Label text="{isoRequest.owner}"/>
         </s:FormItem>
         <s:FormItem label="Plate Set Label:">
-            <s:Label text="{isoRequest.plate_set_label}"/>
+            <s:Label text="{isoRequest.label}"/>
         </s:FormItem>
     </s:Group>
     <s:Group>
         <s:layout>
             <s:FormLayout/>
         </s:layout>
-        <s:FormItem includeIn="standard" label="Experiment Metadata:">
+        <s:FormItem includeIn="lab" label="Experiment Metadata:">
             <components1:MemberLinkButton link="{isoRequest.experiment_metadata}"/>
         </s:FormItem>
         <s:FormItem label="ISO Rack Shape:">

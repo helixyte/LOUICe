@@ -29,7 +29,6 @@
             import com.cenix.louice.shared.model.vos.ExperimentMetaDataTypes;
             import com.cenix.louice.shared.model.vos.ExperimentRackMember;
             import com.cenix.louice.shared.model.vos.ItemStatusMember;
-            import com.cenix.louice.shared.model.vos.JobTypeMember;
             import com.cenix.louice.shared.model.vos.PlateMember;
             import com.cenix.louice.shared.model.vos.PlateSpecsMember;
             import com.cenix.louice.shared.model.vos.RackMember;
@@ -94,9 +93,7 @@
 					job.subproject = new SubprojectMember();
 					job.subproject.link = this._experimentMetadataModel.subproject.link;
 					job.subproject.active = undefined; //needs to be undefined to avoid xml element
-					job.job_type = new JobTypeMember();
-					job.job_type.link = new Link("RNAi Experiment",
-                                                 _application.appUrl + "/job-types/rnai-experiment/");
+					job.job_type = 'EXPERIMENT';
 					job.experiments = new MembersCollection();
 					job.experiments = this.experiments;
 					job.start_time = new Date();

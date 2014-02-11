@@ -2,51 +2,98 @@
 <s:Group xmlns:fx="http://ns.adobe.com/mxml/2009"
          xmlns:s="library://ns.adobe.com/flex/spark"
          xmlns:mx="library://ns.adobe.com/flex/mx"
+         xmlns:rack="com.cenix.louice.shared.ui.components.rack.*"
          xmlns:components="com.cenix.louice.modules.isorequestmember.ui.components.*"
-         creationComplete="creationCompleteHandler(event)" >
+         creationComplete="creationCompleteHandler(event)"
+         removedFromStage="resetPreview()">
     <fx:Script>
         <![CDATA[
             import com.cenix.louice.modules.isorequestmember.ui.presenters.IsoRequestMemberPresentationModel;
+            import com.cenix.louice.modules.platemember.ui.views.PlateMemberView;
+            import com.cenix.louice.shared.model.vos.IsoJobMember;
             import com.cenix.louice.shared.model.vos.IsoMember;
             import com.cenix.louice.shared.model.vos.JobMember;
-
+            import com.cenix.louice.shared.model.vos.RackMember;
+            
             import mx.events.FlexEvent;
-
+            
             import spark.events.IndexChangeEvent;
+            
+            import org.everest.flex.events.MemberEvent;
 
             [Bindable]
             public var isoRequest:IsoRequestMemberPresentationModel;
 
+            private static var loadRack:Function;
+            
+            public function quickLook(barcode:String, dimensions:Array=null):void
+            {
+                rackPreview.visible = false;
+                rackPreview.label = barcode;
+                var rack:RackMember = isoRequest.racks[barcode];
+                if (rack == null)
+                {
+                    // Trigger asyncronous load of the given rack.
+                    isoRequest.loadRack(barcode);
+                    isoRequest.addEventListener(
+                        MemberEvent.MEMBER_CHANGED,
+                        loadRack = function(event:Event):void { 
+                            quickLook(barcode, dimensions) });
+                } else {
+                    isoRequest.removeEventListener(MemberEvent.MEMBER_CHANGED, loadRack);
+                    rackPreview.members = rack.containers;
+                    rackPreview.dimension = dimensions;
+                    rackPreview.visible = true;
+                }
+            }
+
+            public function resetPreview():void
+            {
+                // Reset the rack preview.
+                rackPreview.visible = false;
+                isoRequest.platesToLoad = 0;
+                if (loadRack != null)
+                {
+                    // Remove the preview listener.
+                    isoRequest.removeEventListener(MemberEvent.MEMBER_CHANGED, loadRack);
+                }
+            }
+            
             protected function creationCompleteHandler(event:FlexEvent):void
             {
                 isoRequest.addEventListener(Event.CHANGE, updateList);
             }
-
+            
             protected function updateList(event:Event=null):void
             {
-                isoList.selectedIndex = isoRequest.selectedIsoIndex;
+                if (isoRequest.selectedIsoIndex != -1)
+                {
+                    isoList.selectedIndex = isoRequest.selectedIsoIndex;    
+                }               
             }
-
+            
             protected function isoList_changeHandler(event:IndexChangeEvent):void
             {
                 isoRequest.selectedIsoIndex = event.newIndex;
             }
-
+            
         ]]>
     </fx:Script>
-    <s:HGroup width="100%" height="100%" gap="-1" paddingTop="6" paddingLeft="4" paddingBottom="6" paddingRight="6">
+    <s:HGroup width="100%" height="100%" gap="-1" paddingBottom="6"
+              paddingLeft="4" paddingRight="6" paddingTop="6">
 
-        <s:List  id="isoList" height="100%" width="200"
-                 dataProvider="{isoRequest.isos}"
-                 fontWeight="bold" contentBackgroundColor="#FFFFFF" borderColor="#FFFFFF"
-                 selectionColor="#EBF4FF" borderVisible="false"
-                 change="isoList_changeHandler(event)"
-                 selectedIndex="{isoRequest.selectedIsoIndex}" >
+        <s:List id="isoList" width="200" height="100%" borderColor="#FFFFFF"
+                borderVisible="false" change="isoList_changeHandler(event)"
+                contentBackgroundColor="#FFFFFF"
+                dataProvider="{isoRequest.isos}" fontWeight="bold"
+                selectedIndex="{isoRequest.selectedIsoIndex}"
+                selectionColor="#EBF4FF">
             <s:itemRenderer>
                 <fx:Component>
-                    <s:ItemRenderer height="28" >
+                    <s:ItemRenderer height="28">
                         <fx:Script>
                             <![CDATA[
+                                import com.cenix.louice.shared.model.vos.IsoJobMember;
                                 import com.cenix.louice.shared.model.vos.IsoMember;
                                 [Bindable]
                                 private var color:uint = 0x000000;
@@ -56,20 +103,39 @@
                                 override public function set data(value:Object):void
                                 {
                                     super.data = value;
+                                    var doJobFirst:Boolean = 
+                                        outerDocument.isoRequest.process_job_first;
                                     if (data is IsoMember)
                                     {
                                         title = " - " + data.label;
-                                    } else {
+                                        enabled = (IsoMember(data).status == 'in_progress')
+                                                    || !doJobFirst 
+                                                    || (IsoMember(data).iso_job.number_stock_racks == 0);
+                                    } 
+                                    else // IsoJobMember
+                                    {
                                         title = data.label;
+                                        enabled = (IsoJobMember(data).status != 'done')
+                                                    && (doJobFirst 
+                                                        && IsoJobMember(data).number_stock_racks > 0);
                                     }
-
+                                    // If we do not have a selection, pick the 
+                                    // first enabled ISO or ISO job.
+                                    if (enabled) {
+                                        if (outerDocument.isoRequest.selectedIsoIndex == -1) {
+                                            selected = true;                                            
+                                        }
+                                    }
                                     if (data.status == 'cancelled')
                                     {
                                         color = 0xFF0000;
-                                    } else if (data.status == 'done')
+                                    } 
+                                    else if (data.status == 'done')
                                     {
                                         color = 0x00CC33;
-                                    } else {
+                                    } 
+                                    else 
+                                    {
                                         color = 0x000000;
                                     }
                                 }
@@ -77,37 +143,51 @@
                         </fx:Script>
                         <s:Line left="0" right="0" top="0">
                             <s:stroke>
-                                <s:SolidColorStroke color="#FFFFFF" weight="2" />
+                                <s:SolidColorStroke color="#FFFFFF" weight="2"/>
                             </s:stroke>
                         </s:Line>
-                        <s:Line left="0" bottom="0" top="0">
+                        <s:Line left="0" top="0" bottom="0">
                             <s:stroke>
-                                <s:SolidColorStroke color="#FFFFFF" weight="2" />
+                                <s:SolidColorStroke color="#FFFFFF" weight="2"/>
                             </s:stroke>
                         </s:Line>
-                        <s:Label text="{title}" color="{color}" paddingLeft="8" paddingTop="8"/>
+                        <s:Label color="{color}" paddingLeft="8" paddingTop="8"
+                                 text="{title}"/>
                     </s:ItemRenderer>
                 </fx:Component>
             </s:itemRenderer>
         </s:List>
         <s:Line height="100%">
             <s:stroke>
-                <s:SolidColorStroke color="#EBF4FF" caps="square" weight="8"/>
+                <s:SolidColorStroke caps="square" color="#EBF4FF" weight="8"/>
             </s:stroke>
         </s:Line>
+        <!-- ISO or ISO JOB VIEW -->
         <s:Scroller width="100%" height="100%">
             <s:Group width="100%" height="100%">
-                <components:IsoForm width="100%" height="100%" visible="{isoList.selectedItem is IsoMember}"
-                                    isoRequest="{isoRequest}"
-                                    iso="{(isoList.selectedItem is IsoMember) ? isoList.selectedItem : null}" />
-
-                <components:JobForm width="100%" height="100%" visible="{isoList.selectedItem is JobMember}"
-                                    isoRequest="{isoRequest}"
-                                    isoJob="{(isoList.selectedItem is JobMember) ? isoList.selectedItem : null}" />
+                <components:IsoForm visible="{isoList.selectedItem is IsoMember}"
+                                    width="100%" height="100%"
+                                    iso="{(isoList.selectedItem is IsoMember) ? isoList.selectedItem : null}"
+                                    isoRequest="{isoRequest}" isosView="{this}"/>
+                <components:JobForm visible="{isoList.selectedItem is JobMember}"
+                                    width="100%" height="100%"
+                                    isoJob="{(isoList.selectedItem is JobMember) ? isoList.selectedItem : null}"
+                                    isoRequest="{isoRequest}" isosView="{this}"/>
             </s:Group>
         </s:Scroller>
-
+        <!-- RACK/PLATE PREVIEW -->
+        <s:Group width="100%" height="100%">
+            <rack:RackView id="rackPreview" visible="true" left="0" right="5"
+                           top="10" bottom="5" includeInLayout="true"
+                           toolTipFunction="{PlateMemberView.toolTipFunction}"/>
+            <s:HGroup id="rackPreviewSpinner"
+                      visible="{(isoRequest.platesToLoad &gt; 0)&amp;&amp;(!rackPreview.visible)}"
+                      left="20" top="20" verticalAlign="middle">
+                <s:BusyIndicator/>
+                <s:Label color="#999999" text="getting containers from server .."/>
+            </s:HGroup>
+        </s:Group>
     </s:HGroup>
-    <s:BusyIndicator top="13" left="170" visible="{isoRequest.isosLoading}"/>
+    <s:BusyIndicator visible="{isoRequest.isosLoading}" left="170" top="13"/>
 
 </s:Group>

@@ -195,7 +195,7 @@
                           contentType="{ContentType.TUBE_COLLECTION}" />
 
             <vos:MenuItem uid="20"
-                          url="{'/iso-requests/?q=owner:contains:' + getIsoOwnerFilter()}"
+                          url="{'/lab-iso-requests/?q=owner:contains:' + getIsoOwnerFilter()}"
                           title="ISO Requests"
                           description="Manage ISO Requests"
                           imageUrl="/static/images/iso-requests.png"

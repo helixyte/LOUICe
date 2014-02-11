@@ -11,19 +11,19 @@
           verticalAlign="middle">
     <fx:Script>
         <![CDATA[
-            import org.everest.flex.events.SuggestionEvent;
-            import com.cenix.louice.shared.model.vos.IsoRequestMember;
-            import org.everest.flex.query.Criteria;
-            import org.everest.flex.ui.presenters.FeedPresentationModel;
-            import org.everest.flex.ui.presenters.SuggestionDropDownListPresentationModel;
-
+            import com.cenix.louice.shared.model.vos.LabIsoRequestMember;
+            
             import mx.binding.utils.BindingUtils;
             import mx.collections.ArrayCollection;
             import mx.collections.IList;
-
-            import org.as3commons.lang.StringUtils;
-
+            
             import spark.events.IndexChangeEvent;
+            
+            import org.as3commons.lang.StringUtils;
+            import org.everest.flex.events.SuggestionEvent;
+            import org.everest.flex.query.Criteria;
+            import org.everest.flex.ui.presenters.FeedPresentationModel;
+            import org.everest.flex.ui.presenters.SuggestionDropDownListPresentationModel;
 
             [Bindable]
             public var isoPlates:ArrayCollection=new ArrayCollection();
@@ -32,9 +32,9 @@
             private var _model:FeedPresentationModel;
 
 
-            public function set isoRequest(isoRequest:IsoRequestMember):void
+            public function set isoRequest(isoRequest:LabIsoRequestMember):void
             {
-				var url:String = "/iso-requests/" + isoRequest.id + "/completed-iso-plates/"
+				var url:String = "/lab-iso-requests/" + isoRequest.id + "/completed-iso-plates/"
 				isoAliquotePlateInput.url = url
             }
             public function get model():FeedPresentationModel

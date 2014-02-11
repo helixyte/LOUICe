@@ -37,5 +37,10 @@
 			<type>2</type>
 			<location>/Volumes/raven/home/cenixadm/Webapps/thelma/public/dev</location>
 		</link>
+		<link>
+			<name>bin-release1</name>
+			<type>2</type>
+			<location>/Volumes/raven/Webapps/thelma/public/dev</location>
+		</link>
 	</linkedResources>
 </projectDescription>

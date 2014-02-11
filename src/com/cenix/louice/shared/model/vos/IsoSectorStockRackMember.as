@@ -1,18 +1,12 @@
 package com.cenix.louice.shared.model.vos
 {
-	import org.everest.flex.model.Member;
 
-    public class LocationMember extends Member
+    [Bindable]
+    public class IsoSectorStockRackMember extends StockRackMember
     {
-        public var barcode:String;
-        public var label:String;
-        public var type:String;
-        public var device:DeviceMember;
-        public var rack:RackMember;
-
         private var _index:uint = 0;
 
-        public function LocationMember(title:String=null, selfLink:String=null)
+        public function IsoSectorStockRackMember(title:String=null, selfLink:String=null)
         {
             super(title, selfLink);
         }
@@ -28,6 +22,6 @@ package com.cenix.louice.shared.model.vos
         public function set index(index:uint):void {
             _index = index;
         }
-        
+
     }
 }

@@ -5,6 +5,8 @@ package com.cenix.louice.modules.isorequestmember.ui.presenters
     import com.cenix.louice.shared.model.vos.IsoJobMember;
     import com.cenix.louice.shared.model.vos.IsoMember;
     import com.cenix.louice.shared.model.vos.IsoRequestMember;
+    import com.cenix.louice.shared.model.vos.LabIsoMember;
+    import com.cenix.louice.shared.model.vos.LabIsoRequestMember;
     import com.cenix.louice.shared.model.vos.RackLayoutMember;
     import com.cenix.louice.shared.model.vos.RackMember;
     import com.cenix.louice.shared.model.vos.RackShapeMember;
@@ -32,8 +34,6 @@ package com.cenix.louice.modules.isorequestmember.ui.presenters
 
     public class IsoRequestMemberPresentationModel extends MemberPresentationModel
     {
-
-
         [Bindable]
         public var racks:Dictionary = new Dictionary();
 
@@ -58,10 +58,13 @@ package com.cenix.louice.modules.isorequestmember.ui.presenters
         [Bindable]
         public var isosLoading:Boolean;
 
-        private var _selectedIsoIndex:int;
+        [Bindable]
+        private var _application:Object = FlexGlobals.topLevelApplication;
+        
+        private var _selectedIsoIndex:int = -1;
         private var _isos:MembersCollection;
 
-        //we need this to remember after reload which iso was selected
+        // We need this to remember which ISO was selected on reload.
         private var so:SharedObject = SharedObject.getLocal("LOUICe");
 
         public function IsoRequestMemberPresentationModel(dispatcher:IEventDispatcher)
@@ -74,9 +77,10 @@ package com.cenix.louice.modules.isorequestmember.ui.presenters
             super.member = member;
             if (member != null)
             {
-                var shape:RackShapeMember = IsoRequestMember(_member).rack_layout.rack_shape;
+                var shape:RackShapeMember = 
+                        LabIsoRequestMember(_member).rack_layout.rack_shape;
                 rackShape = shape.number_columns * shape.number_rows;
-                // Trigger async load of the isos.
+                // Trigger async load of the ISOs.
                 var dLink:INavigationLink = isosLink;
                 if ((dLink != null)&&(dLink.href != null)) {
 
@@ -125,7 +129,7 @@ package com.cenix.louice.modules.isorequestmember.ui.presenters
                     platesToLoad--;
                     dispatchEvent(new MemberEvent(MemberEvent.MEMBER_CHANGED));
 
-                } else if (member is IsoMember){
+                } else if (member is LabIsoMember){
                     var mbs:MembersCollection = new MembersCollection();
                     mbs.addItem(member);
                     subMembers = mbs;
@@ -140,22 +144,20 @@ package com.cenix.louice.modules.isorequestmember.ui.presenters
          */
         public function loadRack(barcode:String):void
         {
-
             var rackLink:Link = new Link("a rack to load", "/racks/" + barcode);
             var iEvt:NavigationEvent = 
                     new NavigationEvent(NavigationEvent.LOAD_SUBORDINATE_PAGE);
             iEvt.pageUrl = rackLink.href;
-
             dispatcher.dispatchEvent(iEvt);
             platesToLoad++;
         }
 
         public function changeOwner(newOwner:String):void
         {
-            owner = newOwner;
-            IsoRequestMember(_member).isos = null;
-            IsoRequestMember(_member).rack_layout = null; // We do not need to send all that again.
-            submit();
+            this.owner = newOwner;
+            var isoReqClone:LabIsoRequestMember = this._member.blank();
+            isoReqClone.owner = this.owner;
+            submit(isoReqClone);
         }
 
         public function generateNewIsos(numberOfIsos:int, 
@@ -163,60 +165,91 @@ package com.cenix.louice.modules.isorequestmember.ui.presenters
                                         optimizer_required_racks:String):void
         {
             var newIsos:MembersCollection = new MembersCollection();
-
             for (var i:int = 0; i < numberOfIsos; i++)
             {
-                var iso:IsoMember = new IsoMember();
-                    iso.label = "new iso";
-                    iso.status = "NEW";
-                    iso.optimizer_excluded_racks = optimizer_excluded_racks;
-                    iso.optimizer_required_racks = optimizer_required_racks;
+                var iso:LabIsoMember = new LabIsoMember();
+                iso.label = "new iso";
+                iso.status = "NEW";
+                iso.optimizer_excluded_racks = optimizer_excluded_racks;
+                iso.optimizer_required_racks = optimizer_required_racks;
                 newIsos.addItem(iso);
             }
-
-            IsoRequestMember(_member).isos = newIsos;
-            IsoRequestMember(_member).rack_layout = null; //We do not need to send all that again.
-            submit();
+            LabIsoRequestMember(_member).isos = newIsos;
+            var isoReqClone:LabIsoRequestMember = this._member.blank();
+            isoReqClone.isos = newIsos;
+            submit(isoReqClone);
         }
 
-//        public function verifyStockRacks(iso:IsoMember):void
-//        {
-//            iso.iso_request = null;
-//            iso.status = "VERIFY";
-//            var iso_request:IsoRequestMember = IsoRequestMember(_member);
-//                iso_request.isos = new MembersCollection();
-//                iso_request.isos.addItem(iso);
-//
-//            submit();
-//        }
-
-        public function updateControlStockRack(isoJob:IsoJobMember, barcode:String):void
+        public function updateStockRacks(isoOrIsoJob:*, barcode1:String, barcode2:String,
+                                         barcode3:String, barcode4:String): void
         {
-            //need to find one parent iso
-            for each (var iso:* in isos)
-            {
-                if ((iso is IsoMember) && (iso.iso_job.id == isoJob.id))
-                {
-                    submitIsoChange(iso, "UPDATE_CONTROL_STOCK_RACK"+barcode);
-                    break;
-                }
+            var numStockRacks:int = 0;
+            if (isoOrIsoJob is IsoJobMember) {
+                numStockRacks += IsoJobMember(isoOrIsoJob).number_stock_racks;
+            } else {
+                numStockRacks += IsoMember(isoOrIsoJob).number_stock_racks;
+            }
+            var bcString:String = barcode1;
+            this.racks = new Dictionary()
+            if (numStockRacks > 1) {
+                bcString += ";" + barcode2;
+            }
+            if (numStockRacks > 2) {
+                bcString += ";" + barcode3;
+            }
+            if (numStockRacks > 3) {
+                bcString += ";" + barcode4;
+            }                    
+            var status:String = "UPDATE_STOCK_RACKS"+bcString;
+            if (isoOrIsoJob is IsoJobMember) {
+                submitIsoJobChange(isoOrIsoJob, status);
+            } else {
+                submitIsoChange(isoOrIsoJob, status);
             }
         }
-
-        public function transferControlStockInDB(isoJob:IsoJobMember):void
+        
+        public function getXl20WorklistUrl(
+            isoOrIsoJob:*, barcode1:String, barcode2:String, barcode3:String, 
+            barcode4:String, excludedRacks:String, requiredTubes:String):String 
         {
-            //need to find one parent iso
-            for each (var iso:* in isos)
-            {
-                if ((iso is IsoMember) && (iso.iso_job.id == isoJob.id))
-                {
-                    // transfer the stock in the database
-                    submitIsoChange(iso,"TRANSFER_CONTROL_STOCK");
-                    break;
-                }
+            var numStockRacks:int = 0;
+            var url:String = getSelfLink(isoOrIsoJob);
+            url += "/worklists.zip";
+            if (isoOrIsoJob is IsoJobMember) {
+                numStockRacks += IsoJobMember(isoOrIsoJob).number_stock_racks;
+            } else {
+                numStockRacks += IsoMember(isoOrIsoJob).number_stock_racks;
+            }            
+            url += "?type=XL20";
+            if (numStockRacks == 1) {
+                url += "&rack=" + barcode1;                    
+            } else {
+                url += "&rack1=" + barcode1;
             }
+            if (numStockRacks > 1) {
+                url += "&rack2=" + barcode2;    
+            }
+            if (numStockRacks > 2) {
+                url += "&rack3=" + barcode3;    
+            }
+            if (numStockRacks > 3) {
+                url += "&rack4=" + barcode4;
+            }
+            url += "&optimizer_excluded_racks=" + cleanBarcodes(excludedRacks);
+            url += "&optimizer_required_racks=" + cleanBarcodes(requiredTubes);
+            if (_application.RELEASE_QUALIFIER != '')
+                url += "&include_dummy_output=true";
+            return url;
         }
-
+        
+        public function getPipettingWorklistUrl(isoOrIsoJob:*):String
+        {
+            var url:String = getSelfLink(isoOrIsoJob);
+            url += "/worklists.zip";
+            url += "?type=PIPETTING";
+            return url;
+        }
+        
         public function processXl20OutputData(data:ByteArray):void
         {
 			var event:MemberEvent = new MemberEvent(MemberEvent.CREATE_MEMBER_FROM_DATA);
@@ -227,97 +260,87 @@ package com.cenix.louice.modules.isorequestmember.ui.presenters
 			dispatcher.dispatchEvent(event);
         }
 
-        public function transferStockInDB(iso:IsoMember):void
+        public function executePipettingWorklist(isoOrIsoJob:*):void
         {
-            submitIsoChange(iso, "TRANSFER_STOCK");
+            var status:String = "PIPETTING";
+            if (isoOrIsoJob is IsoJobMember) {
+                submitIsoJobChange(isoOrIsoJob, status);    
+            } else {
+                submitIsoChange(isoOrIsoJob, status);
+            }
         }
         
-
-        public function transferToIsoInDB(iso:IsoMember):void
-        {
-            // verify and save the stock rack
-            submitIsoChange(iso, "TRANSFER_TO_ISO");
-        }
-
-        public function transferToAliquotInDB(iso:IsoMember, barcode:String):void
-        {
-            submitIsoChange(iso, "TRANSFER_TO_ADD_ALIQUOT"+barcode);
-        }
-
-        public function cancelIso(iso:IsoMember):void
+        public function cancelIso(iso:LabIsoMember):void
         {
             submitIsoChange(iso, "CANCEL_ISO");
         }
 
-        public function closeIso(iso:IsoMember):void
+        public function closeIso(iso:LabIsoMember):void
         {
             submitIsoChange(iso, "CLOSE_ISO");
         }
 
-        public function reopenIso(iso:IsoMember):void
+        public function reopenIso(iso:LabIsoMember):void
         {
             submitIsoChange(iso, "REOPEN_ISO");
         }
 
-        public function addAliquotePlate(iso:IsoMember):void
-        {
-            submitIsoChange(iso, "ADD_ALIQUOT");
-        }
-
-        public function copyIso(iso:IsoMember, withOptimization:Boolean):void
+        public function copyIso(iso:LabIsoMember, withOptimization:Boolean):void
         {
             submitIsoChange(iso, withOptimization ? 
                 "COPY_ISO_WITH_OPTIMIZATION" : "COPY_ISO_WITHOUT_OPTIMIZATION");
         }
 
-        private function submitIsoChange(iso:IsoMember, status:String):void
+        private function submitIsoChange(iso:LabIsoMember, status:String):void
         {
-            // We only need to send a lightweight clone to the server.
-            var isoClone:IsoMember = new IsoMember();
-            isoClone.id = iso.id;
-            isoClone.label = iso.label;
+            var isoClone:LabIsoMember = LabIsoMember(iso.blank());
             isoClone.status = status;
-            var isoReqClone:IsoRequestMember = new IsoRequestMember();
-            isoReqClone.id = _member.id;
-            isoReqClone.selfLink = IsoRequestMember(_member).selfLink;
-            isoReqClone.iso_type = IsoRequestMember(_member).iso_type;
-            isoReqClone.plate_set_label = IsoRequestMember(_member).plate_set_label;
-            isoReqClone.requester = IsoRequestMember(_member).requester;
+            var isoReqClone:LabIsoRequestMember = 
+                                LabIsoRequestMember(this._member.blank());
             isoReqClone.isos = new MembersCollection();
-			isoReqClone.ticket_number = IsoRequestMember(_member).ticket_number
-			isoReqClone.owner = IsoRequestMember(_member).owner
             isoReqClone.isos.addItem(isoClone);
+            submit(isoReqClone);
+        }
+        
+        private function submitIsoJobChange(isoJob:IsoJobMember, status:String):void
+        {
+            var isoJobClone:IsoJobMember = IsoJobMember(isoJob.blank());
+            isoJobClone.status = status;
+            var isoReqClone:LabIsoRequestMember = 
+                LabIsoRequestMember(this._member.blank());
+            isoReqClone.jobs = new MembersCollection();
+            isoReqClone.jobs.addItem(isoJobClone);
             submit(isoReqClone);
         }
         
         [Bindable(Event="memberChanged")]
         public function get iso_type():String
         {
-            return IsoRequestMember(_member).iso_type;
+            return LabIsoRequestMember(_member).iso_type;
         }
 
         [Bindable(Event="memberChanged")]
-        public function get plate_set_label():String
+        public function get label():String
         {
-            return IsoRequestMember(_member).plate_set_label;
+            return LabIsoRequestMember(_member).label;
         }
 
         [Bindable(Event="memberChanged")]
         public function get rack_layout():RackLayoutMember
         {
-            return IsoRequestMember(_member).rack_layout;
+            return LabIsoRequestMember(_member).rack_layout;
         }
 
         [Bindable(Event="memberChanged")]
         public function set rack_layout(rl:RackLayoutMember):void
         {
-            IsoRequestMember(_member).rack_layout = rl;
+            LabIsoRequestMember(_member).rack_layout = rl;
         }
 
         [Bindable(Event="memberChanged")]
         public function get delivery_date():Date
         {
-            return IsoRequestMember(_member).delivery_date;
+            return LabIsoRequestMember(_member).delivery_date;
         }
 
         [Bindable]
@@ -341,7 +364,7 @@ package com.cenix.louice.modules.isorequestmember.ui.presenters
                 isos.refresh();
                 for each (var iso:* in isos)
                 {
-                    if (iso is IsoMember)
+                    if (iso is LabIsoMember)
                     {
                         if (iso.iso_job.id != lastJobId)
                         {
@@ -357,67 +380,74 @@ package com.cenix.louice.modules.isorequestmember.ui.presenters
         [Bindable(Event="memberChanged")]
         public function get requester():UserMember
         {
-            return IsoRequestMember(_member).requester;
+            return LabIsoRequestMember(_member).requester;
         }
         
         [Bindable(Event="memberChanged")]
         public function get owner():String
         {
-            return IsoRequestMember(_member).owner;
+            return LabIsoRequestMember(_member).owner;
         }
         
         [Bindable(Event="memberChanged")]
         public function set owner(newOwner:String):void
         {
-            IsoRequestMember(_member).owner = newOwner;
+            LabIsoRequestMember(_member).owner = newOwner;
         }
         
         [Bindable(Event="memberChanged")]
-        public function get number_plates():int
+        public function get expected_number_isos():int
         {
-            return IsoRequestMember(_member).number_plates;
+            return LabIsoRequestMember(_member).expected_number_isos;
         }
         
         [Bindable(Event="memberChanged")]
         public function get number_aliquots():int
         {
-            return IsoRequestMember(_member).number_aliquots;
+            return LabIsoRequestMember(_member).number_aliquots;
+        }
+        
+        [Bindable(Event="memberChanged")]
+        public function get process_job_first():Boolean
+        {
+            return LabIsoRequestMember(_member).process_job_first;
         }
         
         [Bindable(Event="memberChanged")]
         public function get ticket_number():uint
         {
-            return IsoRequestMember(_member).ticket_number;
+            return LabIsoRequestMember(_member).ticket_number;
         }
 
         [Bindable(Event="memberChanged")]
         public function get experiment_metadata_type():ExperimentMetaDataTypeMember
         {
-            return IsoRequestMember(_member).experiment_metadata_type;
+            return LabIsoRequestMember(_member).experiment_metadata_type;
         }
 
         [Bindable(Event="memberChanged")]
-        public function set experiment_metadata_type(new_experiment_metadata_type:ExperimentMetaDataTypeMember):void
+        public function set experiment_metadata_type(
+                new_experiment_metadata_type:ExperimentMetaDataTypeMember):void
         {
-            IsoRequestMember(_member).experiment_metadata_type = new_experiment_metadata_type;
+            LabIsoRequestMember(_member).experiment_metadata_type = new_experiment_metadata_type;
         }
 
         [Bindable(Event="memberChanged")]
         public function get experiment_metadata():ExperimentMetaDataMember
         {
-            return IsoRequestMember(_member).experiment_metadata;
+            return LabIsoRequestMember(_member).experiment_metadata;
         }
         
         [Bindable(Event="memberChanged")]
         public function get tagPredicates():ArrayCollection
         {
-            return IsoRequestMember(_member).rack_layout.tagPredicates;
+            return LabIsoRequestMember(_member).rack_layout.tagPredicates;
         }
 
         [Bindable(Event="memberChanged")]
         public function get isosLink():INavigationLink
         {
-            return IsoRequestMember(_member).isos;
+            return LabIsoRequestMember(_member).isos;
         }
         
         [Bindable]
@@ -431,9 +461,9 @@ package com.cenix.louice.modules.isorequestmember.ui.presenters
             if (value > -1)
             {
                 _selectedIsoIndex = value;
-
+                // Store in shared object and flush (save).
                 so.data.selectedIso = isos[value].title;
-                so.flush(); // flush saves the data
+                so.flush();
             }
         }
 
@@ -443,18 +473,15 @@ package com.cenix.louice.modules.isorequestmember.ui.presenters
             this.acceptEnabled = false;
             this.generateEnabled = false;
             this.reopenEnabled = false;
-
-
             if ((owner != '') && 
                 (FlexGlobals.topLevelApplication.currentUser != null))
             {
-                //determine the actions that are possible
+                // Determine the actions that are possible.
                 var currentUser:String = 
                     FlexGlobals.topLevelApplication.currentUser.directory_user_id;
-
                 if (owner.indexOf(IsoRequestMember.STOCKMANAGEMENT_USER) > -1)
                 {
-                    if (iso_type == 'STANDARD' 
+                    if (iso_type == 'LAB' 
                         && owner.indexOf(currentUser) < 0)
                     {
                         this.acceptEnabled = true;
@@ -467,6 +494,34 @@ package com.cenix.louice.modules.isorequestmember.ui.presenters
                     this.reopenEnabled = true;
                 }
             }
+        }        
+        
+        private function cleanBarcodes(barcodes:String):String
+        {
+            if (barcodes.length < 1)
+            {
+                return barcodes;
+            }
+            
+            barcodes = barcodes.replace(/ /g, '');
+            if (barcodes.charAt(barcodes.length -1) == ',')
+            {
+                barcodes = barcodes.substr(0, barcodes.length - 1);
+            }
+            return barcodes;
         }
+
+        private function getSelfLink(isoOrIsoJob:*):String 
+        {
+            var url:String = '';
+            if (isoOrIsoJob is IsoJobMember) {
+                // FIXME: Can we use the selfLink here?
+                url += "/iso-jobs/" + IsoJobMember(isoOrIsoJob).id;
+            } else {
+                url += IsoMember(isoOrIsoJob).selfLink;
+            }
+            return url;
+        }
+
     }
 }

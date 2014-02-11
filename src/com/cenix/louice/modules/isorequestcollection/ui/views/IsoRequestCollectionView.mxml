@@ -84,7 +84,7 @@
         <s:GridColumn dataField="owner" headerText="Request Owner"/>
         <s:GridColumn dataField="requester" headerText="Requester"
                       itemRenderer="org.everest.flex.ui.renderers.DataGridLinkRenderer"/>
-        <s:GridColumn dataField="plate_set_label" headerText="Plate Set Label"/>
+        <s:GridColumn dataField="label" headerText="Plate Set Label"/>
         <s:GridColumn width="180" minWidth="136" dataField="delivery_date"
                       headerText="Delivery Date"
                       labelFunction="{dateLabelFunction}">
