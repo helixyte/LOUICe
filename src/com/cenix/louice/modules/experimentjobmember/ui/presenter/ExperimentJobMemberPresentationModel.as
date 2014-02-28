@@ -120,10 +120,9 @@ package com.cenix.louice.modules.experimentjobmember.ui.presenter
 
         public override function submit(member:Member=null, 
                                         processInBackground:Boolean=false,
-                                        editMode:String=MemberEvent.EDIT_MODE_UPDATE):void
+                                        editMode:String=MemberEvent.EDIT_MODE_REPLACE):void
         {
             trace("- Editing Member using XML\n");
-
             var m:ExperimentJobMember = ExperimentJobMember(_member);
             for each (var experiment:ExperimentMember in m.experiments)
             {
@@ -138,10 +137,8 @@ package com.cenix.louice.modules.experimentjobmember.ui.presenter
                     rack.plate = plate;
                 }
             }
-
             var event:MemberEvent = new MemberEvent(MemberEvent.EDIT_MEMBER);
-                event.member = m;
-
+            event.member = m;
             dispatcher.dispatchEvent(event);
         }
     }

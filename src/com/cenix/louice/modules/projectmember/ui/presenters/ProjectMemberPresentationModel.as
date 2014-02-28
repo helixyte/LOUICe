@@ -1,19 +1,16 @@
 package com.cenix.louice.modules.projectmember.ui.presenters
 {
-    import org.everest.flex.events.MemberEvent;
-    import org.everest.flex.interfaces.INavigationLink;
-    import org.everest.flex.model.MembersCollection;
     import com.cenix.louice.shared.model.vos.OrganizationMember;
     import com.cenix.louice.shared.model.vos.ProjectMember;
     import com.cenix.louice.shared.model.vos.SubprojectMember;
     import com.cenix.louice.shared.model.vos.UserMember;
-    import org.everest.flex.ui.presenters.MemberPresentationModel;
-
+    
     import flash.events.Event;
     import flash.events.IEventDispatcher;
-
-    import mx.collections.ArrayCollection;
-    import mx.collections.ArrayList;
+    
+    import org.everest.flex.events.MemberEvent;
+    import org.everest.flex.model.MembersCollection;
+    import org.everest.flex.ui.presenters.MemberPresentationModel;
 
     public class ProjectMemberPresentationModel extends MemberPresentationModel
     {

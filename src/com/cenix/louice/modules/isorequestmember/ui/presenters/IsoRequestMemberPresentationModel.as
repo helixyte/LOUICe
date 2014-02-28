@@ -299,7 +299,7 @@ package com.cenix.louice.modules.isorequestmember.ui.presenters
                                 LabIsoRequestMember(this._member.blank());
             isoReqClone.isos = new MembersCollection();
             isoReqClone.isos.addItem(isoClone);
-            submit(isoReqClone);
+            submit(isoReqClone, false, MemberEvent.EDIT_MODE_UPDATE);
         }
         
         private function submitIsoJobChange(isoJob:IsoJobMember, status:String):void
@@ -310,7 +310,7 @@ package com.cenix.louice.modules.isorequestmember.ui.presenters
                 LabIsoRequestMember(this._member.blank());
             isoReqClone.jobs = new MembersCollection();
             isoReqClone.jobs.addItem(isoJobClone);
-            submit(isoReqClone);
+            submit(isoReqClone, false, MemberEvent.EDIT_MODE_UPDATE);
         }
         
         [Bindable(Event="memberChanged")]

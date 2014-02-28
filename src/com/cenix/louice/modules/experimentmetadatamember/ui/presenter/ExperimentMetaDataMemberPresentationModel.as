@@ -115,7 +115,6 @@ package com.cenix.louice.modules.experimentmetadatamember.ui.presenter
         
         public function reset():void
         {
-            ExperimentMetaDataMember(_member).lab_iso_request = null;
             ExperimentMetaDataMember(_member).experiment_design = null;
             ExperimentMetaDataMember(_member).molecule_design_pool_set = null;
         }
