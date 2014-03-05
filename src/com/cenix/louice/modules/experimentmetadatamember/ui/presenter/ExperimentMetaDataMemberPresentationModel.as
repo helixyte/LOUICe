@@ -47,10 +47,10 @@ package com.cenix.louice.modules.experimentmetadatamember.ui.presenter
         public override function set member(member:Member):void
         {
             super.member = member;
-            //extract jobs for the experiment job view
+            // Extract jobs for the experiment job view.
             if (member != null)
             {
-                //trigger async load of all tags and values
+                // Trigger asynchronous load of all tags and values.
                 var dEvt:NavigationEvent = 
                     new NavigationEvent(NavigationEvent.LOAD_SUBORDINATE_PAGE);
                 dEvt.pageUrl = member.selfLink + 'tags?size=1000';
@@ -97,19 +97,15 @@ package com.cenix.louice.modules.experimentmetadatamember.ui.presenter
             var event:MemberEvent;
             event = new MemberEvent(MemberEvent.DELETE_MEMBER);
             event.member = job;
-
             dispatcher.dispatchEvent(event);
         }
 
         public function createJob(job:JobMember):void
         {
             trace("- Create Job ");
-
-            var event:MemberEvent;
-            event = new MemberEvent(MemberEvent.CREATE_MEMBER);
+            var event:MemberEvent = new MemberEvent(MemberEvent.CREATE_MEMBER);
             event.pageUrl = '/experiment-jobs';
             event.member = job;
-
             dispatcher.dispatchEvent(event);
         }
         

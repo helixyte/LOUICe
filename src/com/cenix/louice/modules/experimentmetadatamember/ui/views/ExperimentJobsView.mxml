@@ -42,7 +42,7 @@
 
                  popup = PopUpManager.createPopUp(this, NewExperimentJobView, true);
                  NewExperimentJobView(popup).experimentMetadataModel = this.model;
-                 //maximize popup
+                 // Maximize popup.
                  popup.move(5,5);
                  popup.width = FlexGlobals.topLevelApplication.width - 10;
                  popup.height = FlexGlobals.topLevelApplication.height - 10;
@@ -100,8 +100,8 @@
                 </s:GridColumn>
                 <s:GridColumn dataField="user" headerText="User"
                               itemRenderer="org.everest.flex.ui.renderers.DataGridLinkRenderer"/>
-                <s:GridColumn width="150" minWidth="136" dataField="start_time"
-                              headerText="Start"
+                <s:GridColumn width="150" minWidth="136" dataField="creation_time"
+                              headerText="Created"
                               labelFunction="{CollectionView.dateTimeLabelFunction}">
                     <s:itemRenderer>
                         <fx:Component>

@@ -6,7 +6,6 @@ package com.cenix.louice.modules.experimentjobmember.ui.presenter
     import com.cenix.louice.shared.model.vos.ExperimentRackMember;
     import com.cenix.louice.shared.model.vos.JobMember;
     import com.cenix.louice.shared.model.vos.PlateMember;
-    import com.cenix.louice.shared.model.vos.SubprojectMember;
     import com.cenix.louice.shared.model.vos.UserMember;
     
     import flash.events.Event;
@@ -52,18 +51,6 @@ package com.cenix.louice.modules.experimentjobmember.ui.presenter
         }
 
         [Bindable(Event="memberChanged")]
-        public function get subproject():SubprojectMember
-        {
-            return JobMember(_member).subproject;
-        }
-
-        public function set subproject(subproject:SubprojectMember):void
-        {
-            JobMember(_member).subproject = subproject;
-            dispatchEvent(new Event(MemberEvent.MEMBER_CHANGED));
-        }
-
-        [Bindable(Event="memberChanged")]
         public function get user():UserMember
         {
             return JobMember(_member).user;
@@ -76,26 +63,14 @@ package com.cenix.louice.modules.experimentjobmember.ui.presenter
         }
 
         [Bindable(Event="memberChanged")]
-        public function get start_time():Date
+        public function get creation_time():Date
         {
-            return JobMember(_member).start_time;
+            return JobMember(_member).creation_time;
         }
 
-        public function set start_time(start_time:Date):void
+        public function set creation_time(creation_time:Date):void
         {
-            JobMember(_member).start_time = start_time;
-            dispatchEvent(new Event(MemberEvent.MEMBER_CHANGED));
-        }
-
-        [Bindable(Event="memberChanged")]
-        public function get end_time():Date
-        {
-            return JobMember(_member).end_time;
-        }
-
-        public function set end_time(end_time:Date):void
-        {
-            JobMember(_member).end_time = end_time;
+            JobMember(_member).creation_time = creation_time;
             dispatchEvent(new Event(MemberEvent.MEMBER_CHANGED));
         }
 

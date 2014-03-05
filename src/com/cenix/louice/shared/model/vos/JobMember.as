@@ -4,14 +4,10 @@ package com.cenix.louice.shared.model.vos
 
     public class JobMember extends Member
     {
-
+		public var job_type:String;
         public var label:String;
-        public var description:String;
-        public var job_type:String;
         public var user:UserMember;
-        public var subproject:SubprojectMember;
-        public var start_time:Date;
-        public var end_time:Date;
+        public var creation_time:Date;
 
         public function JobMember(title:String=null, selfLink:String=null)
         {

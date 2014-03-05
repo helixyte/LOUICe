@@ -20,29 +20,28 @@
 	</components:states>
 	<fx:Script>
 		<![CDATA[
-            import com.cenix.louice.modules.experimentmetadatamember.ui.components.ExperimentDesignRackComponent;
-            import com.cenix.louice.modules.experimentmetadatamember.ui.presenter.ExperimentMetaDataMemberPresentationModel;
-            import com.cenix.louice.shared.model.vos.ExperimentDesignMember;
-            import com.cenix.louice.shared.model.vos.ExperimentDesignRackMember;
-            import com.cenix.louice.shared.model.vos.ExperimentJobMember;
-            import com.cenix.louice.shared.model.vos.ExperimentMember;
-            import com.cenix.louice.shared.model.vos.ExperimentMetaDataTypes;
-            import com.cenix.louice.shared.model.vos.ExperimentRackMember;
-            import com.cenix.louice.shared.model.vos.ItemStatusMember;
-            import com.cenix.louice.shared.model.vos.PlateMember;
-            import com.cenix.louice.shared.model.vos.PlateSpecsMember;
-            import com.cenix.louice.shared.model.vos.RackMember;
-            import com.cenix.louice.shared.model.vos.SubprojectMember;
-            
-            import mx.collections.ArrayCollection;
-            import mx.core.FlexGlobals;
-            import mx.events.CollectionEvent;
-            import mx.events.FlexEvent;
-            import mx.managers.PopUpManager;
-            
-            import org.everest.flex.model.Link;
-            import org.everest.flex.model.MembersCollection;
-            import org.everest.flex.ui.presenters.FeedPresentationModel;
+			import com.cenix.louice.modules.experimentmetadatamember.ui.components.ExperimentDesignRackComponent;
+			import com.cenix.louice.modules.experimentmetadatamember.ui.presenter.ExperimentMetaDataMemberPresentationModel;
+			import com.cenix.louice.shared.model.vos.ExperimentDesignMember;
+			import com.cenix.louice.shared.model.vos.ExperimentDesignRackMember;
+			import com.cenix.louice.shared.model.vos.ExperimentJobMember;
+			import com.cenix.louice.shared.model.vos.ExperimentMember;
+			import com.cenix.louice.shared.model.vos.ExperimentMetaDataTypes;
+			import com.cenix.louice.shared.model.vos.ExperimentRackMember;
+			import com.cenix.louice.shared.model.vos.ItemStatusMember;
+			import com.cenix.louice.shared.model.vos.PlateMember;
+			import com.cenix.louice.shared.model.vos.PlateSpecsMember;
+			import com.cenix.louice.shared.model.vos.RackMember;
+			
+			import mx.collections.ArrayCollection;
+			import mx.core.FlexGlobals;
+			import mx.events.CollectionEvent;
+			import mx.events.FlexEvent;
+			import mx.managers.PopUpManager;
+			
+			import org.everest.flex.model.Link;
+			import org.everest.flex.model.MembersCollection;
+			import org.everest.flex.ui.presenters.FeedPresentationModel;
 			
             [Bindable]
             private var _application:Object = FlexGlobals.topLevelApplication;
@@ -88,15 +87,13 @@
 				if(formValidator.formIsValid)
                 {
 					var job:ExperimentJobMember = new ExperimentJobMember();
-					//                        job.user = FlexGlobals.topLevelApplication.currentUser;
+					job.user = _application.currentUser;
+					job.user.link = new Link('User', job.user.selfLink);
 					job.label = inputLabel.text;
-					job.subproject = new SubprojectMember();
-					job.subproject.link = this._experimentMetadataModel.subproject.link;
-					job.subproject.active = undefined; //needs to be undefined to avoid xml element
 					job.job_type = 'EXPERIMENT';
 					job.experiments = new MembersCollection();
 					job.experiments = this.experiments;
-					job.start_time = new Date();
+					job.creation_time = new Date();
 					if(job != null)
                     {
 						this._experimentMetadataModel.createJob(job);

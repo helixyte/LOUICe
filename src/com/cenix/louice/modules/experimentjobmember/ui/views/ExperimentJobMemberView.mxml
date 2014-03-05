@@ -201,8 +201,8 @@
                 <s:layout>
                     <s:FormLayout/>
                 </s:layout>
-                <s:FormItem label="Start-time">
-                    <s:Label text="{model.start_time.toLocaleString()}"/>
+                <s:FormItem label="Time created">
+                    <s:Label text="{model.creation_time.toLocaleString()}"/>
                 </s:FormItem>
                 <s:FormItem label="Experiment Metadata">
                     <components1:MemberLinkButton link="{model.experimentMetadata}" />
