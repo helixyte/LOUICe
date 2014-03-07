@@ -158,7 +158,7 @@
 				var irq_clone:LabIsoRequestMember = model.iso_request.blank();
 				irq_clone.selfLink = '/lab-iso-requests/' + irq_clone.id;
 				irq_clone.owner = model.iso_request.owner;
-				model.submit(irq_clone, true);
+				model.submit(irq_clone, true, MemberEvent.EDIT_MODE_UPDATE);
 			}
 			
 			protected function downloadMoleculeDesignPools(event:MouseEvent):void

@@ -10,6 +10,6 @@ package com.cenix.louice.shared.model.vos
             super(title, selfLink);
             this.iso_type = 'LAB';
         }
-
+		
     }
 }

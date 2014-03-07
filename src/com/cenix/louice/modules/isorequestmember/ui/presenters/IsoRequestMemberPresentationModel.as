@@ -157,7 +157,7 @@ package com.cenix.louice.modules.isorequestmember.ui.presenters
             this.owner = newOwner;
             var isoReqClone:LabIsoRequestMember = this._member.blank();
             isoReqClone.owner = this.owner;
-            submit(isoReqClone);
+            submit(isoReqClone, false, MemberEvent.EDIT_MODE_UPDATE);
         }
 
         public function generateNewIsos(numberOfIsos:int, 
@@ -177,7 +177,7 @@ package com.cenix.louice.modules.isorequestmember.ui.presenters
             LabIsoRequestMember(_member).isos = newIsos;
             var isoReqClone:LabIsoRequestMember = this._member.blank();
             isoReqClone.isos = newIsos;
-            submit(isoReqClone);
+            submit(isoReqClone, false, MemberEvent.EDIT_MODE_UPDATE);
         }
 
         public function updateStockRacks(isoOrIsoJob:*, barcode1:String, barcode2:String,

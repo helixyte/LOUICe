@@ -15,6 +15,7 @@ package com.cenix.louice.shared.model.vos
         public function LabIsoRequestMember(title:String=null, selfLink:String=null)
         {
             super(title, selfLink);
+			this.iso_type = 'LAB';
         }
 
         public function get process_job_first():* {

@@ -51,7 +51,8 @@
 
             protected function reopenTicket_clickHandler(event:MouseEvent):void
             {
-                model.changeOwner('reopen'); //Ugly but I see no other way to do this without a status.
+				// Reopening starts the workflow from the beginning.
+                model.changeOwner(IsoRequestMember.STOCKMANAGEMENT_USER);
             }
 
         ]]>
