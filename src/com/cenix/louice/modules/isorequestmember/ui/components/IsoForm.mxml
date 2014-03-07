@@ -98,9 +98,9 @@
                 isoRequest.reopenIso(_iso);
             }
             
-            protected function copy(withOptimization:Boolean):void
+            protected function copyIso(event:MouseEvent):void
             {
-                isoRequest.copyIso(_iso, withOptimization);
+                isoRequest.copyIso(_iso);
                 
             }
             
@@ -194,33 +194,9 @@
                   click="reopenIso(event)"/>
         <s:Button excludeFrom="canceled" label="Cancel"
                   click="cancelIso(event)"/>
-        <s:CalloutButton id="buttonCopy" label="Copy"
-                         horizontalPosition="start"
-                         verticalPosition="after">
-            <s:calloutContent>
-                <s:BorderContainer width="100%" height="100%"
-                                   borderWeight="2" cornerRadius="3">
-                    <s:borderStroke>
-                        <s:LinearGradientStroke rotation="270" weight="5">
-                            <s:GradientEntry color="#efefef"/>
-                            <s:GradientEntry color="#efefef"/>
-                        </s:LinearGradientStroke>
-                    </s:borderStroke>
-                    <s:backgroundFill>
-                        <s:LinearGradient rotation="90">
-                            <s:GradientEntry color="#FFFFFF"/>
-                            <s:GradientEntry color="#EFEFEF"/>
-                        </s:LinearGradient>
-                    </s:backgroundFill>
-                    <s:VGroup gap="0">
-                        <s:Button width="100%"
-                                  label="Without Optimization"
-                                  click="buttonCopy.closeDropDown();copy(false)"/>
-                        <s:Button width="100%" label="With Optimization"
-                                  click="buttonCopy.closeDropDown();copy(true)"/>
-                    </s:VGroup>
-                </s:BorderContainer>
-            </s:calloutContent>
-        </s:CalloutButton>
+		<!--
+		FIXME: Disabled until we figure out what to do on the server side here (.
+        <s:Button label="Copy" click="copyIso(event)"/>
+		-->
     </s:HGroup>    
 </s:Form>

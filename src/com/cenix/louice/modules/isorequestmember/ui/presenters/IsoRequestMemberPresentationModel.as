@@ -285,10 +285,9 @@ package com.cenix.louice.modules.isorequestmember.ui.presenters
             submitIsoChange(iso, "REOPEN_ISO");
         }
 
-        public function copyIso(iso:LabIsoMember, withOptimization:Boolean):void
+        public function copyIso(iso:LabIsoMember):void
         {
-            submitIsoChange(iso, withOptimization ? 
-                "COPY_ISO_WITH_OPTIMIZATION" : "COPY_ISO_WITHOUT_OPTIMIZATION");
+            submitIsoChange(iso, "COPY_ISO");
         }
 
         private function submitIsoChange(iso:LabIsoMember, status:String):void
