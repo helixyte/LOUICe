@@ -12,7 +12,6 @@
                                  xmlns:validators1="org.everest.flex.ui.validators.*"
                                  width="1124" minWidth="1124" minHeight="780"
                                  close="{close()}"
-                                 creationComplete="creationCompleteHandler(event)"
                                  title="New Job">
 	<components:states>
 		<s:State name="normal"/>
@@ -36,7 +35,6 @@
 			import mx.collections.ArrayCollection;
 			import mx.core.FlexGlobals;
 			import mx.events.CollectionEvent;
-			import mx.events.FlexEvent;
 			import mx.managers.PopUpManager;
 			
 			import org.everest.flex.model.Link;
@@ -71,12 +69,6 @@
 				labelPatternComponent.showBusyIndicator();
 				this.currentState = model.experiment_metadata_type.id.toUpperCase() == ExperimentMetaDataTypes.ISO_LESS ? "isoless" : "normal";
                 isoPlates.addEventListener(CollectionEvent.COLLECTION_CHANGE, updateRacks);	
-			}
-			
-			protected function creationCompleteHandler(event:FlexEvent):void
-			{
-				plateTypeInput.dataProvider = new ArrayCollection(plateSpecs);
-				plateTypeInput.selectedIndex = 0;
 			}
 			
 			public function close():void {
@@ -114,6 +106,8 @@
             
 			private function updateRacks(event:Event=null):void
 			{
+				if (this.rackGrid == null)
+					return;
 				if(this.currentState == 'isoless')
 				{
 					updateIsoLessRacks(event);
@@ -126,9 +120,6 @@
 
 			private function updateIsoLessRacks(event:Event=null):void
 			{
-				if(plateTypeInput.selectedItem == null){
-					return;
-				}
                 experimentRacksCount = 0;
 				experimentRacks.removeAll();
 				this.experiments = new MembersCollection();
@@ -141,9 +132,6 @@
             
 			private function updateIsoRacks(event:Event=null):void
 			{
-				if(plateTypeInput.selectedItem == null){
-					return;
-				}				
                 experimentRacksCount = 0;
 				experimentRacks.removeAll();
 				this.experiments = new MembersCollection();
@@ -159,6 +147,7 @@
 					this.experiments.addItem(experiment);
                     experimentCount++;
 				}
+				
 				rackGrid.validateNow();
 				rackGrid.expandAll();
 			}
@@ -167,10 +156,6 @@
             {
                 // Create new experiment member.
                 experiment.experiment_metadata_type = this._experimentMetadataModel.experiment_metadata_type;
-                experiment.destination_rack_specs = new PlateSpecsMember();
-                experiment.destination_rack_specs.link = 
-                    new Link(plateTypeInput.selectedItem.label, 
-                        plateTypeInput.selectedItem.value);
                 experiment.experiment_design = new ExperimentDesignMember();
                 experiment.experiment_design.link = 
                     new Link("Design", 
@@ -183,24 +168,46 @@
                     for (var i:int = 1; i <= int(inputReplicates.text); i++)
                     {
                         experimentRacksCount++;
+						// Create the (virtual) experiment rack.
                         var experimentRack:ExperimentRackMember = new ExperimentRackMember();
                         experimentRack.design_rack = new ExperimentDesignRackMember();
                         experimentRack.design_rack.link = 
                             new Link(designRack.label, 
-                                this._experimentMetadataModel.selfLink + "/experiment-design-racks/" + designRack.id);
+	                                 this._experimentMetadataModel.selfLink + 
+									 				"/experiment-design-racks/" + designRack.id);
                         experimentRack.title = experimentDesignRacksComponent.generateLabel(
                             designRack,
                             i,
                             prefix,
                             labelPatternComponent.pattern);
+						// Create and populate the (physical) cell plate.
                         var plate:PlateMember = new PlateMember();
                         plate.label = experimentRack.title;
                         plate.creation_date = new Date();
-                        plate.specs = experiment.destination_rack_specs;
-                        plate.status = new ItemStatusMember();
-                        plate.status.link = 
-                            new Link("future",
-                                     _application.appUrl + "/item-statuses/future/"); //TODO not sure about the status to set here
+						plate.status = new ItemStatusMember();
+						plate.status.link = 
+							new Link("future",
+								_application.appUrl + "/item-statuses/future/");
+						// Determine the plate specs from the design rack shape.
+						// FIXME: Perhaps this should be made configurable somewhere.
+						var plateSpecsUrl:String = _application.appUrl + "/plate-specs/";
+						var plateSpecsName:String = '';
+						switch (designRack.rack_shape.name) {
+							case "8x12":
+								plateSpecsName += "std96";
+								break;
+							case "16x24":
+								plateSpecsName += "std384";
+								break;
+							case "32x48":
+								plateSpecsName += "std1536";
+								break;
+							default:
+								throw new Error("Invalid rack shape name: " + designRack.rack_shape.name);								
+						}
+						var plateSpecs:PlateSpecsMember = new PlateSpecsMember();
+						plateSpecs.link = new Link(plateSpecsName, plateSpecsUrl+plateSpecsName);
+                        plate.specs = plateSpecs;						
                         experimentRack.plate = plate;						
                         experimentRacks.addItem(experimentRack);
                         experiment.experiment_racks.addItem(experimentRack);									
@@ -247,7 +254,6 @@
 		<fx:Array id="validators">
 			<mx:StringValidator maxLength="256" minLength="3" property="text"
                                 source="{inputLabel}"/>
-			<validators:SelectionValidator source="{plateTypeInput}"/>
 		</fx:Array>
 		
 		<validators1:FormValidator id="formValidator" validators="{validators}"/>
@@ -282,12 +288,6 @@
 				
 				<s:FormItem width="100%" label="Replicates">
 					<s:Label id="inputReplicates"/>
-				</s:FormItem>
-				
-				<s:FormItem visible="true" width="100%" label="Plate Type"
-                            required="true">
-					<s:ComboBox id="plateTypeInput" width="220"
-                                change="updateRacks(event)"/>
 				</s:FormItem>
 			</s:Group>
 			<s:Group width="100%" height="100%">
