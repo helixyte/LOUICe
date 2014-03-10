@@ -35,7 +35,7 @@ package com.cenix.louice.shared.model.vos
         }
         
         public function set number_aliquots(number_aliquots:uint):void {
-            _expected_number_isos = number_aliquots;
+            _number_aliquots = number_aliquots;
         }
         
         public function get expected_number_isos():* {
