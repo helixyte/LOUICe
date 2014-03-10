@@ -19,9 +19,6 @@
             import spark.events.IndexChangeEvent;
             
             import org.everest.flex.events.MemberEvent;
-            
-            
-            
 
             [Bindable]
             public var isoRequest:IsoRequestMemberPresentationModel;
@@ -105,28 +102,26 @@
                                 override public function set data(value:Object):void
                                 {
                                     super.data = value;
-                                    var doJobFirst:Boolean = 
-                                        outerDocument.isoRequest.process_job_first;
+									// If we do not have a selection yet, we select the first enabled
+									// ISO or ISO job.
+									var doCheckSelection:Boolean = outerDocument.isoRequest.selectedIsoIndex == -1;
                                     if (data is IsoMember)
                                     {
                                         title = " - " + data.label;
-                                        enabled = (IsoMember(data).status == 'in_progress')
-                                                    || !doJobFirst 
-                                                    || (IsoMember(data).iso_job.number_stock_racks == 0);
+                                        enabled = (IsoMember(data).number_stock_racks > 0);
+										selected = doCheckSelection 
+													&& enabled
+													&& (IsoMember(data).status == 'in_progress'
+														|| IsoMember(data).status == 'done');
                                     } 
                                     else // IsoJobMember
                                     {
                                         title = data.label;
-                                        enabled = (IsoJobMember(data).status != 'done')
-                                                    && (doJobFirst 
-                                                        && IsoJobMember(data).number_stock_racks > 0);
-                                    }
-                                    // If we do not have a selection, pick the 
-                                    // first enabled ISO or ISO job.
-                                    if (enabled) {
-                                        if (outerDocument.isoRequest.selectedIsoIndex == -1) {
-                                            selected = true;                                            
-                                        }
+                                        enabled = (IsoJobMember(data).number_stock_racks > 0);
+										selected = doCheckSelection
+													&& enabled
+													&& (IsoJobMember(data).status == 'in_progress'
+														|| IsoJobMember(data).status == 'done');
                                     }
                                     if (data.status == 'cancelled')
                                     {
