@@ -6,7 +6,6 @@ package com.cenix.louice.shared.model.vos
         public var delivery_date:Date;
         public var requester:UserMember;
         public var experiment_metadata:ExperimentMetaDataMember = null;
-        public var experiment_metadata_type:ExperimentMetaDataTypeMember = null;
         public var rack_layout:RackLayoutMember;
         
         private var _process_job_first:int = -1;

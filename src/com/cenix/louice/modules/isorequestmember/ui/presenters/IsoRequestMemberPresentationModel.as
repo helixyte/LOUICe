@@ -419,19 +419,6 @@ package com.cenix.louice.modules.isorequestmember.ui.presenters
         }
 
         [Bindable(Event="memberChanged")]
-        public function get experiment_metadata_type():ExperimentMetaDataTypeMember
-        {
-            return LabIsoRequestMember(_member).experiment_metadata_type;
-        }
-
-        [Bindable(Event="memberChanged")]
-        public function set experiment_metadata_type(
-                new_experiment_metadata_type:ExperimentMetaDataTypeMember):void
-        {
-            LabIsoRequestMember(_member).experiment_metadata_type = new_experiment_metadata_type;
-        }
-
-        [Bindable(Event="memberChanged")]
         public function get experiment_metadata():ExperimentMetaDataMember
         {
             return LabIsoRequestMember(_member).experiment_metadata;

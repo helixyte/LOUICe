@@ -27,6 +27,7 @@ package
     import com.cenix.louice.shared.model.vos.JobMember;
     import com.cenix.louice.shared.model.vos.LabIsoMember;
     import com.cenix.louice.shared.model.vos.LabIsoRequestMember;
+    import com.cenix.louice.shared.model.vos.LibraryPlateMember;
     import com.cenix.louice.shared.model.vos.LocationMember;
     import com.cenix.louice.shared.model.vos.LocationTypeMember;
     import com.cenix.louice.shared.model.vos.MoleculeDesignMember;
@@ -158,6 +159,7 @@ package
             res.push( new SchemaModelEntry("job", "http://schemata.cenix-bioscience.com/job", "Job", JobMember, "/schemata/Job.xsd") );
             res.push( new SchemaModelEntry("lab_iso", "http://schemata.cenix-bioscience.com/iso", "LabIso", LabIsoMember) );
             res.push( new SchemaModelEntry("lab_iso_request", "http://schemata.cenix-bioscience.com/isorequest", "LabIsoRequest", LabIsoRequestMember) );
+			res.push( new SchemaModelEntry("library_plate", "http://schemata.cenix-bioscience.com/libraryplate", "LibraryPlate", LibraryPlateMember) );
             res.push( new SchemaModelEntry("location", "http://schemata.cenix-bioscience.com/location", "Location", LocationMember, "/schemata/Location.xsd" ) );
             res.push( new SchemaModelEntry("location_type", "http://schemata.cenix-bioscience.com/locationtype", "LocationType", LocationTypeMember, "/schemata/LocationType.xsd") );
             res.push( new SchemaModelEntry("molecule_design", "http://schemata.cenix-bioscience.com/moleculedesign", "MoleculeDesign", MoleculeDesignMember, "/schemata/MoleculeDesign.xsd") );

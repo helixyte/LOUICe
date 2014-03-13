@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <s:Form xmlns:fx="http://ns.adobe.com/mxml/2009"
-        xmlns:s="library://ns.adobe.com/flex/spark"
-        xmlns:mx="library://ns.adobe.com/flex/mx"
-        xmlns:rack="com.cenix.louice.shared.ui.components.rack.*"
-        xmlns:components="com.cenix.louice.shared.ui.components.*"
-        xmlns:components1="org.everest.flex.ui.components.*"
-        xmlns:components2="com.cenix.louice.modules.isorequestmember.ui.components.*">
+		xmlns:s="library://ns.adobe.com/flex/spark"
+		xmlns:mx="library://ns.adobe.com/flex/mx"
+		xmlns:rack="com.cenix.louice.shared.ui.components.rack.*"
+		xmlns:components="com.cenix.louice.shared.ui.components.*"
+		xmlns:components1="org.everest.flex.ui.components.*"
+		xmlns:components2="com.cenix.louice.modules.isorequestmember.ui.components.*">
     <s:layout>
         <s:VerticalLayout/>
     </s:layout>
@@ -111,41 +111,36 @@
     
     <!--CURRENTSTATUS -->
     <s:HGroup includeIn="completed" width="100%" paddingLeft="5" paddingTop="2"
-              verticalAlign="middle">
+			  verticalAlign="middle">
         <s:Label width="140" fontWeight="bold" text="Status" textAlign="right"/>
         <s:Label color="#00CC33" text="ISO has been marked as completed."/>
     </s:HGroup>
-    <s:HGroup includeIn="canceled" width="100%" paddingLeft="5" paddingTop="2"
-              verticalAlign="middle">
+    <s:HGroup includeIn="canceled" width="100%" paddingLeft="5" paddingTop="2" verticalAlign="middle">
         <s:Label width="140" fontWeight="bold" text="Status" textAlign="right"/>
         <s:Label color="#FF0000" text="ISO has been marked as canceled."/>
     </s:HGroup>
     
     <!-- ISO PROCESSING -->
-    <components2:IsoProcessingForm id="processingForm" width="100%" height="100%"
-                                   data="{_iso}" isoRequest="{isoRequest}"
-                                   isosView="{isosView}"
-                                   currentState="{this.currentState}"/>
+    <components2:IsoProcessingForm id="processingForm" enabled="{_iso.number_stock_racks &gt; 0}"
+								   width="100%" height="100%" currentState="{this.currentState}"
+								   data="{_iso}" isoRequest="{isoRequest}" isosView="{isosView}"/>
     
     <!-- ALIQUOT PLATES -->
-    <s:HGroup visible="{isoRequest.experiment_metadata_type.id.toUpperCase() != ExperimentMetaDataTypes.MANUAL}"
-              width="100%" contentBackgroundColor="#EBF4FF"
-              paddingLeft="5" paddingTop="2" verticalAlign="top">
-        <s:Label width="140" fontWeight="bold" paddingTop="5"
-                 text="Aliquot plate(s)" textAlign="right"/>
-        <s:HGroup visible="{_iso.aliquot_plates != null}" width="100%"
-                  verticalAlign="middle">
-            <s:DataGroup width="100%"
-                         dataProvider="{_iso.aliquot_plates}">
+    <s:HGroup visible="{isoRequest.experiment_metadata.experiment_metadata_type.id.toUpperCase() != ExperimentMetaDataTypes.MANUAL
+			            &amp;&amp; isoRequest.experiment_metadata.experiment_metadata_type.id.toUpperCase() != ExperimentMetaDataTypes.LIBRARY}"
+			  width="100%" contentBackgroundColor="#EBF4FF" paddingLeft="5" paddingTop="2"
+			  verticalAlign="top">
+        <s:Label width="140" fontWeight="bold" paddingTop="5" text="Aliquot plate(s)"
+				 textAlign="right"/>
+        <s:HGroup visible="{_iso.aliquot_plates != null}" width="100%" verticalAlign="middle">
+            <s:DataGroup width="100%" dataProvider="{_iso.aliquot_plates}">
                 <s:layout>
-                    <s:VerticalLayout paddingTop="5"
-                                      useVirtualLayout="true"/>
+                    <s:VerticalLayout paddingTop="5" useVirtualLayout="true"/>
                 </s:layout>
                 <s:itemRenderer>
                     <fx:Component>
-                        <s:ItemRenderer width="100%"
-                                        autoDrawBackground="false"
-                                        currentState="{outerDocument.currentState}">
+                        <s:ItemRenderer width="100%" autoDrawBackground="false"
+										currentState="{outerDocument.currentState}">
                             <fx:Script>
                                 <![CDATA[
                                     import com.cenix.louice.shared.model.vos.BarcodeType;
@@ -160,19 +155,17 @@
                                 <s:State name="unknown"/>
                             </s:states>
                             <s:VGroup width="100%">
-                                <s:HGroup width="100%"
-                                          verticalAlign="middle">
+                                <s:HGroup width="100%" verticalAlign="middle">
                                     <components:BarcodeButton label="{data.label}"
-                                                              barcode="{data.barcode}"
-                                                              type="{BarcodeType.UNIRACK}"/>
+															  barcode="{data.barcode}"
+															  type="{BarcodeType.UNIRACK}"/>
                                     <s:Label text="{data.status}"/>
                                     <s:Label color="{(data.specs.title.indexOf('deep') &gt; 0) ? 0xFF0000 : 0x000000}"
-                                             text="- {data.specs.title}"/>
+											 text="- {data.specs.title}"/>
                                     <s:Spacer width="100%"/>
-                                    <s:Button height="18"
-                                              label="show &gt;"
-                                              click="{outerDocument.isosView.quickLook(data.barcode)}"
-                                              enabled="{outerDocument.isoRequest.platesToLoad &lt; 1}"/>
+                                    <s:Button height="18" label="show &gt;"
+											  click="{outerDocument.isosView.quickLook(data.barcode)}"
+											  enabled="{outerDocument.isoRequest.platesToLoad &lt; 1}"/>
                                 </s:HGroup>
                             </s:VGroup>
                         </s:ItemRenderer>
@@ -182,18 +175,63 @@
         </s:HGroup>
     </s:HGroup>
     
-    <!-- CHANGE STATUS -->
-    <s:HGroup width="100%" contentBackgroundColor="#EBF4FF"
-              paddingLeft="5" paddingTop="10" verticalAlign="middle">
-        <s:Label width="140" fontWeight="bold" text="Change Status"
-                 textAlign="right"/>
-        <s:Button excludeFrom="completed,canceled" label="Complete"
-                  click="completeIso(event)"
-                  enabled="{(_iso.aliquot_plates.length &gt; 0) &amp;&amp; !_iso.aliquot_plates.getItemAt(0).isFuture() || !_iso.preparation_plates.getItemAt(0).isFuture()}"/>
-        <s:Button includeIn="completed" label="Reopen"
-                  click="reopenIso(event)"/>
-        <s:Button excludeFrom="canceled" label="Cancel"
-                  click="cancelIso(event)"/>
+	<!-- LIBRARY PLATES -->
+	<s:HGroup visible="{isoRequest.experiment_metadata.experiment_metadata_type.id.toUpperCase() == ExperimentMetaDataTypes.LIBRARY}"
+			  width="100%" contentBackgroundColor="#EBF4FF" paddingLeft="5" paddingTop="2"
+			  verticalAlign="top">
+		<s:Label width="140" fontWeight="bold" paddingTop="5" text="Library plate(s)"
+				 textAlign="right"/>
+		<s:HGroup visible="{_iso.library_plates != null}" width="100%" verticalAlign="middle">
+			<s:DataGroup width="100%" dataProvider="{_iso.library_plates}">
+				<s:layout>
+					<s:VerticalLayout paddingTop="5" useVirtualLayout="true"/>
+				</s:layout>
+				<s:itemRenderer>
+					<fx:Component>
+						<s:ItemRenderer width="100%" autoDrawBackground="false"
+										currentState="{outerDocument.currentState}">
+							<fx:Script>
+								<![CDATA[
+									import com.cenix.louice.shared.model.vos.BarcodeType;
+								]]>
+							</fx:Script>
+							<s:states>
+								<s:State name="xl20"/>
+								<s:State name="pipetting"/>
+								<s:State name="completed"/>
+								<s:State name="canceled"/>
+								<s:State name="reopened"/>
+								<s:State name="unknown"/>
+							</s:states>
+							<s:VGroup width="100%">
+								<s:HGroup width="100%" verticalAlign="middle">
+									<components:BarcodeButton label="{data.rack.label}"
+															  barcode="{data.rack.barcode}"
+															  type="{BarcodeType.UNIRACK}"/>
+									<s:Label text="{data.rack.status}"/>
+									<s:Label color="{(data.rack.specs.title.indexOf('deep') &gt; 0) ? 0xFF0000 : 0x000000}"
+											 text="- {data.rack.specs.title}"/>
+									<s:Spacer width="100%"/>
+									<s:Button height="18" label="show &gt;"
+											  click="{outerDocument.isosView.quickLook(data.rack.barcode)}"
+											  enabled="{outerDocument.isoRequest.platesToLoad &lt; 1}"/>
+								</s:HGroup>
+							</s:VGroup>
+						</s:ItemRenderer>
+					</fx:Component>
+				</s:itemRenderer>
+			</s:DataGroup>
+		</s:HGroup>
+	</s:HGroup>
+
+	<!-- CHANGE STATUS -->
+    <s:HGroup width="100%" contentBackgroundColor="#EBF4FF" paddingLeft="5" paddingTop="10"
+			  verticalAlign="middle">
+        <s:Label width="140" fontWeight="bold" text="Change Status" textAlign="right"/>
+        <s:Button excludeFrom="completed,canceled" label="Complete" click="completeIso(event)"
+				  enabled="{(_iso.aliquot_plates.length &gt; 0) &amp;&amp; !_iso.aliquot_plates.getItemAt(0).isFuture() || !_iso.preparation_plates.getItemAt(0).isFuture()}"/>
+        <s:Button includeIn="completed" label="Reopen" click="reopenIso(event)"/>
+        <s:Button excludeFrom="canceled" label="Cancel" click="cancelIso(event)"/>
 		<!--
 		FIXME: Disabled until we figure out what to do on the server side here (.
         <s:Button label="Copy" click="copyIso(event)"/>

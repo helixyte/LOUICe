@@ -20,7 +20,6 @@
             import com.cenix.louice.modules.isorequestmember.ui.views.IsosView;
             import com.cenix.louice.shared.model.vos.BarcodePrintJobMember;
             import com.cenix.louice.shared.model.vos.BarcodeType;
-            import com.cenix.louice.shared.model.vos.IsoJobMember;
             import com.cenix.louice.shared.model.vos.IsoMember;
             import com.cenix.louice.shared.model.vos.PlateMember;
             import com.cenix.louice.shared.model.vos.RackShapeMember;

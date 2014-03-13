@@ -105,21 +105,22 @@
 									// If we do not have a selection yet, we select the first enabled
 									// ISO or ISO job.
 									var doCheckSelection:Boolean = outerDocument.isoRequest.selectedIsoIndex == -1;
+									var hasStockRacks:Boolean;
                                     if (data is IsoMember)
                                     {
                                         title = " - " + data.label;
-                                        enabled = (IsoMember(data).number_stock_racks > 0);
+										hasStockRacks = (IsoMember(data).number_stock_racks > 0);
 										selected = doCheckSelection 
-													&& enabled
+													&& hasStockRacks
 													&& (IsoMember(data).status == 'in_progress'
 														|| IsoMember(data).status == 'done');
                                     } 
                                     else // IsoJobMember
                                     {
                                         title = data.label;
-                                        enabled = (IsoJobMember(data).number_stock_racks > 0);
+										hasStockRacks = (IsoJobMember(data).number_stock_racks > 0);
 										selected = doCheckSelection
-													&& enabled
+													&& hasStockRacks
 													&& (IsoJobMember(data).status == 'in_progress'
 														|| IsoJobMember(data).status == 'done');
                                     }
