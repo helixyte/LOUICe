@@ -21,7 +21,6 @@
             import com.cenix.louice.modules.isorequestmember.ui.presenters.IsoRequestMemberPresentationModel;
             import com.cenix.louice.modules.isorequestmember.ui.views.IsosView;
             import com.cenix.louice.shared.model.vos.IsoJobMember;
-            import com.cenix.louice.shared.model.vos.IsoMember;
             
             import org.everest.flex.interfaces.INavigationLink;
             
@@ -54,25 +53,11 @@
                         ((isoJobMember.stock_racks == null)
                             || (isoJobMember.stock_racks.length < 1))) {
                         setCurrentState("xl20");
-                    } else {
+                    } else if (isoJobMember.status == 'done'){
+						setCurrentState('completed');
+					} else {
                         setCurrentState("pipetting");
-                        for each (var isoOrIsoJob:* in isoRequest.isos)
-                        {
-                            if ((isoOrIsoJob is IsoMember)
-                                &&(isoOrIsoJob.iso_job.id == isoJobMember.id))
-                            {
-                                if( (isoOrIsoJob.preparation_plates != null)
-                                    && (isoOrIsoJob.preparation_plates.length > 0)
-                                    && (isoOrIsoJob.preparation_plates[0].status.toString().toUpperCase() == 'MANAGED' ))
-                                {
-                                    // The control stock transfer has already been done
-                                    // and we can disable the buttons:
-                                    setCurrentState('completed');
-                                    break;
-                                }
-                            }
-                        }
-                    }
+	                }
                     _isoJob = isoJobMember;
                     processingForm.data = _isoJob;
                     isosView.resetPreview();

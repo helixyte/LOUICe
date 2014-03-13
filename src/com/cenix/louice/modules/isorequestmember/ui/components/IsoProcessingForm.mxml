@@ -5,8 +5,7 @@
 		  xmlns:mx="library://ns.adobe.com/flex/mx"
 		  xmlns:components="com.cenix.louice.shared.ui.components.*"
 		  xmlns:components1="org.everest.flex.ui.components.*"
-		  xmlns:validators1="org.everest.flex.ui.validators.*"
-		  width="400" height="300">
+		  xmlns:validators1="org.everest.flex.ui.validators.*">
     <s:states>
         <s:State name="xl20"/>
         <s:State name="pipetting"/>
@@ -250,7 +249,7 @@
             </s:HGroup>
             <s:HGroup>
                 <s:Spacer width="140"/>
-                <components:Xl20UploadButton id="xl20Button" width="175"
+                <components:Xl20UploadButton id="xl20Button" excludeFrom="canceled" width="175"
 											 click="{xl20Button.addEventListener(Event.COMPLETE, onXl20OutputLoadComplete)}"
 											 enabled="false"
 											 enabled.pipetting="{isoRequest.platesToLoad &lt; 1}"/>                
