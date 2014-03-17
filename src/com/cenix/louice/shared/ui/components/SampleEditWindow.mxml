@@ -38,9 +38,14 @@
                 var vol:Number = UnitConvUtils.displayedVolumeToStored(Number(inputVolume.text));
                 for each (var mb:TubeMember in _tubes) 
                 {
-                    mb.sample_volume = vol;
+					// First, update local member.
+					mb.sample_volume = vol;
+					// Now, create clone for PATCH request.
+					var tubeClone:TubeMember = mb.blank();
+                    tubeClone.sample_volume = vol;
                     var ev:MemberEvent = new MemberEvent(MemberEvent.EDIT_MEMBER_IN_BACKGROUND);
-                    ev.member = mb;
+                    ev.member = tubeClone;
+					ev.editMode = MemberEvent.EDIT_MODE_UPDATE;
                     this.parent.dispatchEvent(ev);
                 }
                 this.close();
