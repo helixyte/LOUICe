@@ -7,6 +7,7 @@ package com.cenix.louice.shared.model.vos
     {
         public var lab_iso_request:LabIsoRequestMember;
 		public var library_plates:MembersCollection;
+		public var requested_library_plates:String;
 
         public function LabIsoMember(title:String=null, selfLink:String=null)
         {

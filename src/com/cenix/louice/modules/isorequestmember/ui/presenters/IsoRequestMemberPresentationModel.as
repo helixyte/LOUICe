@@ -1,7 +1,6 @@
 package com.cenix.louice.modules.isorequestmember.ui.presenters
 {
     import com.cenix.louice.shared.model.vos.ExperimentMetaDataMember;
-    import com.cenix.louice.shared.model.vos.ExperimentMetaDataTypeMember;
     import com.cenix.louice.shared.model.vos.IsoJobMember;
     import com.cenix.louice.shared.model.vos.IsoMember;
     import com.cenix.louice.shared.model.vos.IsoRequestMember;
@@ -162,7 +161,8 @@ package com.cenix.louice.modules.isorequestmember.ui.presenters
 
         public function generateNewIsos(numberOfIsos:int, 
                                         optimizer_excluded_racks:String, 
-                                        optimizer_required_racks:String):void
+                                        optimizer_requested_tubes:String,
+										requested_library_plates:String):void
         {
             var newIsos:MembersCollection = new MembersCollection();
             for (var i:int = 0; i < numberOfIsos; i++)
@@ -171,7 +171,8 @@ package com.cenix.louice.modules.isorequestmember.ui.presenters
                 iso.label = "new iso";
                 iso.status = "NEW";
                 iso.optimizer_excluded_racks = optimizer_excluded_racks;
-                iso.optimizer_required_racks = optimizer_required_racks;
+                iso.optimizer_requested_tubes = optimizer_requested_tubes;
+				iso.requested_library_plates = requested_library_plates;
                 newIsos.addItem(iso);
             }
             LabIsoRequestMember(_member).isos = newIsos;
@@ -210,7 +211,7 @@ package com.cenix.louice.modules.isorequestmember.ui.presenters
         
         public function getXl20WorklistUrl(
             isoOrIsoJob:*, barcode1:String, barcode2:String, barcode3:String, 
-            barcode4:String, excludedRacks:String, requiredTubes:String):String 
+            barcode4:String, excludedRacks:String, requestedTubes:String):String 
         {
             var numStockRacks:int = 0;
             var url:String = getSelfLink(isoOrIsoJob);
@@ -236,7 +237,7 @@ package com.cenix.louice.modules.isorequestmember.ui.presenters
                 url += "&rack4=" + barcode4;
             }
             url += "&optimizer_excluded_racks=" + cleanBarcodes(excludedRacks);
-            url += "&optimizer_required_racks=" + cleanBarcodes(requiredTubes);
+            url += "&optimizer_requested_tubes=" + cleanBarcodes(requestedTubes);
             if (_application.RELEASE_QUALIFIER != '')
                 url += "&include_dummy_output=true";
             return url;

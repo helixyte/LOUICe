@@ -59,7 +59,7 @@
             public function set model(value:EntryPresentationModel):void
             {
                 _model=value;
-                BindingUtils.bindProperty(this, "loadedTubeSpec", model, "member");
+                BindingUtils.bindProperty(this, "loadedTubeSpecs", model, "member");
             }
             
             public function set tubes(tubes:Vector.<Object>):void
@@ -91,7 +91,7 @@
                 return _tubes;
             }
             
-            public function set loadedTubeSpec(item:*):void
+            public function set loadedTubeSpecs(item:*):void
             {
                 if (currentState != "pendingResponse")
                 {

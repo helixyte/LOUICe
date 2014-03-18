@@ -18,7 +18,7 @@ package com.cenix.louice.shared.model.vos
         public var preparation_plates:MembersCollection;
         public var molecule_design_pool_set:MoleculeDesignPoolSetMember;
         public var optimizer_excluded_racks:String;
-        public var optimizer_required_racks:String;
+        public var optimizer_requested_tubes:String;
 
         private var _aliquot_plates:MembersCollection;
         private var _number_stock_racks:uint = 0;

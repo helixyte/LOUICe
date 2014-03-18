@@ -5,12 +5,12 @@
         xmlns:components="com.cenix.louice.shared.ui.components.*"
         xmlns:components1="org.everest.flex.ui.components.*"
         width="400" height="200"
-        currentState="{isoRequest.iso_type == ISO_TYPE_LAB ? 'lab' : 'library'}">
+        currentState="{isoRequest.iso_type == ISO_TYPE_LAB ? 'lab' : 'stocksamplecreation'}">
     <fx:Declarations>
     </fx:Declarations>
     <s:states>
         <s:State name="lab"/>
-        <s:State name="library"/>
+        <s:State name="stocksamplecreation"/>
     </s:states>    
     <fx:Script>
         <![CDATA[
