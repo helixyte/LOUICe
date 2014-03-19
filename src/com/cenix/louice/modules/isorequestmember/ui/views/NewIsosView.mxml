@@ -6,7 +6,7 @@
 			   xmlns:view="org.everest.flex.ui.views.*"
 			   xmlns:components="org.everest.flex.ui.components.*"
 			   xmlns:validators1="org.everest.flex.ui.validators.*"
-			   minWidth="400" close="{close()}" title="Generate New Internal Sample Orders">
+			   minWidth="500" close="{close()}" title="Generate New Internal Sample Orders">
 	<s:states>
 		<s:State name="lab"/>
 		<s:State name="library"/>
