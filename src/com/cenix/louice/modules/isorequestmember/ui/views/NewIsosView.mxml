@@ -28,8 +28,9 @@
             protected function createIsos(e:Event=null):void{
                 formValidator.validateForm();
                 if(formValidator.formIsValid){
+					var reqLibPlates:String = currentState == 'lab' ? '' : inputReqestedLibraryPlates.text;
                     _model.generateNewIsos(inputNumberOfIsos.value, inputExcludedRacks.text,  
-											inputRequestedTubes.text, inputReqestedLibraryPlates.text);
+											inputRequestedTubes.text, reqLibPlates);
                     //                    this.close();
                 }
             }
@@ -73,18 +74,19 @@
         </s:FormItem>
 
         <s:FormItem width="100%" label="Excluded Racks:">
-            <components:SmartTextArea id="inputExcludedRacks" prompt="rack barcode, one or csv list"
-									  restrict="0-9 ,"/>
+            <s:TextInput id="inputExcludedRacks" prompt="rack barcode, one or csv list"
+								  change="{formValidator.validateForm(event)}"/>
         </s:FormItem>
 
         <s:FormItem width="100%" label="Requested Tubes:">
-            <components:SmartTextArea id="inputRequestedTubes" prompt="tube barcode, one or csv list"
-									  restrict="0-9 ,"/>
+            <s:TextInput id="inputRequestedTubes" prompt="tube barcode, one or csv list"
+									  change="{formValidator.validateForm(event)}"/>
         </s:FormItem>
 
 		<s:FormItem excludeFrom="lab" width="100%" label="Requested Library Plates:">
-			<components:SmartTextArea id="inputReqestedLibraryPlates"
-									  prompt="library plate barcode, one or csv list" restrict="0-9 ,"/>
+			<s:TextInput id="inputReqestedLibraryPlates"
+								  change="{formValidator.validateForm(event)}"
+								  prompt="library plate barcode, one or csv list"/>
 		</s:FormItem>
 		
         <s:FormItem>
