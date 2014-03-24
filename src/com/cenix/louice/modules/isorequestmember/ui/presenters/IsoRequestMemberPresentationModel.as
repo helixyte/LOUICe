@@ -424,6 +424,12 @@ package com.cenix.louice.modules.isorequestmember.ui.presenters
         {
             return LabIsoRequestMember(_member).experiment_metadata;
         }
+		
+		[Bindable(Event="memberChanged")]
+		public function get experiment_metadata_link():Link
+		{
+			return new Link(experiment_metadata.label, _member.selfLink + 'experiment-metadata');
+		}
         
         [Bindable(Event="memberChanged")]
         public function get tagPredicates():ArrayCollection
