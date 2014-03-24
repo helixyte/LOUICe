@@ -28,8 +28,9 @@
             protected function createIsos(e:Event=null):void{
                 formValidator.validateForm();
                 if(formValidator.formIsValid){
+					var reqLibPlates:String = currentState == 'lab' ? '' : inputReqestedLibraryPlates.text;
                     _model.generateNewIsos(inputNumberOfIsos.value, inputExcludedRacks.text,  
-											inputRequestedTubes.text, inputReqestedLibraryPlates.text);
+											inputRequestedTubes.text, reqLibPlates);
                     //                    this.close();
                 }
             }
