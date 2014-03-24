@@ -14,10 +14,10 @@
     </s:states>    
     <fx:Script>
         <![CDATA[
-            import com.cenix.louice.modules.isorequestmember.ui.presenters.IsoRequestMemberPresentationModel;
-            
-            import spark.formatters.DateTimeFormatter;
-            
+			import com.cenix.louice.modules.isorequestmember.ui.presenters.IsoRequestMemberPresentationModel;
+			
+			import spark.formatters.DateTimeFormatter;
+			
             private static const ISO_TYPE_LAB:String = 'LAB';
 
             [Bindable]
@@ -64,7 +64,7 @@
             <s:FormLayout/>
         </s:layout>
         <s:FormItem includeIn="lab" label="Experiment Metadata:">
-            <components1:MemberLinkButton link="{isoRequest.experiment_metadata}"/>
+            <components1:MemberLinkButton link="{isoRequest.experiment_metadata_link}"/>
         </s:FormItem>
         <s:FormItem label="ISO Rack Shape:">
             <s:Label text="{isoRequest.rackShape}"/>

@@ -11,7 +11,7 @@
 				 xmlns:components1="org.everest.flex.ui.components.*"
 				 xmlns:components2="com.cenix.louice.modules.isorequestmember.ui.components.*"
 				 width="100%" height="100%"
-				 title="{model.iso_type == 'LAB' ? 'Internal Sample Order Request for: ' + model.experiment_metadata.title : 'Library Creation Internal Sample Order'}" >
+				 title="{model.iso_type == 'LAB' ? 'Internal Sample Order Request for: ' + model.experiment_metadata.label : 'Library Creation Internal Sample Order'}" >
     <fx:Script>
         <![CDATA[
 			import com.cenix.louice.shared.model.vos.IsoRequestMember;
