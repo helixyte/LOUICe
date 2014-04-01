@@ -42,9 +42,9 @@
                 if (isoMember != null)
                 {
                     // First, check if we need to create stock racks.
-                    if (isoMember.number_stock_racks > 0 && 
-                        ((isoMember.stock_racks == null) 
-                            || (isoMember.stock_racks.length < 1))) {
+                    if (isoMember.status != 'canceled' && isoMember.number_stock_racks > 0 && 
+                        ((isoMember.stock_racks == null) || (isoMember.stock_racks.length < 1))) 
+					{
                         setCurrentState("xl20");                                                                
                     } else {
                         switch (isoMember.status) {
