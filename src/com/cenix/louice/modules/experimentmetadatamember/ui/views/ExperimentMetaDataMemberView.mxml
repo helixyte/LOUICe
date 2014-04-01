@@ -182,8 +182,10 @@
 					ExperimentMetaDataMemberPresentationModel(model);
 				formValidator.validateForm(null);
 				if(formValidator.formIsValid){
-					// We pass the ISO request as a link since we make no changes here.
-					m.iso_request = new LabIsoRequestMember('ISO request', '/lab-iso-requests/' + m.iso_request.id);
+					if (m.iso_request != null) {
+						// We pass the ISO request as a link since we make no changes here.
+						m.iso_request = new LabIsoRequestMember('ISO request', '/lab-iso-requests/' + m.iso_request.id);						
+					}
 					if (m.experiment_metadata_type.id != _oldExperimentMetaDataTypeId ||
 						m.number_replicates != _oldNumberReplicates)
 					{
@@ -286,7 +288,7 @@
 					<s:TextInput id="inputName" width="200" change="{model.label = inputName.text;}"
 								 fontWeight="bold" styleName="editableLabel" text="{model.label}"/>
 				</s:FormItem>                
-				<s:FormItem width="100%" label="Name:">
+				<s:FormItem width="100%" label="Type:">
 					<components1:SuggestionDropDownListView id="metadataTypeInput" width="200"
 															change="metadataTypeInput_changeHandler(event)"
 															defaultChoice="false"
