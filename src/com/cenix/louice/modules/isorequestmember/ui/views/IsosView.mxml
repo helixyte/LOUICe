@@ -124,7 +124,7 @@
 													&& (IsoJobMember(data).status == 'in_progress'
 														|| IsoJobMember(data).status == 'done');
                                     }
-                                    if (data.status == 'cancelled')
+                                    if (data.status == 'canceled')
                                     {
                                         color = 0xFF0000;
                                     } 

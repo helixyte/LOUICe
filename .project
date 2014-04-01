@@ -47,5 +47,15 @@
 			<type>2</type>
 			<location>/Volumes/raven/Webapps/thelma/public/dev</location>
 		</link>
+		<link>
+			<name>bin-release3</name>
+			<type>2</type>
+			<location>/Volumes/buffalo/Webapps/thelma/public</location>
+		</link>
+		<link>
+			<name>bin-release4</name>
+			<type>2</type>
+			<location>/Volumes/raven/Webapps/thelma/public/demo</location>
+		</link>
 	</linkedResources>
 </projectDescription>
