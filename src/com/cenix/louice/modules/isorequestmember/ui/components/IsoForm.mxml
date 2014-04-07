@@ -126,8 +126,7 @@
 								   data="{_iso}" isoRequest="{isoRequest}" isosView="{isosView}"/>
     
     <!-- ALIQUOT PLATES -->
-    <s:HGroup visible="{isoRequest.experiment_metadata.experiment_metadata_type.id.toUpperCase() != ExperimentMetaDataTypes.MANUAL
-			            &amp;&amp; isoRequest.experiment_metadata.experiment_metadata_type.id.toUpperCase() != ExperimentMetaDataTypes.LIBRARY}"
+    <s:HGroup visible="{isoRequest.experiment_metadata.experiment_metadata_type.id.toUpperCase() != ExperimentMetaDataTypes.LIBRARY}"
 			  width="100%" contentBackgroundColor="#EBF4FF" paddingLeft="5" paddingTop="2"
 			  verticalAlign="top">
         <s:Label width="140" fontWeight="bold" paddingTop="5" text="Aliquot plate(s)"
