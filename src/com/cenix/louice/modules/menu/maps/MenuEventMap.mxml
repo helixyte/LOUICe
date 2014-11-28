@@ -48,7 +48,7 @@
                           url="/locations/"
                           title="Locations"
                           description="Manage locations where racks are held"
-                          imageUrl="/static/images/locations.png"
+                          imageUrl="assets/icons/menu/locations.png"
                           contentType="{ContentType.LOCATION_COLLECTION}"
                           />
 
@@ -56,70 +56,70 @@
                           url="/item-statuses/"
                           title="Item Statuses"
                           description="Manage item statuses"
-                          imageUrl="/static/images/item-statuses.png"
+                          imageUrl="assets/icons/menu/item-statuses.png"
                           contentType="{ContentType.ITEM_STATUS_COLLECTION}" />
 
             <vos:MenuItem uid="3"
                           url="/species/"
                           title="Species"
                           description="Manage species"
-                          imageUrl="/static/images/species.png"
+                          imageUrl="assets/icons/menu/species.png"
                           contentType="{ContentType.SPECIES_COLLECTION}" />
 
             <vos:MenuItem uid="4"
                           url="/rack-shapes/"
                           title="Rack Shapes"
                           description="Rack shapes"
-                          imageUrl="/static/images/rack-shapes.png"
+                          imageUrl="assets/icons/menu/rack-shapes.png"
                           contentType="{ContentType.RACK_SHAPE_COLLECTION}" />
 
             <vos:MenuItem uid="5"
                           url="/rack-specs/"
                           title="Rack Specs"
                           description="Manage rack specifications"
-                          imageUrl="/static/images/rack-specs.png"
+                          imageUrl="assets/icons/menu/rack-specs.png"
                           contentType="{ContentType.RACK_SPECS_COLLECTION}" />
 
             <vos:MenuItem uid="6"
                           url="/location-types/"
                           title="Location Types"
                           description="Manage location types"
-                          imageUrl="/static/images/location-types.png"
+                          imageUrl="assets/icons/menu/location-types.png"
                           contentType="{ContentType.LOCATION_TYPE_COLLECTION}" />
 
             <vos:MenuItem uid="7"
                           url="/device-types/"
                           title="Device Types"
                           description="Manage device types"
-                          imageUrl="/static/images/device-types.png"
+                          imageUrl="assets/icons/menu/device-types.png"
                           contentType="{ContentType.DEVICE_TYPE_COLLECTION}" />
 
             <vos:MenuItem uid="8"
                           url="/container-specs/"
                           title="Container Specs"
                           description="Manage container specifications"
-                          imageUrl="/static/images/container-specs.png"
+                          imageUrl="assets/icons/menu/container-specs.png"
                           contentType="{ContentType.CONTAINER_SPECS_COLLECTION}" />
 
             <vos:MenuItem uid="9"
                           url="/experiment-metadatas/"
                           title="Experiment Metadata"
                           description="Manage the experiment metadata"
-                          imageUrl="/static/images/experiment-metadatas.png"
+                          imageUrl="assets/icons/menu/experiment-metadatas.png"
                           contentType="{ContentType.EXPERIMENT_METADATA_COLLECTION}" />
 
        <!--     <vos:MenuItem uid="10"
                           url="/experiment-jobs/?q=job-type:equal-to:'http://thelma/job-types/rnai-experiment/'"
                           title="Experiment Jobs"
                           description="Manage experiment jobs"
-                          imageUrl="/static/images/jobs.png"
+                          imageUrl="assets/icons/menu/jobs.png"
                           contentType="{ContentType.EXPERIMENT_JOB_COLLECTION}" />
 -->
             <vos:MenuItem uid="11"
                           url="/molecule-types/"
                           title="Molecule Types"
                           description="Manage molecule types"
-                          imageUrl="/static/images/molecule-types.png"
+                          imageUrl="assets/icons/menu/molecule-types.png"
                           contentType="{ContentType.MOLECULE_TYPE_COLLECTION}" />
 
 
@@ -127,7 +127,7 @@
                           url="/genes/"
                           title="Genes"
                           description="Manage Genes"
-                          imageUrl="/static/images/genes.png"
+                          imageUrl="assets/icons/menu/genes.png"
                           prefetch="false"
                           contentType="{ContentType.GENE_COLLECTION}" />
 
@@ -135,7 +135,7 @@
                           url="/racks/"
                           title="Racks"
                           description="Manage tube racks and plates"
-                          imageUrl="/static/images/racks.png"
+                          imageUrl="assets/icons/menu/racks.png"
                           prefetch="false"
                           contentType="{ContentType.RACK_COLLECTION}" />
 
@@ -144,14 +144,14 @@
                           url="/projects/"
                           title="Projects"
                           description="Manage Projects"
-                          imageUrl="/static/images/projects.png"
+                          imageUrl="assets/icons/menu/projects.png"
                           contentType="{ContentType.PROJECT_COLLECTION}" />
 
             <vos:MenuItem uid="15"
                           url="/organizations/"
                           title="Organizations"
                           description="Manage Organizations"
-                          imageUrl="/static/images/organizations.png"
+                          imageUrl="assets/icons/menu/organizations.png"
                           contentType="{ContentType.ORGANIZATION_COLLECTION}" />
 
 
@@ -159,7 +159,7 @@
                           url="/stock-info/"
                           title="Stock Info"
                           description="Stock related information"
-                          imageUrl="/static/images/stock-info.png"
+                          imageUrl="assets/icons/menu/stock-info.png"
                           prefetch="false"
                           contentType="{ContentType.STOCK_INFO_COLLECTION}" />
 
@@ -168,14 +168,14 @@
                           url="/devices/"
                           title="Devices"
                           description="Manage devices"
-                          imageUrl="/static/images/devices.png"
+                          imageUrl="assets/icons/menu/devices.png"
                           contentType="{ContentType.DEVICE_COLLECTION}" />
 
 <!--            <vos:MenuItem uid="18"
                           url="/molecule-designs/"
                           title="Molecule Designs"
                           description="Manage molecule designs"
-                          imageUrl="/static/images/molecule-designs.png"
+                          imageUrl="assets/icons/menu/molecule-designs.png"
                           prefetch="false"
                           contentType="{ContentType.MOLECULE_DESIGN_COLLECTION}" />
 -->
@@ -183,7 +183,7 @@
 						  url="/molecule-design-pools/"
 						  title="Molecule Design Pools"
 						  description="Manage molecule design pools"
-						  imageUrl="/static/images/molecule-designs.png"
+						  imageUrl="assets/icons/menu/molecule-designs.png"
 						  prefetch="false"
 						  contentType="{ContentType.MOLECULE_DESIGN_POOL_COLLECTION}" />
 			
@@ -191,7 +191,7 @@
                           url="/tubes/"
                           title="Tubes"
                           description="Manage 2D barcoded tubes"
-                          imageUrl="/static/images/tubes.png"
+                          imageUrl="assets/icons/menu/tubes.png"
                           prefetch="false"
                           contentType="{ContentType.TUBE_COLLECTION}" />
 
@@ -199,7 +199,7 @@
                           url="{'/lab-iso-requests/?q=owner:contains:' + getIsoOwnerFilter()}"
                           title="ISO Requests"
                           description="Manage ISO Requests"
-                          imageUrl="/static/images/iso-requests.png"
+                          imageUrl="assets/icons/menu/iso-requests.png"
                           prefetch="true"
                           contentType="{ContentType.ISO_REQUEST_COLLECTION}" />
 
@@ -207,7 +207,7 @@
                           url="/barcodes/"
                           title="Label Print"
                           description="Print barcode and text labels"
-                          imageUrl="/static/images/barcodes.png"
+                          imageUrl="assets/icons/menu/barcodes.png"
                           prefetch="false"
                           contentType="{ContentType.BARCODE_PRINT_JOB_COLLECTION}" />
         </fx:Array>
