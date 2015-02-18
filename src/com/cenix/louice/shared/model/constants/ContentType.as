@@ -65,7 +65,8 @@ package com.cenix.louice.shared.model.constants
         public static const PROJECT_COLLECTION:String = "application/vnd.everest+xml;type=ProjectCollection";
         public static const PROJECT_MEMBER:String =  "application/vnd.everest+xml;type=ProjectMember";
         
-        public static const RACK_COLLECTION:String = "application/vnd.everest+xml;type=RackCollection";
+        public static const TUBERACK_COLLECTION:String = "application/vnd.everest+xml;type=TubeRackCollection";
+		public static const PLATE_COLLECTION:String = "application/vnd.everest+xml;type=PlateCollection";
 
         public static const RACK_SHAPE_COLLECTION:String = "application/vnd.everest+xml;type=RackShapeCollection";
         public static const RACK_SHAPE_MEMBER:String =  "application/vnd.everest+xml;type=RackShapeMember";

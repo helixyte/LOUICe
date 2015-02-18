@@ -10,24 +10,27 @@
                       height="100%" showCsvButton="true" title="Racks">
     <fx:Script>
         <![CDATA[
-            import com.cenix.louice.shared.model.vos.BarcodePrintJobMember;
-            import com.cenix.louice.shared.model.vos.BarcodeType;
-            import com.cenix.louice.shared.model.vos.RackMember;
-            import org.everest.flex.ui.presenters.SuggestionDropDownListPresentationModel;
-            import com.cenix.louice.shared.ui.view.BarcodePrintPreView;
+			import com.cenix.louice.shared.model.vos.BarcodePrintJobMember;
+			import com.cenix.louice.shared.model.vos.BarcodeType;
+			import com.cenix.louice.shared.model.vos.PlateMember;
+			import com.cenix.louice.shared.ui.view.BarcodePrintPreView;
+			
+			import org.everest.flex.ui.presenters.SuggestionDropDownListPresentationModel;
+			import org.everest.flex.ui.views.CollectionView;
+            
 
             protected function printBarcodes(event:Event):void
             {
                 var members:Vector.<Object> = model.selectedMembers;
                 var barcodePrintJob:BarcodePrintJobMember = new BarcodePrintJobMember();
-                for each (var loc:RackMember in members)
+                for each (var loc:PlateMember in members)
                 {
                     barcodePrintJob.addBarcodeLabelPair(loc.barcode, loc.label);
                     barcodePrintJob.type = BarcodeType.UNIRACK;
                 }
-
                 BarcodePrintPreView.show(this, barcodePrintJob);
             }
+			
         ]]>
     </fx:Script>
 
@@ -70,32 +73,7 @@
                                                         criteria="{model.criteria}"
                                                         name="specs"
                                                         operator="equal-to"
-                                                        url="/rack-specs"/>
-            </s:HGroup>
-        </s:FormItem>
-        <s:FormItem label="Total Containers">
-            <s:HGroup verticalAlign="middle">
-
-                <s:Label text="less than"/>
-                <components1:NumberInput width="64" criteria="{model.criteria}"
-                                         name="total-containers"
-                                         operator="less-than"/>
-                <s:Label text="less than or equal to"/>
-                <components1:NumberInput width="64" criteria="{model.criteria}"
-                                         name="total-containers"
-                                         operator="less-than-or-equal-to"/>
-                <s:Label text="equal to"/>
-                <components1:NumberInput width="64" criteria="{model.criteria}"
-                                         name="total-containers"
-                                         operator="equal-to"/>
-                <s:Label text="greater than or equal to"/>
-                <components1:NumberInput width="64" criteria="{model.criteria}"
-                                         name="total-containers"
-                                         operator="greater-than-or-equal-to"/>
-                <s:Label text="greater than"/>
-                <components1:NumberInput width="64" criteria="{model.criteria}"
-                                         name="total-containers"
-                                         operator="greater-than"/>
+                                                        url="/plate-specs"/>
             </s:HGroup>
         </s:FormItem>
         <s:FormItem width="100%" label="Location Type">
@@ -128,8 +106,6 @@
         <s:GridColumn minWidth="136" dataField="creation_date"
                       headerText="Creation Date"
                       labelFunction="{CollectionView.dateTimeLabelFunction}"/>
-        <s:GridColumn minWidth="64" dataField="total_containers"
-                      headerText="Total Containers"/>
     </view:collectionGridColumns>
     <view:footerContent>
         <s:Button label="Print Barcodes" click="printBarcodes(event)"

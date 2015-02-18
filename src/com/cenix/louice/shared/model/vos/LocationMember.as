@@ -6,6 +6,7 @@ package com.cenix.louice.shared.model.vos
     {
         public var barcode:String;
         public var label:String;
+		public var name:String;
         public var type:String;
         public var device:DeviceMember;
         public var rack:RackMember;

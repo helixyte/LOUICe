@@ -122,7 +122,6 @@
                           imageUrl="assets/icons/menu/molecule-types.png"
                           contentType="{ContentType.MOLECULE_TYPE_COLLECTION}" />
 
-
             <vos:MenuItem uid="12"
                           url="/genes/"
                           title="Genes"
@@ -132,22 +131,29 @@
                           contentType="{ContentType.GENE_COLLECTION}" />
 
             <vos:MenuItem uid="13"
-                          url="/racks/"
-                          title="Racks"
-                          description="Manage tube racks and plates"
-                          imageUrl="assets/icons/menu/racks.png"
+                          url="/tube-racks/"
+                          title="Tube Racks"
+                          description="Manage tube racks"
+                          imageUrl="assets/icons/menu/tuberacks.png"
                           prefetch="false"
-                          contentType="{ContentType.RACK_COLLECTION}" />
+                          contentType="{ContentType.TUBERACK_COLLECTION}" />
 
+			<vos:MenuItem uid="14"
+						  url="/plates/"
+						  title="Plates"
+						  description="Manage plates"
+						  imageUrl="assets/icons/menu/plates.png"
+						  prefetch="false"
+						  contentType="{ContentType.PLATE_COLLECTION}" />
 
-            <vos:MenuItem uid="14"
+			<vos:MenuItem uid="15"
                           url="/projects/"
                           title="Projects"
                           description="Manage Projects"
                           imageUrl="assets/icons/menu/projects.png"
                           contentType="{ContentType.PROJECT_COLLECTION}" />
 
-            <vos:MenuItem uid="15"
+            <vos:MenuItem uid="16"
                           url="/organizations/"
                           title="Organizations"
                           description="Manage Organizations"
@@ -155,7 +161,7 @@
                           contentType="{ContentType.ORGANIZATION_COLLECTION}" />
 
 
-            <vos:MenuItem uid="16"
+            <vos:MenuItem uid="17"
                           url="/stock-info/"
                           title="Stock Info"
                           description="Stock related information"
@@ -164,22 +170,14 @@
                           contentType="{ContentType.STOCK_INFO_COLLECTION}" />
 
 
-            <vos:MenuItem uid="17"
+            <vos:MenuItem uid="18"
                           url="/devices/"
                           title="Devices"
                           description="Manage devices"
                           imageUrl="assets/icons/menu/devices.png"
                           contentType="{ContentType.DEVICE_COLLECTION}" />
 
-<!--            <vos:MenuItem uid="18"
-                          url="/molecule-designs/"
-                          title="Molecule Designs"
-                          description="Manage molecule designs"
-                          imageUrl="assets/icons/menu/molecule-designs.png"
-                          prefetch="false"
-                          contentType="{ContentType.MOLECULE_DESIGN_COLLECTION}" />
--->
-			<vos:MenuItem uid="18"
+			<vos:MenuItem uid="19"
 						  url="/molecule-design-pools/"
 						  title="Molecule Design Pools"
 						  description="Manage molecule design pools"
@@ -187,7 +185,7 @@
 						  prefetch="false"
 						  contentType="{ContentType.MOLECULE_DESIGN_POOL_COLLECTION}" />
 			
-            <vos:MenuItem uid="19"
+            <vos:MenuItem uid="20"
                           url="/tubes/"
                           title="Tubes"
                           description="Manage 2D barcoded tubes"
@@ -195,7 +193,7 @@
                           prefetch="false"
                           contentType="{ContentType.TUBE_COLLECTION}" />
 
-            <vos:MenuItem uid="20"
+            <vos:MenuItem uid="21"
                           url="{'/lab-iso-requests/?q=owner:contains:' + getIsoOwnerFilter()}"
                           title="ISO Requests"
                           description="Manage ISO Requests"
@@ -203,7 +201,7 @@
                           prefetch="true"
                           contentType="{ContentType.ISO_REQUEST_COLLECTION}" />
 
-            <vos:MenuItem uid="21"
+            <vos:MenuItem uid="22"
                           url="/barcodes/"
                           title="Label Print"
                           description="Print barcode and text labels"

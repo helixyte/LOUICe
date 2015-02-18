@@ -78,6 +78,20 @@ rack|RackViewMember
     skin-class: ClassReference("skin.RackViewMemberSkin");
 }
 
+components|CheckInCheckOutWindow s|ToggleButton 
+{
+	chromeColor: red;
+}
+
+components|CheckInCheckOutWindow s|ToggleButton:upAndSelected,
+components|CheckInCheckOutWindow s|ToggleButton:overAndSelected,
+components|CheckInCheckOutWindow s|ToggleButton:downAndSelected,
+components|CheckInCheckOutWindow s|ToggleButton:disabledAndSelected 
+{
+	chromeColor: haloGreen;
+}
+
+
 views|CollectionView s|FormLayout
 {
     gap: -15;
