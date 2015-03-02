@@ -137,7 +137,10 @@
 					var rackMb:TubeRackMember = new TubeRackMember();
 					var locMb:LocationMember = null;
 					rackMb.barcode = rackBc;
-					rackMb.selfLink = FlexGlobals.topLevelApplication.appUrl + '/racks/' + rackBc;
+					rackMb.selfLink = FlexGlobals.topLevelApplication.appUrl 
+						              + '/racks/' 
+									  + rackBc 
+									  + '/?refs=containers:INLINE~containers.sample:INLINE';
 					if (_editState == 'checkin')
 					{
 						locMb = _locationMap[inputLocationBarcode.text];
@@ -150,7 +153,10 @@
 					} else {
 						var mbDeleteEv:MemberEvent = new MemberEvent(MemberEvent.DELETE_MEMBER_IN_BACKGROUND)
 						locMb = new LocationMember();
-						locMb.selfLink = FlexGlobals.topLevelApplication.appUrl + '/racks/' + rackBc + '/location';
+						locMb.selfLink = FlexGlobals.topLevelApplication.appUrl 
+							             + '/racks/' 
+										 + rackBc 
+										 + '/location?refs=containers:OFF';
 						mbDeleteEv.member = locMb;
 						this.parent.dispatchEvent(mbDeleteEv);						
 					}
