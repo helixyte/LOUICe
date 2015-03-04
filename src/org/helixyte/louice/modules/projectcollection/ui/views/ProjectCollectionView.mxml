@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="utf-8"?>
+<views:CollectionView xmlns:fx="http://ns.adobe.com/mxml/2009"
+                     xmlns:s="library://ns.adobe.com/flex/spark"
+                     xmlns:mx="library://ns.adobe.com/flex/mx"
+                     xmlns:louice="org.helixyte.louice.*"
+                    xmlns:view="org.everest.flex.ui.views.*"
+                     
+                     newMemberView="{NewProjectView}"
+                     width="100%" height="100%"
+                     title="Projects" xmlns:maps1="org.everest.flex.maps.*" xmlns:components1="org.everest.flex.ui.components.*" xmlns:views="org.everest.flex.ui.views.*">
+    <fx:Script>
+        <![CDATA[
+            import org.helixyte.louice.modules.projectcollection.ui.presenter.ProjectCollectionPresentationModel;
+            import org.everest.flex.ui.presenters.SuggestionDropDownListPresentationModel;
+
+            import mx.collections.ArrayCollection;
+
+
+            protected function showInactive_changeHandler(event:Event):void
+            {
+                (model as ProjectCollectionPresentationModel).hideInactive = !showInactive.selected;
+                (resultGrid.dataProvider as ArrayCollection).refresh();
+            }
+
+        ]]>
+    </fx:Script>
+
+    <fx:Declarations>
+        <maps1:SuggestionEventMap dispatcher="{leaderInput}"
+                                 presenter="{SuggestionDropDownListPresentationModel}"
+                                 view="{SuggestionDropDownListView}"/>
+        <maps1:SuggestionEventMap dispatcher="{customerInput}"
+                                 presenter="{SuggestionDropDownListPresentationModel}"
+                                 view="{SuggestionDropDownListView}"/>
+    </fx:Declarations>
+
+    <view:filterFormContent>
+        <s:FormItem label="Customer">
+            <components1:SuggestionDropDownListView id="customerInput"
+                                                   url="/organizations/?size=500"
+                                                   name="customer" operator="equal-to"
+                                                   criteria="{model.criteria}" width="200"
+                                                   defaultChoice="true"/>
+        </s:FormItem>
+        <s:FormItem label="Project Leader">
+            <components1:SuggestionDropDownListView id="leaderInput" url="/users/?size=500"
+                                                   name="leader" operator="equal-to"
+                                                   criteria="{model.criteria}" width="200"
+                                                   defaultChoice="true"/>
+        </s:FormItem>
+    </view:filterFormContent>
+
+    <view:collectionGridColumns>
+        <s:GridColumn headerText="Name" dataField="label" >
+            <s:itemRenderer>
+                <fx:Component>
+                    <s:DefaultGridItemRenderer
+                        fontWeight="bold"/>
+                </fx:Component>
+            </s:itemRenderer>
+        </s:GridColumn>
+
+        <s:GridColumn headerText="Leader" dataField="leader"
+                                   itemRenderer="org.everest.flex.ui.renderers.DataGridLinkRenderer"/>
+
+        <s:GridColumn headerText="Customer" dataField="customer"
+                                   itemRenderer="org.everest.flex.ui.renderers.DataGridLinkRenderer"/>
+
+        <s:GridColumn headerText="Creation Date" minWidth="136" width="180"
+                                    dataField="creation_date"
+                                   labelFunction="{dateLabelFunction}">
+            <s:itemRenderer>
+                <fx:Component>
+                    <s:DefaultGridItemRenderer
+                        textAlign="right"/>
+                </fx:Component>
+            </s:itemRenderer>
+        </s:GridColumn>
+
+        <s:GridColumn headerText="Active" dataField="active" width="80" sortable="false">
+            <s:itemRenderer>
+                <fx:Component>
+                    <s:DefaultGridItemRenderer
+                        textAlign="center"/>
+                </fx:Component>
+            </s:itemRenderer>
+        </s:GridColumn>
+
+        <s:GridColumn headerText="SubPr." dataField="subprojectCount" width="90" sortable="false">
+            <s:itemRenderer>
+                <fx:Component>
+                    <s:DefaultGridItemRenderer
+                        textAlign="center"/>
+                </fx:Component>
+            </s:itemRenderer>
+        </s:GridColumn>
+    </view:collectionGridColumns>
+
+    <view:footerContent>
+        <mx:Spacer width="100%"/>
+        <s:CheckBox id="showInactive"
+                    selected="false"
+                    change="showInactive_changeHandler(event)"/>
+        <s:Label text="show inactive projects " fontWeight="bold"/>
+
+    </view:footerContent>
+
+</views:CollectionView>

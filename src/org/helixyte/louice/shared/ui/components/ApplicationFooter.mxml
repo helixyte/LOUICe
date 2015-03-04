@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Group xmlns:fx="http://ns.adobe.com/mxml/2009"
+         xmlns:s="library://ns.adobe.com/flex/spark"
+         xmlns:mx="library://ns.adobe.com/flex/mx"
+         xmlns:components="org.everest.flex.ui.components.*" height="23" minHeight="23" >
+
+    <fx:Script>
+        <![CDATA[
+            import mx.core.FlexGlobals;
+
+            private function getAppTitle():String
+            {
+                return "LOUICe Version: " + FlexGlobals.topLevelApplication.version;
+            }
+
+            protected function buttonTrac_clickHandler(event:MouseEvent):void
+            {
+
+                var description:String = encodeURIComponent("--" + getAppTitle());
+                navigateToURL( new URLRequest("http://trac/louice/newticket?component=LOUICe&description="
+                                              + description
+                                              +"&summary=LOUICe "));
+            }
+
+        ]]>
+    </fx:Script>
+    <s:Rect top="0"  right="0" left="0" bottom="0">
+        <s:fill>
+            <s:LinearGradient rotation="90">
+                <s:GradientEntry color="0xDFDFDF"/>
+                <s:GradientEntry color="0xE1E1E1"/>
+            </s:LinearGradient>
+        </s:fill>
+    </s:Rect>
+    <s:Line top="0"  right="0" left="0">
+        <s:stroke>
+            <s:SolidColorStroke color="#999999" weight="1" />
+        </s:stroke>
+    </s:Line>
+    <s:HGroup width="100%" height="23" verticalAlign="middle" right="5" left="5">
+        <s:Label text="{getAppTitle()}" color="#777777" paddingTop="2"/>
+       <!-- <s:Label text="{model.appRelease}" color="#999999" paddingTop="2"/> -->
+        <mx:Spacer width="100%"/>
+        <s:Label color="#777777" text="Report a bug:" paddingTop="2"/>
+        <components:ImageButton id="buttonTrac"
+                                click="buttonTrac_clickHandler(event)"
+                                source="@Embed(source='/assets/icons/trac.png')"
+                                toolTip="Report a bug or request a feature."
+                                />
+    </s:HGroup>
+
+</s:Group>

@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<views1:MemberView xmlns:fx="http://ns.adobe.com/mxml/2009"
+                 xmlns:s="library://ns.adobe.com/flex/spark"
+                 xmlns:mx="library://ns.adobe.com/flex/mx"
+                 xmlns:components="org.helixyte.louice.shared.ui.components.*"
+                 xmlns:louice="org.helixyte.louice.*"
+                xmlns:view="org.everest.flex.ui.views.*"
+                 width="100%" height="100%" xmlns:BarCode="BarCode.*"
+                 title="{'Location: ' + model.title}" xmlns:components1="org.everest.flex.ui.components.*" xmlns:views1="org.everest.flex.ui.views.*">
+    <fx:Script>
+        <![CDATA[
+            import org.helixyte.louice.shared.model.vos.BarcodeType;
+        ]]>
+    </fx:Script>
+
+    <view:content>
+        <s:Form width="100%">
+            <s:FormItem label="Barcode" width="100%">
+                <components:BarcodeButton
+                        barcode="{model.barcode}"
+                        label="{model.label}"
+                        showLink="false"
+                        type="{BarcodeType.LOCATION}"/>
+            </s:FormItem>
+            <s:FormItem label="Label" width="100%">
+                <s:Label text="{model.label}"/>
+            </s:FormItem>
+            <s:FormItem label="Type" width="100%">
+                <s:Label text="{model.type}"/>
+            </s:FormItem>
+            <s:FormItem label="Device" width="100%">
+                <components1:MemberLinkButton link="{model.device}" />
+            </s:FormItem>
+            <s:FormItem label="Device Index" width="100%">
+                <s:Label text="{model.index}"/>
+            </s:FormItem>
+            <s:FormItem label="Rack" width="100%">
+                <components1:MemberLinkButton link="{model.rack}" />
+            </s:FormItem>
+        </s:Form>
+    </view:content>
+
+</views1:MemberView>

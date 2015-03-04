@@ -1,0 +1,290 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:ItemRenderer xmlns:fx="http://ns.adobe.com/mxml/2009"
+                xmlns:s="library://ns.adobe.com/flex/spark"
+                xmlns:louice="org.helixyte.louice.*"
+                xmlns:mx="library://ns.adobe.com/flex/mx"
+                xmlns:components1="org.everest.flex.ui.components.*"
+                width="100%">
+
+    <fx:Script>
+        <![CDATA[
+            import org.helixyte.louice.modules.experimentjobmember.ui.presenter.ExperimentJobMemberPresentationModel;
+            import org.helixyte.louice.shared.model.vos.BarcodePrintJobMember;
+            import org.helixyte.louice.shared.model.vos.BarcodeType;
+            import org.helixyte.louice.shared.model.vos.ExperimentMember;
+            import org.helixyte.louice.shared.model.vos.ExperimentMetaDataTypes;
+            import org.helixyte.louice.shared.model.vos.ExperimentRackMember;
+            import org.helixyte.louice.shared.model.vos.ItemStatusMember;
+            import org.helixyte.louice.shared.ui.components.FileDownloadView;
+            import org.helixyte.louice.shared.ui.view.BarcodePrintPreView;
+            
+            import mx.controls.Alert;
+            
+            import org.everest.flex.model.Link;
+            import org.everest.flex.model.MembersCollection;
+            import org.everest.flex.ui.components.ConfirmationView;
+
+            [Bindable]
+            public var plateActionsEnabled:Boolean = false;
+
+            public override function set data(value:Object):void
+            {
+                super.data = value;
+                if (value != null)
+                {
+                    var experiment:ExperimentMember = ExperimentMember(value);
+                    if(experiment.experiment_metadata_type.id.toUpperCase() == ExperimentMetaDataTypes.MANUAL)
+                    {
+						plateActions.visible = true;
+						manualRadioBtn.selected = true;
+						manualRadioBtn.visible = false;
+						robotRadioBtn.visible = false;
+						getWorklistsBtn.visible = false;
+						updateDbBtn.visible = true;
+                    } else if (experiment.experiment_metadata_type.id.toUpperCase() == ExperimentMetaDataTypes.ISO_LESS)
+                    {
+                        plateActions.visible = true;
+                        manualRadioBtn.selected = true;
+                        manualRadioBtn.visible = false;
+                        robotRadioBtn.visible = false;
+                        getWorklistsBtn.visible = false;
+                        updateDbBtn.visible = false;
+                        executionLabel.visible = false;
+                    }
+                }
+            }
+
+
+            protected function downloadWorklist(event:MouseEvent):void
+            {
+                var eracks:MembersCollection = data.experiment_racks;
+                if (eracks && (eracks.length > 0))
+                {
+                    var erack:ExperimentRackMember = ExperimentRackMember(eracks.getItemAt(0));
+                    var url:String = erack.experiment.href + "worklists.zip?type=ROBOT";
+                    FileDownloadView.show(url,  filename);
+                }
+            }
+
+            private function get filename():String
+            {
+                var t:String = data.label;
+                name = t.indexOf(':') > 0 ? t.substr(t.indexOf(':')) : t;
+                name = name.replace(/ /g, '');
+
+                return 'exp_' + name + '.zip';
+
+            }
+
+            protected function printBarcodes(event:Event):void
+            {
+                var barcode:BarcodePrintJobMember = new BarcodePrintJobMember();
+                var eracks:MembersCollection = data.experiment_racks;
+                for each (var rack:ExperimentRackMember in eracks)
+                {
+                    barcode.addBarcodeLabelPair(rack.plate.barcode, rack.plate.label);
+                    barcode.type = BarcodeType.UNIRACK;
+                }
+
+
+                BarcodePrintPreView.show(this.parent.parent.parent, barcode);
+            }
+
+            protected function toggleCheckboxes(dataProvider:*, fieldName:String, select:Boolean=true):void
+            {
+                for each (var field:Object in dataProvider)
+                {
+                    if (field.hasOwnProperty(fieldName))
+                    {
+                        field[fieldName] = select;
+                    }
+                }
+            }
+
+            protected function updateDbBtn_clickHandler(event:MouseEvent):void
+            {
+                if ((manualRadioBtn.selected)||(robotRadioBtn.selected))
+                {
+                    var msg:String = 'Sample volumes for ISO and cell plates will be adjusted';
+                    if (data.experiment_metadata_type.id.toUpperCase() != ExperimentMetaDataTypes.MANUAL)
+                    {
+                        msg += ' and worklist download will be disabled';
+                    }
+                    ConfirmationView.show(msg + '.\n\nAre you sure to proceed?', 
+                                          'Update Database',
+                        function():void{
+                            var eracks:MembersCollection = data.experiment_racks;
+                            if (eracks && (eracks.length > 0))
+                            {
+                                for each (var erack:ExperimentRackMember in eracks)
+                                {
+//									var plate:PlateMember = new PlateMember();
+//									plate.label = experimentRack.title;
+//									plate.creation_date = new Date();
+//									plate.specs = experiment.destination_rack_specs;
+//									plate.status = new ItemStatusMember();
+//									plate.status.link = new Link("future","http://localhost:6543/item-statuses/future/"); //TODO not sure about the status to set here
+//									experimentRack.plate = plate;
+                                    if (manualRadioBtn.selected)
+                                    {
+                                        erack.plate.status = new ItemStatusMember();
+                                        erack.plate.status.link = new Link("manual_execution","http://localhost:6543/item-statuses/manual_execution/");
+                                    } else if (robotRadioBtn.selected) {
+                                        erack.plate.status = new ItemStatusMember();
+                                        erack.plate.status.link = new Link("robot_execution","http://localhost:6543/item-statuses/robot_execution/");
+                                    }
+                                }
+                                var doc:* = parentDocument;
+                                var model:ExperimentJobMemberPresentationModel = ExperimentJobMemberPresentationModel(doc.model);
+                                doc.submit(model);
+//                                plateActionsEnabled = false;
+                            }
+                        });
+                }
+            }
+
+        ]]>
+    </fx:Script>
+    <fx:Declarations>
+        <s:RadioButtonGroup id="group1"/>
+    </fx:Declarations>
+
+    <s:Rect left="0" right="0" top="0" bottom="0">
+        <s:fill>
+            <s:SolidColor color="#FFFFFF"/>
+        </s:fill>
+    </s:Rect>
+
+    <s:VGroup width="100%" gap="5" horizontalCenter="0" paddingBottom="8"
+              paddingLeft="8" paddingRight="8" paddingTop="8">
+        <s:Label id="title" fontSize="13" fontWeight="bold"
+                 text="Experiment {data.label}"/>
+        <s:Line width="100%">
+            <s:stroke>
+                <s:SolidColorStroke color="#EBF4FF" weight="3"/>
+            </s:stroke>
+        </s:Line>
+        <s:HGroup width="100%" gap="10" paddingLeft="5" paddingTop="5">
+            <s:Label width="200" fontWeight="bold"
+                     includeInLayout="{data.experiment_metadata_type.id.toUpperCase() != ExperimentMetaDataTypes.ISO_LESS}"
+                     text="{data.experiment_metadata_type.id.toUpperCase() == ExperimentMetaDataTypes.ISO_LESS ? '' : 'ISO Plate:'}"/>
+            <s:Label width="125" fontWeight="bold" text="Design Plates: "/>
+            <s:Label width="400" fontWeight="bold" text="Cell Plates:"/>
+            <s:Spacer width="100%"/>
+            <s:Label width="200" fontWeight="bold" text="Reaquire Images:"/>
+        </s:HGroup>
+        <s:Line width="100%">
+            <s:stroke>
+                <s:SolidColorStroke color="#EBF4FF" weight="1"/>
+            </s:stroke>
+        </s:Line>
+        <s:Scroller width="100%" maxHeight="350">
+            <s:HGroup width="100%" paddingLeft="5">
+                <components1:MemberLinkButton width="200"
+                                              includeInLayout="{data.experiment_metadata_type.id.toUpperCase() != ExperimentMetaDataTypes.ISO_LESS}"
+                                              link="{data.source_rack}"/>
+                <s:DataGroup id="designRackList" width="140"
+                             dataProvider="{data.experiment_racks}">
+                    <s:layout>
+                        <s:VerticalLayout paddingTop="5" useVirtualLayout="true"/>
+                    </s:layout>
+                    <s:itemRenderer>
+                        <fx:Component>
+                            <s:ItemRenderer width="100%"
+                                            autoDrawBackground="false">
+                                <components1:MemberLinkButton id="link" left="34"
+                                                              height="18"
+                                                              link="{data.design_rack}"/>
+
+                            </s:ItemRenderer>
+                        </fx:Component>
+                    </s:itemRenderer>
+                </s:DataGroup>
+                <s:DataGroup width="400" dataProvider="{data.experiment_racks}">
+                    <s:layout>
+                        <s:VerticalLayout paddingTop="5" useVirtualLayout="true"/>
+                    </s:layout>
+                    <s:itemRenderer>
+                        <fx:Component>
+                            <s:ItemRenderer height="18"
+                                            autoDrawBackground="false">
+                                <fx:Script>
+                                    <![CDATA[
+                                        import org.helixyte.louice.shared.model.vos.ItemStatusMember;
+                                        import org.helixyte.louice.shared.model.vos.PlateMember;
+
+                                        override public function set data(value:Object):void
+                                        {
+                                            super.data = value;
+                                            outerDocument.plateActionsEnabled = false;
+                                            var plate:PlateMember = data.plate;
+                                            var status:ItemStatusMember = plate.status;
+                                            if (status.title.toLowerCase() == 'future')
+                                            {
+                                                outerDocument.plateActionsEnabled = true;
+                                            }
+
+                                            plateLink.link = plate.generateNavigationLink();
+                                        }
+                                    ]]>
+                                </fx:Script>
+                                <components1:MemberLinkButton id="plateLink"/>
+                            </s:ItemRenderer>
+                        </fx:Component>
+                    </s:itemRenderer>
+                </s:DataGroup>
+                <s:Spacer width="100%"/>
+                <s:VGroup height="100%">
+                    <s:DataGroup dataProvider="{data.experiment_racks}">
+                        <s:layout>
+                            <s:VerticalLayout useVirtualLayout="true"/>
+                        </s:layout>
+                        <s:itemRenderer>
+                            <fx:Component>
+                                <s:ItemRenderer height="18"
+                                                autoDrawBackground="false">
+                                    <s:CheckBox click="{data.repeat=!data.repeat;}"
+                                                selected="{data.repeat}"/>
+                                    <!--<s:Label text="{data.plate.barcode} {data.plate.label}" />-->
+                                </s:ItemRenderer>
+                            </fx:Component>
+                        </s:itemRenderer>
+                    </s:DataGroup>
+                </s:VGroup>
+                <s:CheckBox id="cb3" label="all"
+                            click="toggleCheckboxes(data.experiment_racks, 'repeat', cb3.selected)"/>
+                <s:Button height="18" label="reaquire"
+                          click="{Alert.show('TODO')}"/>
+                <s:Spacer width="20"/>
+            </s:HGroup>
+        </s:Scroller>
+        <s:Line width="100%">
+            <s:stroke>
+                <s:SolidColorStroke color="#EBF4FF" weight="1"/>
+            </s:stroke>
+        </s:Line>
+        <s:HGroup width="100%" contentBackgroundColor="#EBF4FF" paddingLeft="5"
+                  paddingTop="2" verticalAlign="middle">
+            <s:Button height="18" label="Print barcodes"
+                      click="printBarcodes(event)"
+                      icon="@Embed(source='/assets/icons/barcode.png')"/>
+            <s:Spacer width="12"/>
+            <s:HGroup id="plateActions" enabled="{plateActionsEnabled}"
+                      verticalAlign="middle">
+                <s:Label id="executionLabel" fontWeight="bold" text="Execution :"/>
+                <s:RadioButton id="manualRadioBtn" label="Manual"
+                               groupName="group1"/>
+                <s:RadioButton id="robotRadioBtn" label="Robot"
+                               groupName="group1"/>
+                <s:Button id="getWorklistsBtn" height="18" label="Get worklists"
+                          click="downloadWorklist(event)"
+                          enabled="{group1.selection != null &amp;&amp; !manualRadioBtn.selected}"
+                          icon="@Embed(source='/assets/icons/download.png')"/>
+                <s:Button id="updateDbBtn" height="18" label="Update database"
+                          click="updateDbBtn_clickHandler(event)"
+                          enabled="{group1.selection != null}"/>
+            </s:HGroup>
+
+        </s:HGroup>
+    </s:VGroup>
+</s:ItemRenderer>

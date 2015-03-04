@@ -1,0 +1,165 @@
+<?xml version="1.0" encoding="utf-8"?>
+<views:CollectionView xmlns:fx="http://ns.adobe.com/mxml/2009"
+					  xmlns:s="library://ns.adobe.com/flex/spark"
+					  xmlns:mx="library://ns.adobe.com/flex/mx"
+					  xmlns:components="org.helixyte.louice.shared.ui.components.*"
+					  xmlns:view="org.everest.flex.ui.views.*"
+					  xmlns:maps1="org.everest.flex.maps.*"
+					  xmlns:components1="org.everest.flex.ui.components.*"
+					  xmlns:views="org.everest.flex.ui.views.*"
+					  width="100%" height="100%" showCsvButton="true">
+
+    <fx:Script>
+        <![CDATA[
+			import org.helixyte.louice.modules.view.AttributeLabelUtils;
+			import org.helixyte.louice.shared.model.vos.TubeMember;
+			import org.helixyte.louice.shared.ui.components.SampleEditWindow;
+			import org.helixyte.louice.shared.utils.UnitConvUtils;
+			
+			import mx.collections.ArrayCollection;
+			import mx.core.IFlexDisplayObject;
+			
+			import org.everest.flex.ui.presenters.SuggestionDropDownListPresentationModel;
+			import org.everest.flex.ui.renderers.DataGridLinkRenderer;
+
+            protected function editVolumes(event:Event):void
+            {
+                var p:IFlexDisplayObject = SampleEditWindow.show(this, model.selectedMembers);
+                p.addEventListener(Event.REMOVED_FROM_STAGE, handleRemoveSampleEditor);
+            }
+            
+			private function onLoadComplete(e:Event):void
+			{
+				model.createMemberFromData(e.target.data, 
+						                   'text/vnd.biomicrolab.xl20.output', 
+					                       '/tube-transfer-worklists',
+										   'application/atom+xml');
+			}
+
+			private function sampleMoleculeAttrLabelFunction(item:Object, column:*):String
+            {
+                return AttributeLabelUtils.sampleMoleculeAttributeList(TubeMember(item), column.dataField);
+            }
+            
+            private function handleRemoveSampleEditor(event:Event):void
+            {
+                // Refresh the display so that volume changes are shown. 
+                ArrayCollection(resultGrid.dataProvider).refresh();
+            }
+        ]]>
+    </fx:Script>
+
+    <fx:Declarations>
+        <maps1:SuggestionEventMap dispatcher="{tubeSpecsInput}"
+								  presenter="{SuggestionDropDownListPresentationModel}"
+								  view="{SuggestionDropDownListView}"/>
+        <maps1:SuggestionEventMap dispatcher="{tubeStatusInput}"
+								  presenter="{SuggestionDropDownListPresentationModel}"
+								  view="{SuggestionDropDownListView}"/>
+    </fx:Declarations>
+
+    <view:filterFormContent>
+        <s:FormItem width="100%" label="Tube Barcode">
+            <components1:SmartTextArea criteria="{model.criteria}" name="barcode"
+									   operator="contained" restrict="0-9 ,"/>
+        </s:FormItem>
+        <s:FormItem width="100%" label="Rack Barcode">
+            <components1:SmartTextArea criteria="{model.criteria}" name="rack.barcode"
+									   operator="equal-to" restrict="0-9 ,"/>
+        </s:FormItem>
+        <s:FormItem label="Tube Status">
+            <components1:SuggestionDropDownListView id="tubeStatusInput" width="128"
+													criteria="{model.criteria}" name="status"
+													operator="equal-to" url="/item-statuses"/>
+        </s:FormItem>
+        <s:FormItem label="Tube Specs">
+            <components1:SuggestionDropDownListView id="tubeSpecsInput" width="128"
+													criteria="{model.criteria}" name="specs"
+													operator="equal-to" url="/tube-specs"/>
+        </s:FormItem>
+        <s:FormItem label="Sample Molecule Concentration (μM)">
+            <components1:NumberInput id="concentrationInput" width="64"
+									 conversionFactor="{UnitConvUtils.CONCENTRATION_FACTOR}"
+									 criteria="{model.criteria}"
+									 name="sample-molecules.concentration" operator="equal-to"/>
+        </s:FormItem>
+        <s:FormItem label="Sample Volume (μl)">
+            <s:HGroup verticalAlign="middle">
+                <s:Label text="less than"/>
+                <components1:NumberInput width="64" conversionFactor="{UnitConvUtils.VOLUME_FACTOR}"
+										 criteria="{model.criteria}" name="sample-volume"
+										 operator="less-than"/>
+                <s:Label text="less than or equal to"/>
+                <components1:NumberInput width="64" conversionFactor="{UnitConvUtils.VOLUME_FACTOR}"
+										 criteria="{model.criteria}" name="sample-volume"
+										 operator="less-than-or-equal-to"/>
+                <s:Label text="equal to"/>
+                <components1:NumberInput width="64" conversionFactor="{UnitConvUtils.VOLUME_FACTOR}"
+										 criteria="{model.criteria}" name="sample-volume"
+										 operator="equal-to"/>
+                <s:Label text="greater than or equal to"/>
+                <components1:NumberInput width="64" conversionFactor="{UnitConvUtils.VOLUME_FACTOR}"
+										 criteria="{model.criteria}" name="sample-volume"
+										 operator="greater-than-or-equal-to"/>
+                <s:Label text="greater than"/>
+                <components1:NumberInput width="64" conversionFactor="{UnitConvUtils.VOLUME_FACTOR}"
+										 criteria="{model.criteria}" name="sample-volume"
+										 operator="greater-than"/>
+            </s:HGroup>
+        </s:FormItem>
+        <s:FormItem width="100%" label="Pool Design Id">
+            <components1:SmartTextArea criteria="{model.criteria}"
+									   name="sample-molecule-design-pool-id" operator="contained"
+									   restrict="0-9 ,"/>
+        </s:FormItem>
+        <s:FormItem width="100%" label="Old Design Id">
+            <components1:SmartTextArea criteria="{model.criteria}"
+									   name="sample-molecules.molecule-design-id"
+									   operator="contained" restrict="0-9 ,"/>
+        </s:FormItem>
+        <s:FormItem width="100%" label="Product Id">
+            <components1:SmartTextArea criteria="{model.criteria}" name="sample-product-id"
+									   operator="equal-to" restrict="a-zA-Z0-9 ,-_"/>
+        </s:FormItem>
+    </view:filterFormContent>
+
+    <view:collectionGridColumns>
+        <s:GridColumn minWidth="128" dataField="tube_rack" headerText="Rack Barcode"
+					  itemRenderer="org.everest.flex.ui.renderers.DataGridLinkRenderer"/>
+        <s:GridColumn minWidth="128" dataField="location" headerText="Rack Location"
+					  itemRenderer="org.everest.flex.ui.renderers.DataGridLinkRenderer"/>
+        <s:GridColumn minWidth="164" dataField="tube_rack_specs" headerText="Rack Specs"
+					  itemRenderer="org.everest.flex.ui.renderers.DataGridLinkRenderer"
+					  sortable="false"/>
+        <s:GridColumn width="76" dataField="position" headerText="Position"
+					  itemRenderer="org.everest.flex.ui.renderers.DataGridLinkRenderer"/>
+        <s:GridColumn minWidth="64" dataField="barcode" headerText="Tube Barcode"/>
+        <s:GridColumn minWidth="64" dataField="itemstatus" headerText="Status"
+					  itemRenderer="org.everest.flex.ui.renderers.DataGridLinkRenderer"/>
+        <s:GridColumn width="64" dataField="sample_volume" headerText="Vol. (µl)"
+					  labelFunction="{UnitConvUtils.dataGridVolumeLabelFunction}"/>
+        <s:GridColumn minWidth="128" dataField="tube_specs" headerText="Tube Specs"
+					  itemRenderer="org.everest.flex.ui.renderers.DataGridLinkRenderer"
+					  sortable="false"/>
+        <s:GridColumn minWidth="60" dataField="sample_supplier" headerText="Supplier"
+					  itemRenderer="org.everest.flex.ui.renderers.DataGridLinkRenderer"/>
+        <s:GridColumn minWidth="60" dataField="sample_product_id" headerText="Product ID"/>
+        <s:GridColumn minWidth="90" dataField="sample_molecule_design_pool_id"
+					  headerText="Pool Design ID" sortable="false"/>
+        <s:GridColumn width="90" dataField="molecule_design_id" headerText="Old Design ID"
+					  labelFunction="{sampleMoleculeAttrLabelFunction}" sortable="false"/>
+        <s:GridColumn minWidth="64" dataField="concentration" headerText="Conc. (µM)"
+					  labelFunction="{sampleMoleculeAttrLabelFunction}" sortable="false"/>
+        <s:GridColumn width="76" dataField="freeze_thaw_cycles" headerText="F/T Cycles"
+					  labelFunction="{sampleMoleculeAttrLabelFunction}" sortable="false"/>
+        <s:GridColumn minWidth="148" dataField="insert_date" headerText="Insert Date"
+					  labelFunction="{sampleMoleculeAttrLabelFunction}" sortable="false"/>
+    </view:collectionGridColumns>
+	<view:footerContent>
+		<s:Label fontWeight="bold" text="Move Tubes with XL20 Output File:" verticalAlign="middle"/>
+		<components:Xl20UploadButton id="xl20Button"
+									 click="{xl20Button.addEventListener(Event.COMPLETE, onLoadComplete)}"/>
+        <s:Button label="Edit sample volumes" click="editVolumes(event)"
+				  enabled="{resultGrid.selectedItem != null}"/>
+	</view:footerContent>
+</views:CollectionView>

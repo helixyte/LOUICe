@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="utf-8"?>
+<views:CollectionView xmlns:fx="http://ns.adobe.com/mxml/2009"
+					  xmlns:s="library://ns.adobe.com/flex/spark"
+					  xmlns:mx="library://ns.adobe.com/flex/mx"
+					  xmlns:components="org.helixyte.louice.shared.ui.components.*"
+					  xmlns:view="org.everest.flex.ui.views.*"
+					  xmlns:maps1="org.everest.flex.maps.*"
+					  xmlns:components1="org.everest.flex.ui.components.*"
+					  xmlns:views="org.everest.flex.ui.views.*"
+					  height="100%" showCsvButton="true" title="Racks">
+    <fx:Script>
+        <![CDATA[
+			import org.helixyte.louice.shared.model.vos.BarcodePrintJobMember;
+			import org.helixyte.louice.shared.model.vos.BarcodeType;
+			import org.helixyte.louice.shared.model.vos.RackMember;
+			import org.helixyte.louice.shared.ui.components.CheckInCheckOutWindow;
+			import org.helixyte.louice.shared.ui.view.BarcodePrintPreView;
+			
+			import org.everest.flex.ui.presenters.SuggestionDropDownListPresentationModel;
+			import org.everest.flex.ui.renderers.DataGridLinkRenderer;
+			import org.everest.flex.ui.views.CollectionView;
+            
+
+            protected function printBarcodes(event:Event):void
+            {
+                var members:Vector.<Object> = model.selectedMembers;
+                var barcodePrintJob:BarcodePrintJobMember = new BarcodePrintJobMember();
+                for each (var loc:RackMember in members)
+                {
+                    barcodePrintJob.addBarcodeLabelPair(loc.barcode, loc.label);
+                    barcodePrintJob.type = BarcodeType.UNIRACK;
+                }
+
+                BarcodePrintPreView.show(this, barcodePrintJob);
+            }
+			
+			protected function checkInCheckOut(event:Event):void
+			{
+				CheckInCheckOutWindow.show(this, this.model);
+			}
+        ]]>
+    </fx:Script>
+
+    <fx:Declarations>
+        <maps1:SuggestionEventMap dispatcher="{rackSpecsInput}"
+								  presenter="{SuggestionDropDownListPresentationModel}"
+								  view="{SuggestionDropDownListView}"/>
+        <maps1:SuggestionEventMap dispatcher="{rackStatusInput}"
+								  presenter="{SuggestionDropDownListPresentationModel}"
+								  view="{SuggestionDropDownListView}"/>
+        <maps1:SuggestionEventMap dispatcher="{locationTypeInput}"
+								  presenter="{SuggestionDropDownListPresentationModel}"
+								  view="{SuggestionDropDownListView}"/>
+    </fx:Declarations>
+
+    <view:filterFormContent>
+        <s:FormItem width="100%" label="Barcode">
+
+            <components1:SmartTextArea criteria="{model.criteria}" name="barcode"
+									   operator="contained" restrict="0-9 ,"/>
+
+        </s:FormItem>
+        <s:FormItem width="100%" label="Label">
+            <components1:SmartTextArea id="labelInput" criteria="{model.criteria}" name="label"
+									   operator="contains" restrict="a-zA-Z0-9 ,_\-"/>
+        </s:FormItem>
+        <s:FormItem label="Status">
+            <s:HGroup verticalAlign="middle">
+                <components1:SuggestionDropDownListView id="rackStatusInput" width="128"
+														criteria="{model.criteria}" name="status"
+														operator="equal-to" url="/item-statuses"/>
+                <s:Label text="Specs"/>
+                <components1:SuggestionDropDownListView id="rackSpecsInput" width="296"
+														criteria="{model.criteria}" name="specs"
+														operator="equal-to" url="/tube-rack-specs"/>
+            </s:HGroup>
+        </s:FormItem>
+        <s:FormItem label="Total Containers">
+            <s:HGroup verticalAlign="middle">
+
+                <s:Label text="less than"/>
+                <components1:NumberInput width="64" criteria="{model.criteria}"
+										 name="total-containers" operator="less-than"/>
+                <s:Label text="less than or equal to"/>
+                <components1:NumberInput width="64" criteria="{model.criteria}"
+										 name="total-containers" operator="less-than-or-equal-to"/>
+                <s:Label text="equal to"/>
+                <components1:NumberInput width="64" criteria="{model.criteria}"
+										 name="total-containers" operator="equal-to"/>
+                <s:Label text="greater than or equal to"/>
+                <components1:NumberInput width="64" criteria="{model.criteria}"
+										 name="total-containers" operator="greater-than-or-equal-to"/>
+                <s:Label text="greater than"/>
+                <components1:NumberInput width="64" criteria="{model.criteria}"
+										 name="total-containers" operator="greater-than"/>
+            </s:HGroup>
+        </s:FormItem>
+        <s:FormItem width="100%" label="Location Type">
+            <s:HGroup width="100%" verticalAlign="middle">
+                <components1:SuggestionDropDownListView id="locationTypeInput" width="128"
+														criteria="{model.criteria}"
+														name="location.type" operator="equal-to"
+														url="/location-types"/>
+                <s:Label text="Location Label"/>
+                <components1:SmartTextArea id="locationLabelInput" criteria="{model.criteria}"
+										   name="location.label" operator="contains"
+										   restrict="a-zA-Z0-9 ,_\-"/>
+            </s:HGroup>
+        </s:FormItem>
+    </view:filterFormContent>
+
+    <view:collectionGridColumns>
+        <s:GridColumn minWidth="64" dataField="barcode" headerText="Barcode"/>
+        <s:GridColumn minWidth="96" dataField="label" headerText="Label"/>
+        <s:GridColumn minWidth="148" dataField="specs" headerText="Specs"
+					  itemRenderer="org.everest.flex.ui.renderers.DataGridLinkRenderer"/>
+        <s:GridColumn minWidth="128" dataField="location" headerText="Location"
+					  itemRenderer="org.everest.flex.ui.renderers.DataGridLinkRenderer"/>
+        <s:GridColumn minWidth="64" dataField="status" headerText="Status"
+					  itemRenderer="org.everest.flex.ui.renderers.DataGridLinkRenderer"/>
+        <s:GridColumn minWidth="136" dataField="creation_date" headerText="Creation Date"
+					  labelFunction="{CollectionView.dateTimeLabelFunction}"/>
+        <s:GridColumn minWidth="64" dataField="total_containers" headerText="Total Containers"/>
+    </view:collectionGridColumns>
+    <view:footerContent>
+        <s:Button label="Print Barcodes" click="printBarcodes(event)"
+				  enabled="{resultGrid.selectedItem != null}"
+				  icon="@Embed(source='/assets/icons/barcode.png')"/>
+		<s:Button label="Check In/Check Out" click="checkInCheckOut(event)"/>
+    </view:footerContent>
+</views:CollectionView>

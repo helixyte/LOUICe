@@ -123,20 +123,35 @@ package flexUnitTests.query
 
         [Test]
         public function testOneCriterionQueryWithUrl():void{
+<<<<<<< HEAD
             var expr:String = 'species:equal-to:http://thelma/species/human';
             var result:Vector.<Criterion> = QueryParser.parse(expr).list();
             var crit:Criterion = result[0];
             Assert.assertEquals(crit.value[0], 'http://thelma/species/human');
+=======
+            var expr:String = 'species:equal-to:http://thelma.com/species/human';
+            var result:Vector.<Criterion> = QueryParser.parse(expr).list();
+            var crit:Criterion = result[0];
+            Assert.assertEquals(crit.value[0], 'http://thelma.com/species/human');
+>>>>>>> master
         }
 
         [Test]
         public function testMultipleCriterionQueryWithUrl():void{
 
+<<<<<<< HEAD
             var expr:String = 'species:equal-to:http://thelma/species/human,http://thelma/species/rat';
             var result:Vector.<Criterion> = QueryParser.parse(expr).list();
             var crit:Criterion = result[0];
             Assert.assertEquals(crit.value[0], 'http://thelma/species/human');
             Assert.assertEquals(crit.value[1], 'http://thelma/species/rat');
+=======
+            var expr:String = 'species:equal-to:http://thelma.com/species/human,http://thelma.com/species/rat';
+            var result:Vector.<Criterion> = QueryParser.parse(expr).list();
+            var crit:Criterion = result[0];
+            Assert.assertEquals(crit.value[0], 'http://thelma.com/species/human');
+            Assert.assertEquals(crit.value[1], 'http://thelma.com/species/rat');
+>>>>>>> master
         }
 
         [Test]

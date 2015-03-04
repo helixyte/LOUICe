@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="utf-8"?>
+<views:CollectionView xmlns:fx="http://ns.adobe.com/mxml/2009"
+                     xmlns:s="library://ns.adobe.com/flex/spark"
+                     xmlns:mx="library://ns.adobe.com/flex/mx"
+                     xmlns:louice="org.helixyte.louice.*"
+                    xmlns:view="org.everest.flex.ui.views.*"
+                     
+                     width="100%" height="100%" title="Locations" showCsvButton="true" xmlns:maps1="org.everest.flex.maps.*" xmlns:components1="org.everest.flex.ui.components.*" xmlns:views="org.everest.flex.ui.views.*">
+    <fx:Script>
+        <![CDATA[
+            import org.helixyte.louice.shared.model.vos.BarcodePrintJobMember;
+            import org.helixyte.louice.shared.model.vos.BarcodeType;
+            import org.helixyte.louice.shared.model.vos.LocationMember;
+            import org.everest.flex.ui.presenters.SuggestionDropDownListPresentationModel;
+            import org.helixyte.louice.shared.ui.view.BarcodePrintPreView;
+
+            protected function printBarcodes(event:Event):void
+            {
+                var members:Vector.<Object> = model.selectedMembers;
+                var barcodePrintJob:BarcodePrintJobMember = new BarcodePrintJobMember();
+                for each (var loc:LocationMember in members)
+                {
+                    barcodePrintJob.addBarcodeLabelPair(loc.barcode, loc.label);
+                    barcodePrintJob.type = BarcodeType.LOCATION;
+                }
+
+                BarcodePrintPreView.show(this, barcodePrintJob);
+            }
+        ]]>
+    </fx:Script>
+
+    <fx:Declarations>
+        <maps1:SuggestionEventMap dispatcher="{locationTypeInput}"
+                                 presenter="{SuggestionDropDownListPresentationModel}"
+                                 view="{SuggestionDropDownListView}"/>
+        <components1:QueryRadioGroup id="emptyState" criteria="{model.criteria}" name="empty"
+                                    operator="equal-to"/>
+    </fx:Declarations>
+
+    <view:filterFormContent>
+        <s:FormItem width="100%" label="Barcode">
+            <components1:SmartTextArea criteria="{model.criteria}" name="barcode" operator="equal-to"
+                                      restrict="0-9 ,"/>
+        </s:FormItem>
+        <s:FormItem width="100%" label="Label">
+            <components1:SmartTextArea criteria="{model.criteria}" name="label" operator="contains"
+                                      restrict="a-zA-Z0-9 ,_\-"/>
+        </s:FormItem>
+        <s:FormItem width="100%" label="Rack Barcode">
+            <components1:SmartTextArea criteria="{model.criteria}" name="rack.barcode" operator="equal-to"
+                                      restrict="0-9 ,"/>
+        </s:FormItem>
+        <s:FormItem label="Location Type">
+            <components1:SuggestionDropDownListView id="locationTypeInput" width="128"
+                                                   criteria="{model.criteria}" name="type"
+                                                   operator="equal-to" url="/location-types"/>
+        </s:FormItem>
+        <s:FormItem>
+            <s:HGroup>
+                <s:RadioButton label="All locations" groupName="emptyState" selected="true"
+                               value="{null}"/>
+                <s:RadioButton label="Empty" groupName="emptyState" value="true"/>
+                <s:RadioButton label="Occupied" groupName="emptyState" value="false"/>
+            </s:HGroup>
+        </s:FormItem>
+    </view:filterFormContent>
+    <view:collectionGridColumns>
+        <s:GridColumn dataField="barcode" headerText="Barcode"/>
+        <s:GridColumn dataField="label" headerText="Label"/>
+        <s:GridColumn dataField="type" headerText="Type"/>
+        <s:GridColumn dataField="device" headerText="Device"
+                                   itemRenderer="org.everest.flex.ui.renderers.DataGridLinkRenderer"/>
+        <s:GridColumn dataField="index" headerText="Device Index"/>
+        <s:GridColumn dataField="rack" headerText="Rack"
+                                   itemRenderer="org.everest.flex.ui.renderers.DataGridLinkRenderer"/>
+    </view:collectionGridColumns>
+    <view:footerContent>
+        <s:Button label="Print Barcodes"
+                  icon="@Embed(source='/assets/icons/barcode.png')"
+                  click="printBarcodes(event)"
+                  enabled="{resultGrid.selectedItem != null}" />
+    </view:footerContent>
+</views:CollectionView>

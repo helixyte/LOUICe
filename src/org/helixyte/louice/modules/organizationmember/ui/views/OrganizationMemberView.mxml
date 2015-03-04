@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<views1:MemberView xmlns:fx="http://ns.adobe.com/mxml/2009"
+                   xmlns:s="library://ns.adobe.com/flex/spark"
+                   xmlns:mx="library://ns.adobe.com/flex/mx"
+                   xmlns:louice="org.helixyte.louice.*"
+                   xmlns:view="org.everest.flex.ui.views.*"
+                   xmlns:views1="org.everest.flex.ui.views.*"
+                   width="100%" height="100%"
+                   title="{'Organization: ' + model.title}">
+
+    <fx:Declarations>
+        <fx:Array id="validators">
+            <mx:StringValidator maxLength="256" minLength="3" property="text"
+                                source="{inputName}"/>
+        </fx:Array>
+    </fx:Declarations>
+
+    <!-- NORMAL CONTENT -->
+    <view:content>
+        <s:Form width="100%" height="100%">
+            <s:FormItem label="Name">
+                <s:Label fontWeight="bold" text="{model.name}"/>
+            </s:FormItem>
+            <s:FormItem width="100%">
+                <s:VGroup width="100%" verticalAlign="top">
+                    <s:RichText width="100%" fontStyle="italic">
+                        <s:content>
+                            <s:p>Future versions of TheLMA &amp; LOUICe should display
+                                more information and links related to an organization
+                            like project/subproject info.</s:p>
+                        </s:content>
+                    </s:RichText>
+                </s:VGroup>
+            </s:FormItem>
+        </s:Form>
+    </view:content>
+
+    <!-- EDITOR CONTENT -->
+    <view:editorContent>
+        <s:Form width="100%" height="100%">
+            <s:FormItem label="Name">
+                <s:TextInput id="inputName"
+                             change="{model.name = inputName.text;}"
+                             text="{model.name}"/>
+            </s:FormItem>
+            <s:FormItem width="100%">
+                <s:VGroup width="100%" verticalAlign="top">
+                    <s:RichText width="100%" fontStyle="italic">
+                        <s:content>
+                            <s:p>Future versions of TheLMA &amp; LOUICe should display
+                                more information and links related to an organization
+                            like project/subproject info.</s:p>
+                        </s:content>
+                    </s:RichText>
+                </s:VGroup>
+            </s:FormItem>
+        </s:Form>
+    </view:editorContent>
+</views1:MemberView>
