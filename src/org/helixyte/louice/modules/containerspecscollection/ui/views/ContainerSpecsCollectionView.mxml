@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<views:CollectionView xmlns:fx="http://ns.adobe.com/mxml/2009"
+                     xmlns:s="library://ns.adobe.com/flex/spark"
+                     xmlns:mx="library://ns.adobe.com/flex/mx"
+                     xmlns:louice="org.helixyte.louice.*"
+                    xmlns:view="org.everest.flex.ui.views.*"
+                     title="Tube and Well Specs" xmlns:views="org.everest.flex.ui.views.*">
+    <fx:Script>
+        <![CDATA[
+            import org.helixyte.louice.shared.utils.UnitConvUtils;
+        ]]>
+    </fx:Script>
+
+    <view:collectionGridColumns>
+        <s:GridColumn dataField="label" headerText="Label" >
+            <s:itemRenderer>
+                <fx:Component>
+                    <s:DefaultGridItemRenderer
+                        fontWeight="bold"/>
+                </fx:Component>
+            </s:itemRenderer>
+        </s:GridColumn>
+        <s:GridColumn dataField="max_volume" headerText="Maximum Volume (µl)"
+                                   labelFunction="{UnitConvUtils.dataGridVolumeLabelFunction}"/>
+        <s:GridColumn dataField="dead_volume" headerText="Dead Volume (µl)"
+                                   labelFunction="{UnitConvUtils.dataGridVolumeLabelFunction}"/>
+        <s:GridColumn dataField="manufacturer" headerText="Manufacturer"
+                                   itemRenderer="org.everest.flex.ui.renderers.DataGridLinkRenderer"/>
+    </view:collectionGridColumns>
+
+</views:CollectionView>

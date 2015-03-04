@@ -1,0 +1,165 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Group xmlns:fx="http://ns.adobe.com/mxml/2009"
+         xmlns:s="library://ns.adobe.com/flex/spark"
+         xmlns:mx="library://ns.adobe.com/flex/mx"
+         xmlns:louice="org.helixyte.louice.*"
+         xmlns:BarCode="BarCode.*"
+         height="20" creationComplete="creationCompleteHandler(event)">
+
+    <fx:Script>
+        <![CDATA[
+            import BarCode.Code128B;
+
+            import org.helixyte.louice.shared.model.vos.BarcodePrintJobMember;
+            import org.helixyte.louice.shared.ui.view.BarcodePrintPreView;
+
+            import mx.events.FlexEvent;
+
+            import org.everest.flex.events.NavigationEvent;
+            import org.everest.flex.model.Link;
+
+            [Bindable]
+            private var _barcode:String;
+            [Bindable]
+            public var label:String;
+            [Bindable]
+            public var type:String;
+            [Bindable]
+            public var showLink:Boolean = true;
+
+            private var barcodeDisplay:Code128B;
+
+            protected function creationCompleteHandler(event:FlexEvent):void
+            {
+                contextMenu = createContextMenu();
+            }
+
+            protected function openNewWindow(event:Event):void
+            {
+                event.preventDefault();
+
+                var e:NavigationEvent = new NavigationEvent(NavigationEvent.NEW_WINDOW);
+                e.pageUrl = "/racks/" + _barcode;
+                dispatchEvent(e);
+            }
+
+            protected function createContextMenu():ContextMenu
+            {
+                var newWindow:ContextMenuItem = new ContextMenuItem("Open Rack in New Tab", false);
+                newWindow.addEventListener(ContextMenuEvent.MENU_ITEM_SELECT, openNewWindow);
+                newWindow.enabled = showLink;
+                var cm:ContextMenu = new ContextMenu();
+                cm.hideBuiltInItems();
+                cm.customItems = [newWindow];
+
+                return cm;
+            }
+
+            public function set barcode(bc:String):void
+            {
+                if (bc != null)
+                {
+                    this._barcode = bc;
+                    if (barcodeDisplay == null)
+                    {
+                        barcodeDisplay = new Code128B();
+                        barcodeDisplay.addLabel = false;
+                        barcodeDisplay.width = 220;
+                        barcodeDisplay.barCodeHeight = 53;
+                        barcodeContainer.addElement(barcodeDisplay);
+                    }
+                    barcodeDisplay.barCodeText = bc;
+                }
+
+            }
+
+            protected function hideBarcodeContainer(event:Event=null):void
+            {
+                barcodeLabel.closeDropDown();
+            }
+
+            protected function showBarcodeContainer(event:Event=null):void
+            {
+                barcodeLabel.openDropDown();
+            }
+
+            protected function copyBarcode(event:Event=null):void
+            {
+                hideBarcodeContainer();
+                System.setClipboard(_barcode);
+            }
+
+            protected function printBarcode(event:Event=null):void
+            {
+                hideBarcodeContainer();
+                var bc:BarcodePrintJobMember = new BarcodePrintJobMember();
+                bc.addBarcodeLabelPair(_barcode, label);
+                bc.type = type;
+                BarcodePrintPreView.show(this.parent, bc);
+            }
+
+            public function loadRack(event:Event=null):void
+            {
+                var rackLink:Link = new Link("a rack to load", "/racks/" + _barcode);
+                var iEvt:NavigationEvent = new NavigationEvent(NavigationEvent.LOAD_PAGE);
+                iEvt.pageUrl = rackLink.href;
+
+                dispatchEvent(iEvt);
+            }
+        ]]>
+    </fx:Script>
+
+    <s:CalloutButton id="barcodeLabel" top="3"
+                     label="{_barcode}"
+                     verticalPosition="after" calloutDestructionPolicy="never"
+                     horizontalPosition="start"
+                     skinClass="org.everest.flex.ui.skins.LinkButtonSkin">
+        <!-- layout the callout content here -->
+        <s:calloutLayout>
+            <s:VerticalLayout paddingTop="10" paddingBottom="10" paddingLeft="10" paddingRight="10" horizontalAlign="center" gap="5"/>
+        </s:calloutLayout>
+        <s:calloutContent>
+            <s:BorderContainer borderWeight="2"
+                               cornerRadius="3"
+                               height="100%"
+                               width="100%"
+                               rollOut="{hideBarcodeContainer()}"
+                               id="barcodeContainer">
+                <s:borderStroke>
+                    <s:LinearGradientStroke weight="2" rotation="270">
+                        <s:GradientEntry color="#efefef"/>
+                        <s:GradientEntry color="#efefef"/>
+                    </s:LinearGradientStroke>
+                </s:borderStroke>
+                <s:backgroundFill>
+                    <s:LinearGradient rotation="90">
+                        <s:GradientEntry color="#FFFFFF"/>
+                        <s:GradientEntry color="#EFEFEF"/>
+                    </s:LinearGradient>
+                </s:backgroundFill>
+                <s:layout>
+                    <s:HorizontalLayout paddingBottom="5"
+                                      paddingTop="5"
+                                      paddingRight="5"
+                                      paddingLeft="5"
+                                      horizontalAlign="left"
+                                      gap="0"/>
+                </s:layout>
+
+                <s:VGroup gap="0">
+                    <s:Button label="Copy"
+                              click="copyBarcode(event)"  height="18" alpha="0.8"/>
+                    <s:Button label="Print"
+                              id="printButton"
+                              click="printBarcode(event)"   height="18" alpha="0.8"/>
+                    <s:Button label="Show" visible="{showLink}"
+                              click="loadRack()"   height="18" alpha="0.8"/>
+                </s:VGroup>
+            </s:BorderContainer>
+        </s:calloutContent>
+    </s:CalloutButton>
+
+    <s:Image source="@Embed(source='/assets/icons/barcode.png')"
+             click="showBarcodeContainer(event)"
+             left="{barcodeLabel.width + 2}"/>
+</s:Group>

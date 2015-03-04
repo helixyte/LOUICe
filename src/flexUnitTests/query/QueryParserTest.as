@@ -123,20 +123,20 @@ package flexUnitTests.query
 
         [Test]
         public function testOneCriterionQueryWithUrl():void{
-            var expr:String = 'species:equal-to:http://thelma.cenix-bioscience.com/species/human';
+            var expr:String = 'species:equal-to:http://thelma.com/species/human';
             var result:Vector.<Criterion> = QueryParser.parse(expr).list();
             var crit:Criterion = result[0];
-            Assert.assertEquals(crit.value[0], 'http://thelma.cenix-bioscience.com/species/human');
+            Assert.assertEquals(crit.value[0], 'http://thelma.com/species/human');
         }
 
         [Test]
         public function testMultipleCriterionQueryWithUrl():void{
 
-            var expr:String = 'species:equal-to:http://thelma.cenix-bioscience.com/species/human,http://thelma.cenix-bioscience.com/species/rat';
+            var expr:String = 'species:equal-to:http://thelma.com/species/human,http://thelma.com/species/rat';
             var result:Vector.<Criterion> = QueryParser.parse(expr).list();
             var crit:Criterion = result[0];
-            Assert.assertEquals(crit.value[0], 'http://thelma.cenix-bioscience.com/species/human');
-            Assert.assertEquals(crit.value[1], 'http://thelma.cenix-bioscience.com/species/rat');
+            Assert.assertEquals(crit.value[0], 'http://thelma.com/species/human');
+            Assert.assertEquals(crit.value[1], 'http://thelma.com/species/rat');
         }
 
         [Test]

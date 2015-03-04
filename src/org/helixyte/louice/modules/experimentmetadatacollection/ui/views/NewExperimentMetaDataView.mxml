@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="utf-8"?>
+<views:NewMemberView xmlns:fx="http://ns.adobe.com/mxml/2009"
+                     xmlns:s="library://ns.adobe.com/flex/spark"
+                     xmlns:mx="library://ns.adobe.com/flex/mx"
+                     xmlns:louice="org.helixyte.louice.*"
+                     xmlns:view="org.everest.flex.ui.views.*"
+                     xmlns:validators="org.helixyte.louice.shared.ui.components.validators.*"
+                     xmlns:maps1="org.everest.flex.maps.*"
+                     xmlns:components1="org.everest.flex.ui.components.*"
+                     xmlns:views="org.everest.flex.ui.views.*"
+                     creationComplete="{focusManager.setFocus(inputLabel)}"
+                     title="New Experiment Metadata">
+    <fx:Script>
+        <![CDATA[
+            import org.helixyte.louice.shared.model.vos.ExperimentMetaDataMember;
+            import org.helixyte.louice.shared.model.vos.ExperimentMetaDataTypeMember;
+            import org.helixyte.louice.shared.model.vos.ExperimentMetaDataTypes;
+            import org.helixyte.louice.shared.model.vos.SubprojectMember;
+            
+            import org.everest.flex.model.Member;
+            import org.everest.flex.ui.presenters.SuggestionDropDownListPresentationModel;
+            
+            private var _needNumberReplicates:Boolean;
+
+            protected override function get member():Member
+            {
+                var member:ExperimentMetaDataMember = new ExperimentMetaDataMember();
+                member.label= inputLabel.text;
+                member.experiment_metadata_type = new ExperimentMetaDataTypeMember();
+                member.experiment_metadata_type.link = metadataTypeInput.selectedItemAsLink;
+                if (_needNumberReplicates)
+                {
+                    member.number_replicates = inputNumberOfReplicates.value;    
+                } else
+                {
+                    member.number_replicates = 1; // FIXME: This should not be set for ORDER-ONLY.
+                }
+                member.subproject = new SubprojectMember();
+                member.subproject.link = subprojectInput.selectedItemAsLink;
+                return member;
+            }
+            
+            protected function handle_typeChange(event:Event): void
+            {
+                formValidator.validateForm(event);
+                var expTypeId:String = ExperimentMetaDataTypes.ORDER_ONLY.toLowerCase();
+                _needNumberReplicates = metadataTypeInput.selectedItemAsLink.href.indexOf(expTypeId) == -1
+                inputNumberOfReplicates.enabled = _needNumberReplicates;
+                labelNumberOfReplicates.enabled = _needNumberReplicates;
+            }
+
+        ]]>
+    </fx:Script>
+
+    <fx:Declarations>
+
+        <fx:Array id="validators">
+            <mx:StringValidator maxLength="256" minLength="3" property="text"
+                                source="{inputLabel}"/>
+            <validators:SelectionValidator source="{subprojectInput}"/>
+        </fx:Array>
+
+        <maps1:SuggestionEventMap dispatcher="{metadataTypeInput}"
+                                  presenter="{SuggestionDropDownListPresentationModel}"
+                                  view="{SuggestionDropDownListView}"/>
+
+        <maps1:SuggestionEventMap dispatcher="{subprojectInput}"
+                                  presenter="{SuggestionDropDownListPresentationModel}"
+                                  view="{SuggestionDropDownListView}"/>
+    </fx:Declarations>
+
+
+    <s:Form id="newMemberForm" width="100%">
+
+        <s:FormItem width="100%" label="Label" required="true">
+            <s:TextInput id="inputLabel"
+                         change="this.formValidator.validateForm(event);"/>
+        </s:FormItem>
+        <s:FormItem width="100%" label="Type:" required="true">
+            <components1:SuggestionDropDownListView id="metadataTypeInput"
+                                                    width="220"
+                                                    change="handle_typeChange(event);"
+                                                    defaultChoice="false"
+                                                    url="/experiment-metadata-types"/>
+        </s:FormItem>
+        <s:FormItem width="100%" label="Subproject:" required="true">
+            <components1:SuggestionDropDownListView id="subprojectInput"
+                                                    width="220"
+                                                    change="this.formValidator.validateForm(event);"
+                                                    defaultChoice="false"
+                                                    url="/subprojects/?q=active:equal-to:true"/>
+        </s:FormItem>
+        <s:FormItem id="labelNumberOfReplicates" width="100%"
+                    label="Number of Replicates:" required="true">
+            <s:NumericStepper id="inputNumberOfReplicates" maximum="99"
+                              minimum="1" value="1"/>
+        </s:FormItem>
+        <s:FormItem>
+            <s:HGroup>
+                <s:Button label="Create" click="createMember()"
+                          enabled="{this.formValidator.formIsValid}"/>
+                <s:Button label="Cancel" click="close()"/>
+            </s:HGroup>
+        </s:FormItem>
+
+    </s:Form>
+</views:NewMemberView>

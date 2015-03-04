@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:TitleWindow xmlns:fx="http://ns.adobe.com/mxml/2009"
+			   xmlns:s="library://ns.adobe.com/flex/spark"
+			   xmlns:mx="library://ns.adobe.com/flex/mx"
+			   xmlns:validators="org.helixyte.louice.shared.ui.components.validators.*"
+			   xmlns:view="org.everest.flex.ui.views.*"
+			   xmlns:components="org.everest.flex.ui.components.*"
+			   xmlns:validators1="org.everest.flex.ui.validators.*"
+			   minWidth="500" close="{close()}" title="Generate New Internal Sample Orders">
+	<s:states>
+		<s:State name="lab"/>
+		<s:State name="library"/>
+	</s:states>
+    <fx:Script>
+        <![CDATA[
+			import org.helixyte.louice.modules.isorequestmember.ui.presenters.IsoRequestMemberPresentationModel;
+			import org.helixyte.louice.shared.model.vos.ExperimentMetaDataTypes;
+			
+			import mx.managers.PopUpManager;
+
+            public var _model:IsoRequestMemberPresentationModel;
+
+            // Handle the close button and Cancel button.
+            public function close():void {
+                PopUpManager.removePopUp(this);
+            }
+
+            protected function createIsos(e:Event=null):void{
+                formValidator.validateForm();
+                if(formValidator.formIsValid){
+					var reqLibPlates:String = currentState == 'lab' ? '' : inputReqestedLibraryPlates.text;
+                    _model.generateNewIsos(inputNumberOfIsos.value, inputExcludedRacks.text,  
+											inputRequestedTubes.text, reqLibPlates);
+                    //                    this.close();
+                }
+            }
+			
+			public function set model(model:IsoRequestMemberPresentationModel):void{
+				_model = model;
+				if (model.experiment_metadata.experiment_metadata_type.id == ExperimentMetaDataTypes.LIBRARY) {
+					currentState = 'library';
+				} else {
+					currentState = 'lab';
+				}
+			}
+			
+			[Bindable]
+			public function get model():IsoRequestMemberPresentationModel {
+				return _model;
+			}
+
+        ]]>
+    </fx:Script>
+
+    <fx:Declarations>
+        <fx:Array id="validators">
+            <validators:RackBarcodeValidator property="text" required="false"
+											 source="{inputExcludedRacks}"/>
+            <validators:TubeBarcodeValidator property="text" required="false"
+											 source="{inputRequestedTubes}"/>
+            <validators:RackBarcodeValidator excludeFrom="lab" property="text" required="false"
+											 source="{inputReqestedLibraryPlates}"/>
+        </fx:Array>
+        <validators1:FormValidator id="formValidator" validators="{validators}"/>
+    </fx:Declarations>
+
+    <s:Form id="newMemberForm" width="100%">
+
+        <s:FormItem width="100%" label="Number of ISOs:" required="true">
+            <s:HGroup verticalAlign="middle">
+                <s:NumericStepper id="inputNumberOfIsos" maximum="999" minimum="1" value="1"/>
+                <s:Label fontWeight="bold" text=" (Total: {model.expected_number_isos})"/>
+            </s:HGroup>
+        </s:FormItem>
+
+        <s:FormItem width="100%" label="Excluded Racks:">
+            <s:TextInput id="inputExcludedRacks" prompt="rack barcode, one or csv list"
+								  change="{formValidator.validateForm(event)}"/>
+        </s:FormItem>
+
+        <s:FormItem width="100%" label="Requested Tubes:">
+            <s:TextInput id="inputRequestedTubes" prompt="tube barcode, one or csv list"
+									  change="{formValidator.validateForm(event)}"/>
+        </s:FormItem>
+
+		<s:FormItem excludeFrom="lab" width="100%" label="Requested Library Plates:">
+			<s:TextInput id="inputReqestedLibraryPlates"
+								  change="{formValidator.validateForm(event)}"
+								  prompt="library plate barcode, one or csv list"/>
+		</s:FormItem>
+		
+        <s:FormItem>
+            <s:HGroup>
+                <s:Button label="Create" click="createIsos()"/>
+                <s:Button label="Cancel" click="close()"/>
+            </s:HGroup>
+        </s:FormItem>
+
+    </s:Form>
+</s:TitleWindow>

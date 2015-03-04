@@ -1,0 +1,155 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:TitleWindow xmlns:fx="http://ns.adobe.com/mxml/2009"
+               xmlns:s="library://ns.adobe.com/flex/spark"
+               xmlns:components1="org.everest.flex.ui.components.*"
+               xmlns:maps1="org.everest.flex.maps.*"
+               xmlns:mx="library://ns.adobe.com/flex/mx"
+               xmlns:validators1="org.everest.flex.ui.validators.*"
+               close="close();" title="Edit Sample Volume">
+    <fx:Script>
+        <![CDATA[
+            import org.helixyte.louice.shared.model.vos.TubeMember;
+            import org.helixyte.louice.shared.utils.UnitConvUtils;
+            
+            import mx.binding.utils.BindingUtils;
+            import mx.core.IFlexDisplayObject;
+            import mx.events.CloseEvent;
+            import mx.managers.PopUpManager;
+            
+            import org.everest.flex.events.MemberEvent;
+            import org.everest.flex.events.SuggestionEvent;
+            import org.everest.flex.ui.components.ErrorView;
+            import org.everest.flex.ui.presenters.EntryPresentationModel;
+            import org.everest.flex.ui.views.CollectionView;
+            
+            [Bindable]
+            private var _model:EntryPresentationModel;
+                        
+            private var _tubes:Vector.<Object>;
+            
+            [Bindable]
+            private var _loadedTubeSpecs:Object;
+
+            private var _tubesCollectionView:CollectionView;
+            
+            protected function applyAndClose(event:MouseEvent):void
+            {
+                formValidator.validateForm();
+                var vol:Number = UnitConvUtils.displayedVolumeToStored(Number(inputVolume.text));
+                for each (var mb:TubeMember in _tubes) 
+                {
+					// First, update local member.
+					mb.sample_volume = vol;
+					// Now, create clone for PATCH request.
+					var tubeClone:TubeMember = mb.blank();
+                    tubeClone.sample_volume = vol;
+                    var ev:MemberEvent = new MemberEvent(MemberEvent.EDIT_MEMBER_IN_BACKGROUND);
+                    ev.member = tubeClone;
+					ev.editMode = MemberEvent.EDIT_MODE_UPDATE;
+                    this.parent.dispatchEvent(ev);
+                }
+                this.close();
+            }
+            
+            public function get model():EntryPresentationModel
+            {
+                return _model;
+            }
+            
+            public function set model(value:EntryPresentationModel):void
+            {
+                _model=value;
+                BindingUtils.bindProperty(this, "loadedTubeSpecs", model, "member");
+            }
+            
+            public function set tubes(tubes:Vector.<Object>):void
+            {
+                _tubes = tubes;
+                var tubeSpecsToLoadUrl:String = null
+                for each (var mb:TubeMember in tubes)
+                {
+                    if (tubeSpecsToLoadUrl == null)
+                    {
+                        tubeSpecsToLoadUrl = mb.tube_specs.href;
+                    } else if (mb.tube_specs.href != tubeSpecsToLoadUrl) 
+                    {
+                        ErrorView.show('When editing multiple samples, all \n ' +
+                                       'samples must be in containers of \n ' +
+                                       'the same type!');
+                        close();
+                        return;
+                    }                    
+                }
+                var sugEv:SuggestionEvent = new SuggestionEvent(SuggestionEvent.LOAD_DATA);
+                sugEv.url = tubeSpecsToLoadUrl;
+                this.dispatchEvent(sugEv);
+                setCurrentState("pendingResponse");                    
+            }
+            
+            public function get tubes():Vector.<Object>
+            {
+                return _tubes;
+            }
+            
+            public function set loadedTubeSpecs(item:*):void
+            {
+                if (currentState != "pendingResponse")
+                {
+                    return;
+                }
+                _loadedTubeSpecs = item;
+                setCurrentState("normal");
+            }
+                
+            public static function show(parent:DisplayObject, tubes:Vector.<Object>):IFlexDisplayObject
+            {
+                var p:IFlexDisplayObject = PopUpManager.createPopUp(parent, SampleEditWindow, true);
+                PopUpManager.centerPopUp(p);
+                SampleEditWindow(p).tubes = tubes;
+                return p;
+            }
+
+            public function close():void 
+            {
+                PopUpManager.removePopUp(this);
+            }
+            
+        ]]>
+    </fx:Script>
+    <fx:Declarations>
+        <fx:Array id="validators">
+            <mx:NumberValidator maxValue="{UnitConvUtils.storedVolumeToDisplayed(_loadedTubeSpecs.max_volume)}"
+                                minValue="{UnitConvUtils.storedVolumeToDisplayed(_loadedTubeSpecs.dead_volume)}"
+                                property="text" required="true"
+                                source="{inputVolume}"/>
+        </fx:Array>
+        <validators1:FormValidator id="formValidator" validators="{validators}"/>
+        <maps1:SuggestionEventMap dispatcher="{this}"
+                                  presenter="{EntryPresentationModel}"
+                                  view="{SampleEditWindow}"/>
+    </fx:Declarations>
+    <s:states>
+        <s:State name="normal"/>
+        <s:State name="pendingResponse"/>
+    </s:states>
+    
+    <s:Form width="100%">
+        <s:FormItem width="100%" label="Volume:"
+                    enabled.pendingResponse="false">
+            <s:HGroup>
+                <s:TextInput id="inputVolume"
+                             change="this.formValidator.validateForm(event);"/>
+                <s:BusyIndicator visible="false"
+                                 visible.pendingResponse="true"/>                
+            </s:HGroup>
+        </s:FormItem>
+        
+        <s:FormItem width="100%">
+            <s:HGroup>
+                <s:Button id="ok" label="OK" click="applyAndClose(event)"
+                          enabled="{this.formValidator.formIsValid}"/>
+                <s:Button label="Cancel" click="{close()}"/>
+            </s:HGroup>
+        </s:FormItem>
+    </s:Form>
+</s:TitleWindow>

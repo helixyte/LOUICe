@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Module xmlns:fx="http://ns.adobe.com/mxml/2009"
+		  xmlns:s="library://ns.adobe.com/flex/spark"
+		  xmlns:mx="library://ns.adobe.com/flex/mx"
+		  xmlns:louice="org.helixyte.louice.*"
+		  xmlns:maps1="org.everest.flex.maps.*"
+		  xmlns:views="org.helixyte.louice.modules.moleculedesignpoolmember.ui.views.*"
+		  width="100%" height="100%">
+    <fx:Script>
+        <![CDATA[
+			import org.helixyte.louice.modules.moleculedesignpoolmember.ui.presenters.MoleculeDesignPoolMemberPresentationModel;
+			import org.helixyte.louice.modules.moleculedesignpoolmember.ui.views.MoleculeDesignPoolMemberView;
+			import org.helixyte.louice.shared.model.constants.ContentType;
+			
+			import org.everest.flex.model.managers.MemberManager;
+			
+            
+        ]]>
+    </fx:Script>
+    <fx:Declarations>
+        <maps1:MemberEventMap contentType="{ContentType.MOLECULE_DESIGN_POOL_MEMBER}"
+							  dispatcher="{this}" manager="{MemberManager}"
+							  presenter="{MoleculeDesignPoolMemberPresentationModel}"
+							  view="{MoleculeDesignPoolMemberView}"/>
+    </fx:Declarations>
+
+    <views:MoleculeDesignPoolMemberView width="100%" height="100%"/>
+</s:Module>

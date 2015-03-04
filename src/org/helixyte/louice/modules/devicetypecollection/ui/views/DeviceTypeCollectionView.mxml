@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<views:CollectionView xmlns:fx="http://ns.adobe.com/mxml/2009"
+                     xmlns:s="library://ns.adobe.com/flex/spark"
+                     xmlns:mx="library://ns.adobe.com/flex/mx"
+                     xmlns:louice="org.helixyte.louice.*"
+                    xmlns:view="org.everest.flex.ui.views.*"
+                     title="Device Types" xmlns:views="org.everest.flex.ui.views.*">
+
+    <view:collectionGridColumns>
+            <s:GridColumn headerText="Label"
+                                       dataField="label"/>
+            <s:GridColumn
+                headerText="Total Devices" dataField="devices"
+                itemRenderer="org.everest.flex.ui.renderers.DataGridLinkRenderer" />
+    </view:collectionGridColumns>
+
+</views:CollectionView>

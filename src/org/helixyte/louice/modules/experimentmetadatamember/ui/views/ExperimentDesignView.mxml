@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Group xmlns:fx="http://ns.adobe.com/mxml/2009"
+         xmlns:s="library://ns.adobe.com/flex/spark"
+         xmlns:mx="library://ns.adobe.com/flex/mx"
+         xmlns:rack="org.helixyte.louice.shared.ui.components.rack.*"
+         xmlns:louice="org.helixyte.louice.*">
+
+    <fx:Script>
+        <![CDATA[
+			import org.helixyte.louice.shared.model.vos.ExperimentDesignMember;
+			
+			import mx.collections.ArrayCollection;
+			import mx.events.CollectionEvent;
+			
+			import org.everest.flex.events.NavigationEvent;
+
+            [Bindable]
+            public var tagPredicates:ArrayCollection;
+
+            [Bindable]
+            public var selfLink:String;
+
+            protected function designList_changeHandler(event:Event=null):void
+            {
+                rackViewContainer.visible = false;
+
+                if (designList.selectedIndex > -1)
+                {
+                    var selectedRack:* = designList.selectedItem;
+
+                    if ((selectedRack != null))
+                    {
+                        if (selectedRack.rack_layout.rack_shape != null)
+                        {
+                            rackViewContainer.visible = true;
+                            rackView.tagMap = selectedRack.rack_layout.tagPredicateMap;
+                            rackView.dimension = 
+                                [selectedRack.rack_layout.rack_shape.number_rows,
+                                 selectedRack.rack_layout.rack_shape.number_columns];
+                            rackView.label = 'Design Rack ' + selectedRack.label;
+                            tagForHighlightSelector.refresh();
+                            setCurrentState("normal");
+                        } else {
+                            var dEvt:NavigationEvent = 
+                                new NavigationEvent(NavigationEvent.LOAD_SUBORDINATE_PAGE);
+                            dEvt.pageUrl = selectedRack.rack_layout.href;
+                            dispatchEvent(dEvt);
+                            setCurrentState("busy");
+                        }
+
+                    }
+                }
+
+            }
+
+            public function set experimentDesign(experimentDesign:ExperimentDesignMember):void
+            {
+                if (experimentDesign != null)
+                {
+                    // Refresh the current rack in case the collection has changed.
+                    experimentDesign.experiment_design_racks.addEventListener(
+                        CollectionEvent.COLLECTION_CHANGE, designList_changeHandler);
+                    designList.dataProvider = experimentDesign.experiment_design_racks;
+                } else {
+                    designList.dataProvider = new ArrayCollection();
+                }
+                rackViewContainer.visible = false;                
+            }
+
+            protected function downloadCsvFile(event:MouseEvent):void
+            {
+                var url:String = selfLink + 'experiment-design.csv';
+                navigateToURL(new URLRequest(url));
+            }
+        ]]>
+    </fx:Script>
+    <s:states>
+        <s:State name="normal"/>
+        <s:State name="busy"/>
+    </s:states>
+
+        <s:List id="designList" left="0" top="5" bottom="18" width="170"
+                borderColor="#FFFFFF" borderVisible="false"
+                change="designList_changeHandler(event)"
+                contentBackgroundColor="#FFFFFF" fontWeight="bold"
+                selectionColor="#EBF4FF"
+                enabled.busy="false">
+            <s:itemRenderer>
+                <fx:Component>
+                    <s:ItemRenderer height="28">
+                        <fx:Script>
+                            <![CDATA[
+                                [Bindable]
+                                private var title:String = "";
+
+                                override public function set data(value:Object):void
+                                {
+                                    super.data = value;
+                                    title = 'Design Rack ' + data.label;
+                                }
+                            ]]>
+                        </fx:Script>
+                        <s:Line left="0" right="0" top="0">
+                            <s:stroke>
+                                <s:SolidColorStroke color="#FFFFFF" weight="2"/>
+                            </s:stroke>
+                        </s:Line>
+                        <s:Line left="0" top="0" bottom="0">
+                            <s:stroke>
+                                <s:SolidColorStroke color="#FFFFFF" weight="2"/>
+                            </s:stroke>
+                        </s:Line>
+                        <s:Label paddingLeft="8" paddingTop="8" text="{title}"/>
+                    </s:ItemRenderer>
+                </fx:Component>
+            </s:itemRenderer>
+        </s:List>
+        <s:Button left="0" bottom="6" width="165" label="Design as CSV"
+                  click="downloadCsvFile(event)"
+                  icon="@Embed(source='/assets/icons/download.png')"/>
+    <s:Line left="172" top="5" bottom="0">
+        <s:stroke>
+            <s:SolidColorStroke caps="square" color="#EBF4FF" weight="8"/>
+        </s:stroke>
+    </s:Line>
+
+    <s:HGroup includeIn="busy" left="200" top="20" verticalAlign="middle">
+        <s:BusyIndicator/>
+        <s:Label color="#999999" text="getting plate layout from server .."/>
+    </s:HGroup>
+
+    <s:Group id="rackViewContainer" visible="false" left="187" right="220"
+             top="10" bottom="10">
+        <rack:RackView id="rackView" left="0" right="0" top="0" bottom="0"/>
+    </s:Group>
+
+    <rack:TagForHighlightSelector id="tagForHighlightSelector" right="0"
+                                  width="200" height="100%"
+                                  rackView="{rackView}"
+                                  tagPredicates="{tagPredicates}"/>
+    <s:HGroup visible="{tagPredicates == null}" right="75" top="80"
+              verticalAlign="middle">
+        <s:BusyIndicator/>
+        <s:Label color="#999999" text="getting factors .."/>
+    </s:HGroup>
+
+</s:Group>

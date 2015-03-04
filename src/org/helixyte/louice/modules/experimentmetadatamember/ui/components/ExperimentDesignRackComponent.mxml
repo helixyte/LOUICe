@@ -1,0 +1,167 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:DataGrid xmlns:fx="http://ns.adobe.com/mxml/2009"
+         xmlns:s="library://ns.adobe.com/flex/spark"
+         xmlns:mx="library://ns.adobe.com/flex/mx" visible="false" includeInLayout="false">
+    <fx:Metadata>
+        [Event(name="change", type="flash.events.Event")]
+    </fx:Metadata>
+
+    <fx:Script>
+        <![CDATA[
+            import org.helixyte.louice.modules.experimentmetadatamember.ui.model.StaticTag;
+            import org.helixyte.louice.modules.experimentmetadatamember.ui.model.Tag;
+            import org.everest.flex.events.SuggestionEvent;
+            import org.helixyte.louice.shared.model.vos.ExperimentDesignRackMember;
+            import org.everest.flex.model.Link;
+            import org.everest.flex.ui.presenters.FeedPresentationModel;
+
+            import mx.binding.utils.BindingUtils;
+            import mx.collections.ArrayCollection;
+            import mx.collections.IList;
+
+            [Bindable]
+            public var racks:Array;
+
+            [Bindable]
+            public var tags:ArrayCollection;
+
+            private var _rackTagValues:Object;
+
+            private var _model:FeedPresentationModel;
+
+            public function set model(value:FeedPresentationModel):void
+            {
+                _model = value;
+                BindingUtils.bindProperty(
+                    this, "dataProvider", _model, "members"
+                );
+
+            }
+
+            public function set experimentMetadataLink(link:String):void
+            {
+                loadFeed(link + "experiment-design-racks");
+            }
+
+            protected function loadFeed(url:String):void {
+                var evt:SuggestionEvent;
+                if (url != null) {
+                    evt = new SuggestionEvent(SuggestionEvent.LOAD_DATA);
+                    evt.url = url;
+                    dispatchEvent(evt);
+                }
+            }
+
+            override public function set dataProvider(value:IList):void
+            {
+
+                this.racks = new Array();
+                this.tags = new ArrayCollection();
+                this._rackTagValues = new Object();
+                var dejavu:Object = new Object();
+
+                for each (var rack:* in value)
+                {
+                    var designRack:ExperimentDesignRackMember = new ExperimentDesignRackMember();
+                        designRack.link = new Link(rack.label, rack.selfLink[0]);
+                    this.racks.push(designRack);
+
+                    //extract all tags
+                    for each (var x:* in rack.tags)
+                    {
+                        if (x is Array)
+                        {
+                            for each (var t:* in x)
+                            {
+                                var tag0:Tag = new Tag(t.predicate, t.value);
+                                setRackTagValue(designRack, tag0);
+                                if (dejavu[tag0.predicate] != true)
+                                {
+                                    tags.addItem(tag0);
+                                    dejavu[tag0.predicate] = true;
+                                }
+                            }
+                        } else {
+
+                            var tag:Tag = new Tag(x.predicate, x.value);
+                            setRackTagValue(designRack, tag);
+                            if (dejavu[tag.predicate] != true)
+                            {
+                                tags.addItem(tag);
+                                dejavu[tag.predicate] = true;
+                            }
+
+                        }
+                    }
+                }
+
+                super.dataProvider = value;
+                dispatchEvent(new Event(Event.CHANGE));
+            }
+
+
+            public function generateLabel(designRack:ExperimentDesignRackMember,
+                                          replicate:int,
+                                          prefix:String,
+                                          pattern:IList):String
+            {
+
+                var label:String = "";
+                for each (var entry:Tag in pattern)
+                {
+                    var value:String = null;
+
+                    if (entry is StaticTag)
+                    {
+                        //fill in the static values
+                        value = entry.value;
+                        switch(value)
+                        {
+                            case "PREFIX":
+                            {
+                                value = prefix; break;
+                            }
+                            case "DESIGN-RACK":
+                            {
+                                value = designRack.label; break;
+                            }
+                            case "REP-COUNT":
+                            {
+                                value = String(replicate); break;
+                            }
+                            case "TEXT":
+                            {
+                                value = entry.predicate; break;
+                            }
+                        }
+
+                    } else {
+
+                        //get the tags for this rack
+                        var key:String = designRack.label + "_" + entry.predicate;
+                        value = this._rackTagValues[key];
+                    }
+
+                    label += value ? value : "";
+                }
+
+                return label;
+            }
+
+            protected function setRackTagValue(rack:ExperimentDesignRackMember,
+                                            tag:Tag):void
+            {
+                var key:String = rack.link.title + "_" + tag.predicate;
+
+                if (this._rackTagValues[key] != null)
+                {
+                    this._rackTagValues[key] = this._rackTagValues[key] + ":" + tag.value;
+
+                } else
+                {
+                    this._rackTagValues[key] = tag.value;
+                }
+            }
+        ]]>
+    </fx:Script>
+</s:DataGrid>

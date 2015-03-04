@@ -4,19 +4,18 @@
                xmlns:mx="library://ns.adobe.com/flex/mx"
                xmlns:maps="org.everest.flex.maps.*"
                xmlns:views="org.everest.flex.ui.views.*"
-               xmlns:components="com.cenix.louice.shared.ui.components.*"
+               xmlns:components="org.helixyte.louice.shared.ui.components.*"
                xmlns:local="*"
-               xmlns:louice="com.cenix.louice.*"
-               xmlns:ui="com.cenix.louice.shared.ui.*"
+               xmlns:louice="org.helixyte.louice.*"
                creationComplete="{creationComplete()}"
-               pageTitle="Laboratory Operation User Interface at Cenix"
+               pageTitle="Laboratory Operation User Interface Center"
                scriptTimeLimit="60">
     <fx:Script>
         <![CDATA[
 			import com.adobe.utils.StringUtil;
-			import com.cenix.louice.shared.model.constants.AppHostPort;
-			import com.cenix.louice.shared.model.vos.UserMember;
-			import com.cenix.louice.shared.utils.CurrentUserManager;
+			import org.helixyte.louice.shared.model.constants.AppHostPort;
+			import org.helixyte.louice.shared.model.vos.UserMember;
+			import org.helixyte.louice.shared.utils.CurrentUserManager;
 			
 			import mx.events.BrowserChangeEvent;
 			import mx.managers.BrowserManager;
@@ -28,7 +27,7 @@
 			import org.everest.flex.model.ContentType;
 			import org.everest.flex.ui.components.HTMLToolTip;
 
-            public static const VERSION:String = "1.8.dev";
+            public static const VERSION:String = "1.9.dev";
 			public var RELEASE_QUALIFIER:String = '';
 			public var TRAC_BASE_URL:String = '';
 

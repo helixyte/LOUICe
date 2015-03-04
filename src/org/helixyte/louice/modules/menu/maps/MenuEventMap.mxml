@@ -1,0 +1,251 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LocalEventMap xmlns="http://mate.asfusion.com/"
+               xmlns:fx="http://ns.adobe.com/mxml/2009"
+               xmlns:s="library://ns.adobe.com/flex/spark"
+               xmlns:mx="library://ns.adobe.com/flex/mx"
+               cache="local" xmlns:vos="org.helixyte.louice.modules.menu.model.vos.*" xmlns:utils="org.everest.flex.utils.*">
+    <fx:Script>
+        <![CDATA[
+            import com.asfusion.mate.actionLists.IScope;
+            import org.helixyte.louice.modules.menu.model.managers.MenuManager;
+            import org.helixyte.louice.modules.menu.ui.presenters.MenuPresentationModel;
+            import org.helixyte.louice.modules.menu.ui.views.MenuView;
+            import org.helixyte.louice.shared.model.constants.ContentType;
+            import org.helixyte.louice.shared.model.vos.IsoRequestMember;
+            
+            import mx.core.FlexGlobals;
+            
+            import org.everest.flex.events.DocumentEvent;
+            import org.everest.flex.events.RestFaultEvent;
+            import org.everest.flex.model.ResourceState;
+
+            private function stopDocumentLoadedHandler(scope:IScope):Boolean
+            {
+                return (DocumentEvent(scope.event).document.type !=
+                    org.everest.flex.model.ContentType.APP_SERVICE);
+            }
+
+            private function getIsoOwnerFilter():String
+            {
+                if(FlexGlobals.topLevelApplication.currentUser != null){
+                    var username:String = 
+                        FlexGlobals.topLevelApplication.currentUser.directory_user_id;                    
+                    return '"' + IsoRequestMember.STOCKMANAGEMENT_USER + 
+                           '","' + username + '"';
+                } else {
+                    return '';
+                }
+            }
+        ]]>
+    </fx:Script>
+    <fx:Declarations>
+        <Debugger level="{Debugger.ALL}" />
+
+        <!-- /////////////////////////////////////////////////////////////////////////////////////// -->
+        <!-- MENU ENTRIES-->
+        <fx:Array id="menuItems">
+            <vos:MenuItem uid="1"
+                          url="/locations/"
+                          title="Locations"
+                          description="Manage locations where racks are held"
+                          imageUrl="assets/icons/menu/locations.png"
+                          contentType="{ContentType.LOCATION_COLLECTION}"
+                          />
+
+            <vos:MenuItem uid="2"
+                          url="/item-statuses/"
+                          title="Item Statuses"
+                          description="Manage item statuses"
+                          imageUrl="assets/icons/menu/item-statuses.png"
+                          contentType="{ContentType.ITEM_STATUS_COLLECTION}" />
+
+            <vos:MenuItem uid="3"
+                          url="/species/"
+                          title="Species"
+                          description="Manage species"
+                          imageUrl="assets/icons/menu/species.png"
+                          contentType="{ContentType.SPECIES_COLLECTION}" />
+
+            <vos:MenuItem uid="4"
+                          url="/rack-shapes/"
+                          title="Rack Shapes"
+                          description="Rack shapes"
+                          imageUrl="assets/icons/menu/rack-shapes.png"
+                          contentType="{ContentType.RACK_SHAPE_COLLECTION}" />
+
+            <vos:MenuItem uid="5"
+                          url="/rack-specs/"
+                          title="Rack Specs"
+                          description="Manage rack specifications"
+                          imageUrl="assets/icons/menu/rack-specs.png"
+                          contentType="{ContentType.RACK_SPECS_COLLECTION}" />
+
+            <vos:MenuItem uid="6"
+                          url="/location-types/"
+                          title="Location Types"
+                          description="Manage location types"
+                          imageUrl="assets/icons/menu/location-types.png"
+                          contentType="{ContentType.LOCATION_TYPE_COLLECTION}" />
+
+            <vos:MenuItem uid="7"
+                          url="/device-types/"
+                          title="Device Types"
+                          description="Manage device types"
+                          imageUrl="assets/icons/menu/device-types.png"
+                          contentType="{ContentType.DEVICE_TYPE_COLLECTION}" />
+
+            <vos:MenuItem uid="8"
+                          url="/container-specs/"
+                          title="Container Specs"
+                          description="Manage container specifications"
+                          imageUrl="assets/icons/menu/container-specs.png"
+                          contentType="{ContentType.CONTAINER_SPECS_COLLECTION}" />
+
+            <vos:MenuItem uid="9"
+                          url="/experiment-metadatas/"
+                          title="Experiment Metadata"
+                          description="Manage the experiment metadata"
+                          imageUrl="assets/icons/menu/experiment-metadatas.png"
+                          contentType="{ContentType.EXPERIMENT_METADATA_COLLECTION}" />
+
+       <!--     <vos:MenuItem uid="10"
+                          url="/experiment-jobs/?q=job-type:equal-to:'http://thelma/job-types/rnai-experiment/'"
+                          title="Experiment Jobs"
+                          description="Manage experiment jobs"
+                          imageUrl="assets/icons/menu/jobs.png"
+                          contentType="{ContentType.EXPERIMENT_JOB_COLLECTION}" />
+-->
+            <vos:MenuItem uid="11"
+                          url="/molecule-types/"
+                          title="Molecule Types"
+                          description="Manage molecule types"
+                          imageUrl="assets/icons/menu/molecule-types.png"
+                          contentType="{ContentType.MOLECULE_TYPE_COLLECTION}" />
+
+
+            <vos:MenuItem uid="12"
+                          url="/genes/"
+                          title="Genes"
+                          description="Manage Genes"
+                          imageUrl="assets/icons/menu/genes.png"
+                          prefetch="false"
+                          contentType="{ContentType.GENE_COLLECTION}" />
+
+            <vos:MenuItem uid="13"
+                          url="/racks/"
+                          title="Racks"
+                          description="Manage tube racks and plates"
+                          imageUrl="assets/icons/menu/racks.png"
+                          prefetch="false"
+                          contentType="{ContentType.RACK_COLLECTION}" />
+
+
+            <vos:MenuItem uid="14"
+                          url="/projects/"
+                          title="Projects"
+                          description="Manage Projects"
+                          imageUrl="assets/icons/menu/projects.png"
+                          contentType="{ContentType.PROJECT_COLLECTION}" />
+
+            <vos:MenuItem uid="15"
+                          url="/organizations/"
+                          title="Organizations"
+                          description="Manage Organizations"
+                          imageUrl="assets/icons/menu/organizations.png"
+                          contentType="{ContentType.ORGANIZATION_COLLECTION}" />
+
+
+            <vos:MenuItem uid="16"
+                          url="/stock-info/"
+                          title="Stock Info"
+                          description="Stock related information"
+                          imageUrl="assets/icons/menu/stock-info.png"
+                          prefetch="false"
+                          contentType="{ContentType.STOCK_INFO_COLLECTION}" />
+
+
+            <vos:MenuItem uid="17"
+                          url="/devices/"
+                          title="Devices"
+                          description="Manage devices"
+                          imageUrl="assets/icons/menu/devices.png"
+                          contentType="{ContentType.DEVICE_COLLECTION}" />
+
+<!--            <vos:MenuItem uid="18"
+                          url="/molecule-designs/"
+                          title="Molecule Designs"
+                          description="Manage molecule designs"
+                          imageUrl="assets/icons/menu/molecule-designs.png"
+                          prefetch="false"
+                          contentType="{ContentType.MOLECULE_DESIGN_COLLECTION}" />
+-->
+			<vos:MenuItem uid="18"
+						  url="/molecule-design-pools/"
+						  title="Molecule Design Pools"
+						  description="Manage molecule design pools"
+						  imageUrl="assets/icons/menu/molecule-designs.png"
+						  prefetch="false"
+						  contentType="{ContentType.MOLECULE_DESIGN_POOL_COLLECTION}" />
+			
+            <vos:MenuItem uid="19"
+                          url="/tubes/"
+                          title="Tubes"
+                          description="Manage 2D barcoded tubes"
+                          imageUrl="assets/icons/menu/tubes.png"
+                          prefetch="false"
+                          contentType="{ContentType.TUBE_COLLECTION}" />
+
+            <vos:MenuItem uid="20"
+                          url="{'/lab-iso-requests/?q=owner:contains:' + getIsoOwnerFilter()}"
+                          title="ISO Requests"
+                          description="Manage ISO Requests"
+                          imageUrl="assets/icons/menu/iso-requests.png"
+                          prefetch="true"
+                          contentType="{ContentType.ISO_REQUEST_COLLECTION}" />
+
+            <vos:MenuItem uid="21"
+                          url="/barcodes/"
+                          title="Label Print"
+                          description="Print barcode and text labels"
+                          imageUrl="assets/icons/menu/barcodes.png"
+                          prefetch="false"
+                          contentType="{ContentType.BARCODE_PRINT_JOB_COLLECTION}" />
+        </fx:Array>
+
+
+        <EventHandlers type="{DocumentEvent.DOCUMENT_LOADED}"
+                       dispatcherType="global"
+                       start="trace('* MenuEventMap :: Start of DocumentEvent.DOCUMENT_LOADED handling!')"
+                       end="trace('* MenuEventMap :: End of DocumentEvent.DOCUMENT_LOADED handling!')">
+            <MethodInvoker generator="{MenuManager}"
+                           method="loadMenuItems"
+                           arguments="{[menuItems]}" />
+        </EventHandlers>
+
+        <EventHandlers type="{RestFaultEvent.ERROR}"
+                       dispatcherType="global"
+                       start="trace('* MenuEventMap :: Start of MessageEvent.ERROR handling!')"
+                       end="trace('* MenuEventMap :: End of MessageEvent.ERROR handling!')">
+            <MethodInvoker generator="{MenuPresentationModel}"
+                           method="updateViewState"
+                           arguments="{ResourceState.PENDING_REQUEST}" />
+        </EventHandlers>
+
+        <!-- Injectors -->
+        <Injectors target="{MenuView}"
+                   start="trace('* Start of MenuView injections!')"
+                   end="trace('* End of MenuView injections!')">
+            <ObjectBuilder generator="{MenuManager}" cache="local"/>
+            <ObjectBuilder generator="{MenuPresentationModel}"
+                           constructorArguments="{scope.dispatcher}" />
+            <PropertyInjector targetKey="model" source="{lastReturn}" />
+        </Injectors>
+
+        <Injectors target="{MenuPresentationModel}"
+                   start="trace('* Start of MenuPresentationModel injections!')"
+                   end="trace('* End of MenuPresentationModel injections!')">
+            <PropertyInjector targetKey="menuItems" source="{MenuManager}"
+                              sourceKey="menuItems" />
+        </Injectors>
+    </fx:Declarations>
+</LocalEventMap>

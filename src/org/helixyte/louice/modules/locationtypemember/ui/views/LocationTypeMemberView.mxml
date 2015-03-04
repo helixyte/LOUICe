@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<views1:MemberView xmlns:fx="http://ns.adobe.com/mxml/2009"
+                   xmlns:s="library://ns.adobe.com/flex/spark"
+                   xmlns:mx="library://ns.adobe.com/flex/mx"
+                   xmlns:louice="org.helixyte.louice.*"
+                   xmlns:view="org.everest.flex.ui.views.*"
+                   xmlns:views1="org.everest.flex.ui.views.*"
+                   width="100%" height="100%"
+                   title="{'Location Type: ' + model.title}">
+
+    <view:content>
+        <s:Form width="100%">
+            <s:FormItem width="100%" label="name">
+                <s:Label text="{model.name}"/>
+            </s:FormItem>
+        </s:Form>
+    </view:content>
+<!--
+    <view:additionalContent>
+        <s:Label fontWeight="bold" text="Associated locations:"/>
+            <components:DataGrid width="100%" height="100%" dataProvider="{model.locations}" >
+                <components:columns>
+                    <s:ArrayList>
+                <s:GridColumn dataField="barcode" headerText="Barcode"/>
+                <s:GridColumn dataField="label" headerText="Label"/>
+                <s:GridColumn dataField="type" headerText="Type"/>
+                <s:GridColumn dataField="device" headerText="Device"
+                                           itemRenderer="org.helixyte.louice.shared.ui.renderers.DataGridLinkRenderer"/>
+                <s:GridColumn dataField="index" headerText="Device Index"/>
+                <s:GridColumn dataField="rack" headerText="Rack"
+                                           itemRenderer="org.helixyte.louice.shared.ui.renderers.DataGridLinkRenderer"/>
+                </s:ArrayList>
+            </components:columns>
+        </components:DataGrid>
+    </view:additionalContent>
+-->
+</views1:MemberView>

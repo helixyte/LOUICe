@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<views:CollectionView xmlns:fx="http://ns.adobe.com/mxml/2009"
+                     xmlns:s="library://ns.adobe.com/flex/spark"
+                     xmlns:mx="library://ns.adobe.com/flex/mx"
+                    xmlns:view="org.everest.flex.ui.views.*"
+                     title="Location Types" xmlns:views="org.everest.flex.ui.views.*">
+
+    <view:collectionGridColumns>
+        <s:GridColumn headerText="Name" dataField="name"/>
+     <!--   <s:GridColumn headerText="Total Locations" dataField="locations"
+                                   itemRenderer="org.helixyte.louice.shared.ui.renderers.DataGridLinkRenderer"/> -->
+    </view:collectionGridColumns>
+</views:CollectionView>

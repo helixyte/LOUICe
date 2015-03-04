@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:HGroup xmlns:fx="http://ns.adobe.com/mxml/2009"
+		  xmlns:s="library://ns.adobe.com/flex/spark"
+		  xmlns:mx="library://ns.adobe.com/flex/mx"
+		  xmlns:louice="org.helixyte.louice.*"
+		  verticalAlign="middle">
+
+    <fx:Script>
+        <![CDATA[
+			import mx.core.FlexGlobals;
+
+			[Bindable]
+            public var ticketNumber:String;
+			
+            protected function button_clickHandler(event:MouseEvent):void
+            {
+                navigateToURL( new URLRequest(FlexGlobals.topLevelApplication.TRAC_BASE_URL + 'ticket/' + ticketNumber));
+            }
+        ]]>
+    </fx:Script>
+    <s:Image source="@Embed(source='/assets/icons/trac.png')"/>
+    <s:Button id="button" label="{ticketNumber}" click="button_clickHandler(event)"
+			  skinClass="org.everest.flex.ui.skins.LinkButtonSkin"/>
+</s:HGroup>

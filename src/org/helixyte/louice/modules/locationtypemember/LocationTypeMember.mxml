@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Module xmlns:fx="http://ns.adobe.com/mxml/2009"
+           xmlns:s="library://ns.adobe.com/flex/spark"
+           xmlns:mx="library://ns.adobe.com/flex/mx"
+           
+           xmlns:views="org.helixyte.louice.modules.locationtypemember.ui.views.*"
+           width="100%" height="100%" xmlns:maps1="org.everest.flex.maps.*">
+    <fx:Script>
+        <![CDATA[
+            import org.helixyte.louice.modules.locationtypemember.ui.presenters.LocationTypeMemberPresentationModel;
+            import org.helixyte.louice.shared.model.constants.ContentType;
+        ]]>
+    </fx:Script>
+    <fx:Declarations>
+        <maps1:MemberEventMap
+            dispatcher="{this}"
+            contentType="{ContentType.LOCATION_TYPE_MEMBER}"
+            presenter="{LocationTypeMemberPresentationModel}"
+            view="{LocationTypeMemberView}"
+            />
+    </fx:Declarations>
+
+    <views:LocationTypeMemberView width="100%" height="100%"/>
+</s:Module>

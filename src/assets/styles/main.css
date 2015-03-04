@@ -1,11 +1,12 @@
 @namespace s "library://ns.adobe.com/flex/spark";
 @namespace mx "library://ns.adobe.com/flex/mx";
-@namespace rack "com.cenix.louice.shared.ui.components.rack.*";
-@namespace components "com.cenix.louice.shared.ui.components.*";
+@namespace rack "org.helixyte.louice.shared.ui.components.rack.*";
+@namespace components "org.helixyte.louice.shared.ui.components.*";
 @namespace controls "ws.tink.mx.controls.*";
-@namespace view "com.cenix.louice.shared.ui.view.*";
+@namespace view "org.helixyte.louice.shared.ui.view.*";
 @namespace views "org.everest.flex.ui.views.*";
 @namespace components1 "org.everest.flex.ui.components.*";
+@namespace rack1 "org.helixyte.louice.shared.ui.components.rack.*";
 
 global
 {
@@ -63,7 +64,7 @@ components1|HTMLToolTip
     font-size: 12px;
 }
 
-rack|RackViewLabel
+rack1|RackViewLabel
 {
     /*skin-class: ClassReference("skin.RackViewLabelSkin");*/
     textAlign: center;
